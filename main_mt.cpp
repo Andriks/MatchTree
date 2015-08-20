@@ -7,19 +7,17 @@
 
 #include <QtQml>
 
-#include "controller.h"
-
+#include "tilesmodel.h"
 
 int main(int argc, char *argv[])
 {
-
     QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
-    engine.load(QUrl(QStringLiteral("qrc:/mt_main.qml")));
+    engine.load(QUrl(QStringLiteral("qrc:/main_mt.qml")));
 
-    Controller controller(engine.rootObjects()[0]);
-    engine.rootContext()->setContextProperty("controller", &controller);
+    TilesModel model;
+    engine.rootContext()->setContextProperty("dataModel", &model);
 
     return app.exec();
 }

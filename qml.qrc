@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
-        <file>mt_main.qml</file>
+        <file>main_mt.qml</file>
+        <file>TileForm.qml</file>
     </qresource>
 </RCC>

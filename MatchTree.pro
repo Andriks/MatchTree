@@ -3,8 +3,9 @@ TEMPLATE = app
 QT += qml quick widgets
 
 SOURCES += \
-    controller.cpp \
-    mt_main.cpp
+    tile.cpp \
+    tilesmodel.cpp \
+    main_mt.cpp
 
 RESOURCES += qml.qrc
 
@@ -15,4 +16,6 @@ QML_IMPORT_PATH =
 include(deployment.pri)
 
 HEADERS += \
-    controller.h
+    tile.h \
+    common_types.h \
+    tilesmodel.h
