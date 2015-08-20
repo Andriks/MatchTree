@@ -3,12 +3,8 @@
 
 #include <QObject>
 #include <QString>
+#include <QPoint>
 
-enum TileColor {
-    YELLOW,
-    GREEN,
-    BLUE
-};
 
 #endif // COMMON_TYPES
 

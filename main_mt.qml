@@ -28,7 +28,6 @@ ApplicationWindow {
 
             interactive: false
 
-
             move: Transition {
                 NumberAnimation { properties: "x,y"; duration: 800; easing.type: Easing.OutBounce }
             }
@@ -39,6 +38,8 @@ ApplicationWindow {
                 height: view.cellHeight
                 width: view.cellWidth
                 TileForm {
+                    id: tile
+
                     anchors.margins: 5
                     radius: 15
                     anchors.fill: parent
@@ -52,7 +53,7 @@ ApplicationWindow {
 
                     MouseArea {
                         anchors.fill: parent
-//                        onClicked: dataModel.moveCell(model.index)
+                        onClicked: dataModel.moveTile(model.index)
                     }
                 }
             }
