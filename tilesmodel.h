@@ -21,7 +21,7 @@ class TilesModel : public QAbstractListModel
     };
 
 public:
-    TilesModel(QObject *parent = 0);
+    static TilesModel *Instance();
 
     // for QML Engine
     int rowCount(const QModelIndex & parent = QModelIndex()) const;
@@ -40,11 +40,22 @@ public slots:
     int getHeight();
     void setHeight(const int);
 
+private:
+    TilesModel();
+    TilesModel(const TilesModel&);
+    TilesModel& operator=(const TilesModel&);
+
 
 private:
+
+
     std::vector<Tile *> data_list_;
+
     int width_;
     int height_;
+    int element_score_;
+    int min_scores_;
+    int max_moves_;
 };
 
 #endif // TILESMODEL_H

@@ -4,8 +4,7 @@
 
 
 
-TilesModel::TilesModel(QObject *parent) :
-    QAbstractListModel(parent),
+TilesModel::TilesModel() :
     width_(10),
     height_(15)
 {
@@ -27,6 +26,12 @@ TilesModel::TilesModel(QObject *parent) :
             break;
         }
     }
+}
+
+TilesModel *TilesModel::Instance()
+{
+    static TilesModel theSingleInstance;
+    return &theSingleInstance;
 }
 
 int TilesModel::rowCount(const QModelIndex & parent) const {
