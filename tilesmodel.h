@@ -4,10 +4,11 @@
 #include <QAbstractListModel>
 
 #include <vector>
-#include <exception>
 
 #include "common_types.h"
 #include "tile.h"
+
+
 
 class TilesModel : public QAbstractListModel
 {
@@ -57,15 +58,6 @@ public:
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
     QHash<int, QByteArray> roleNames() const;
 
-    // for game logic
-    bool able_to_move(Cell);
-    std::vector<Cell> cellsToMove(Cell);
-
-    std::vector<std::vector<Cell> > findMatches() const;
-
-    void swapCells(const int, const int);
-    void swapCells(const Cell&, const Cell&);
-
 
 signals:
     void widthChanged();
@@ -73,6 +65,7 @@ signals:
 
 
 public slots:
+    void someSlot();
     void moveTile(int);
 
     int getWidth();
@@ -81,11 +74,23 @@ public slots:
     int getHeight();
     void setHeight(const int);
 
+
 private:
     TilesModel();
     TilesModel(const TilesModel&);
     TilesModel& operator=(const TilesModel&);
 
+    // for game logic
+    bool able_to_move(Cell);
+    std::vector<Cell> cellsToMove(Cell);
+
+    std::vector<std::vector<Tile *> > findMatches() const;
+    void removeMatches();
+
+    void swapCells(const int, const int);
+    void swapCells(const Cell&, const Cell&);
+
+    QString getRandType();
 
 private:
     std::vector<Tile *> data_list_;

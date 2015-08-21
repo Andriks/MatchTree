@@ -29,7 +29,10 @@ ApplicationWindow {
             interactive: false
 
             move: Transition {
-                NumberAnimation { properties: "x,y"; duration: 1500; easing.type: Easing.OutBounce }
+                SequentialAnimation {
+                //ParallelAnimation {
+                    NumberAnimation { properties: "x,y"; duration: 1000; easing.type: Easing.OutBounce }
+                }
             }
 
             delegate: Item {
@@ -49,7 +52,7 @@ ApplicationWindow {
                     opacity: model.opacity
 
                     Behavior on opacity {
-                        NumberAnimation { duration: 1500; }
+                        NumberAnimation { duration: 1000; }
                     }
 
                     Text {
@@ -73,6 +76,10 @@ ApplicationWindow {
     menuBar: MenuBar {
         Menu {
             title: qsTr("&File")
+            MenuItem {
+                text: qsTr("test")
+                onTriggered: dataModel.someSlot()
+            }
             MenuItem {
                 text: qsTr("&Open")
                 onTriggered: messageDialog.show(qsTr("Open action triggered"));

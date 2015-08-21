@@ -1,8 +1,11 @@
 #include "tilesmodel.h"
 
 #include <QDebug>
+#include <QTimer>
+#include <QThread>
 
 #include <cmath>
+
 
 int TilesModel::Cell::width_(0);
 int TilesModel::Cell::height_(0);
@@ -68,7 +71,7 @@ void TilesModel::Cell::setStaticParams(int width, int height)
 
 
 TilesModel::TilesModel() :
-    width_(5),
+    width_(6),
     height_(8),
     draged_cell_()
 {
@@ -77,22 +80,26 @@ TilesModel::TilesModel() :
     int dim_size = width_ * height_;
 
     for (int i = 0; i < dim_size; i++) {
-        int tile_type = std::rand() % 3;
-        switch (tile_type) {
-        case 0:
-            data_list_.push_back(new Tile(this, "rectangle", "yellow", 1));
-            break;
-        case 1:
-            data_list_.push_back(new Tile(this, "triangle", "green", 1));
-            break;
-        case 2:
-            data_list_.push_back(new Tile(this, "circle", "blue", 1));
-            break;
-        default:
-            break;
-        }
+        QString rand_type = getRandType();
+        data_list_.push_back(new Tile(this, rand_type, rand_type, i, 1));
     }
 }
+
+QString TilesModel::getRandType()
+{
+    int tile_type = std::rand() % 3;
+    switch (tile_type) {
+    case 0:
+        return "yellow";
+    case 1:
+        return "green";
+    case 2:
+        return "blue";
+    default:
+        return "";
+    }
+}
+
 
 TilesModel *TilesModel::Instance()
 {
@@ -135,6 +142,13 @@ QHash<int, QByteArray> TilesModel::roleNames() const {
     roles[OpacityRole] = "opacity";
 
     return roles;
+}
+
+void TilesModel::someSlot()
+{
+    for (int i = 0; i < 4; i++) {
+        swapCells(i, i+1);
+    }
 }
 
 bool TilesModel::able_to_move(Cell target_cell)
@@ -180,29 +194,28 @@ std::vector<TilesModel::Cell> TilesModel::cellsToMove(TilesModel::Cell p)
     return res;
 }
 
-std::vector<std::vector<TilesModel::Cell> > TilesModel::findMatches() const
+std::vector<std::vector<Tile *> > TilesModel::findMatches() const
 {
-    std::vector<std::vector<Cell> > res;
-    std::vector<Cell> one_match;
+    std::vector<std::vector<Tile *> > res;
+    std::vector<Tile *> one_match;
 
     // vertical matches
     for (int col = 1; col <= width_; col++) {
-        one_match.push_back(Cell(1, col));
+        one_match.push_back(data_list_[Cell(1, col).getIndex()]);
 
         for (int row = 2; row <= height_; row++) {
             Cell cell(row, col);
-            Cell last_cell = one_match[one_match.size() - 1].getIndex();
-            Tile *last_tile = data_list_[last_cell.getIndex()];
+            Tile *last_tile = one_match[one_match.size() - 1];
 
             if (last_tile->getType() == data_list_[cell.getIndex()]->getType()) {
-                one_match.push_back(cell);
+                one_match.push_back(data_list_[cell.getIndex()]);
             } else {
                 if (one_match.size() >= 3) {
                     res.push_back(one_match);
                 }
 
                 one_match.clear();
-                one_match.push_back(cell);
+                one_match.push_back(data_list_[cell.getIndex()]);
             }
         }
 
@@ -214,22 +227,21 @@ std::vector<std::vector<TilesModel::Cell> > TilesModel::findMatches() const
 
     // horisontal matches
     for (int row = 1; row <= height_; row++) {
-        one_match.push_back(Cell(row, 1));
+        one_match.push_back(data_list_[Cell(row, 1).getIndex()]);
 
         for (int col = 2; col <= width_; col++) {
             Cell cell(row, col);
-            Cell last_cell = one_match[one_match.size() - 1].getIndex();
-            Tile *last_tile = data_list_[last_cell.getIndex()];
+            Tile *last_tile = one_match[one_match.size() - 1];
 
             if (last_tile->getType() == data_list_[cell.getIndex()]->getType()) {
-                one_match.push_back(cell);
+                one_match.push_back(data_list_[cell.getIndex()]);
             } else {
                 if (one_match.size() >= 3) {
                     res.push_back(one_match);
                 }
 
                 one_match.clear();
-                one_match.push_back(cell);
+                one_match.push_back(data_list_[cell.getIndex()]);
             }
         }
 
@@ -240,6 +252,48 @@ std::vector<std::vector<TilesModel::Cell> > TilesModel::findMatches() const
     }
 
     return res;
+}
+
+void TilesModel::removeMatches()
+{
+    std::vector< std::vector<Tile *> > matches_list = findMatches();
+    std::vector< std::vector<Tile *> >::iterator it1;
+
+    while (matches_list.size()) {
+
+        for (it1 = matches_list.begin(); it1 != matches_list.end(); it1++) {
+            std::vector<Tile *>::iterator it2;
+            for (it2 = it1->begin(); it2 != it1->end(); it2++) {
+                Cell curr_cell = Cell((*it2)->getIndex());
+                Cell upper_cell(curr_cell.row - 1, curr_cell.col);
+
+                beginResetModel();
+                data_list_[curr_cell.getIndex()]->setOpacity(0.5);
+                endResetModel();
+
+                while (upper_cell.valid()) {
+                    if (data_list_[upper_cell.getIndex()]->getOpacity() != 1)
+                        break;
+
+                    swapCells(curr_cell, upper_cell);
+
+                    curr_cell = upper_cell;
+                    upper_cell.row -= 1;
+                }
+
+                delete data_list_[curr_cell.getIndex()];
+                QString rand_type = getRandType();
+
+                beginResetModel();
+                data_list_[curr_cell.getIndex()] = new Tile(this, rand_type, rand_type, curr_cell.getIndex(), 1);
+                endResetModel();
+            }
+        }
+
+        matches_list.clear();
+        matches_list = findMatches();
+    }
+
 }
 
 void TilesModel::swapCells(const int from, const int to)
@@ -267,7 +321,17 @@ void TilesModel::swapCells(const int from, const int to)
 
     }
 
+//    qDebug() << data_list_[from]->getIndex() << "  " << data_list_[from]->getColor() << " | " << data_list_[to]->getIndex()<< "  " << data_list_[to]->getColor();
+
     std::swap(data_list_[from], data_list_[to]);
+    int tmp_index = data_list_[from]->getIndex();
+    data_list_[from]->setIndex(data_list_[to]->getIndex());
+    data_list_[to]->setIndex(tmp_index);
+
+    //QTimer::singleShot(1000);
+//    QThread::sleep(1);
+
+//    qDebug() << data_list_[from]->getIndex() << "  " << data_list_[from]->getColor() << " | " << data_list_[to]->getIndex()<< "  " << data_list_[to]->getColor();
 }
 
 void TilesModel::swapCells(const TilesModel::Cell &from, const TilesModel::Cell &to)
@@ -278,55 +342,18 @@ void TilesModel::swapCells(const TilesModel::Cell &from, const TilesModel::Cell 
 
 void TilesModel::moveTile(int index)
 {
-    std::vector< std::vector<Cell> > tmp = findMatches();
-    std::vector< std::vector<Cell> >::iterator it1;
+    Cell curr_cell(index);
 
-    for (it1 = tmp.begin(); it1 != tmp.end(); it1++) {
-        std::vector<Cell>::iterator it2;
-        for (it2 = it1->begin(); it2 != it1->end(); it2++) {
-            Cell curr_cell((*it2));
-
-            beginResetModel();
-            data_list_[curr_cell.getIndex()]->setOpacity(0.5);
-            endResetModel();
+    if (!draged_cell_.valid()) {
+        draged_cell_ = Cell(index);
+    } else {
+        if (able_to_move(curr_cell)) {
+            swapCells(draged_cell_, curr_cell);
+            removeMatches();
         }
+
+        draged_cell_ = Cell();
     }
-
-    for (it1 = tmp.begin(); it1 != tmp.end(); it1++) {
-        std::vector<Cell>::iterator it2;
-        for (it2 = it1->begin(); it2 != it1->end(); it2++) {
-            Cell curr_cell((*it2));
-            Cell upper_cell(curr_cell.row - 1, curr_cell.col);
-
-            if (data_list_[curr_cell.getIndex()]->getOpacity() == 1)
-                continue;
-
-            while (upper_cell.valid()) {
-                if (data_list_[upper_cell.getIndex()]->getOpacity() != 1)
-                    break;
-
-                swapCells(curr_cell, upper_cell);
-
-                curr_cell = upper_cell;
-                upper_cell.row -= 1;
-            }
-        }
-    }
-
-
-
-
-//    Cell curr_cell(index);
-
-//    if (!draged_cell_.valid()) {
-//        draged_cell_ = Cell(index);
-//    } else {
-//        if (able_to_move(curr_cell)) {
-//            swapCells(draged_cell_, curr_cell);
-//        }
-
-//        draged_cell_ = Cell();
-//    }
 
 }
 
