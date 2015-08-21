@@ -1,11 +1,22 @@
 #include "tile.h"
 
-Tile::Tile(QObject *parent, QString color, QString type) :
+Tile::Tile(QObject *parent, QString type, QString color, int opacity) :
     QObject(parent),
+    type_(type),
     color_(color),
-    type_(type)
+    opacity_(opacity)
 {
 
+}
+
+QString Tile::getType() const
+{
+    return type_;
+}
+
+void Tile::setType(const QString &type)
+{
+    type_ = type;
 }
 
 QString Tile::getColor() const
@@ -13,8 +24,23 @@ QString Tile::getColor() const
     return color_;
 }
 
-QString Tile::getType() const
+void Tile::setColor(const QString &color)
 {
-    return type_;
+    color_ = color;
 }
+
+float Tile::getOpacity() const
+{
+    return opacity_;
+}
+
+void Tile::setOpacity(const float &opacity)
+{
+    opacity_ = opacity;
+}
+
+
+
+
+
 

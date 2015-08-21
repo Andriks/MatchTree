@@ -17,8 +17,9 @@ class TilesModel : public QAbstractListModel
 
     ///////////////////////////////////////////////////////
     enum TileElemRoles {
-        ColorRole = Qt::UserRole + 1,
-        TypeRole
+        TypeRole = Qt::UserRole + 1,
+        ColorRole,
+        OpacityRole
     };
 
     ///////////////////////////////////////////////////////
@@ -26,8 +27,8 @@ class TilesModel : public QAbstractListModel
     {
     public:
         Cell();
+        Cell(const Cell &cell);
         Cell(int r, int c);
-        Cell(const TilesModel::Cell &cell);
         Cell(int index);
 
         bool operator ==(const Cell);
@@ -37,7 +38,8 @@ class TilesModel : public QAbstractListModel
 
         static void setStaticParams(int width, int height);
 
-    //private:
+    // no need to do setter/getter for such simle private class
+    public:
         int row;
         int col;
 
@@ -59,16 +61,16 @@ public:
     bool able_to_move(Cell);
     std::vector<Cell> cellsToMove(Cell);
 
-    std::vector< std::vector<Cell> > findMatches() const;
+    std::vector<std::vector<Cell> > findMatches() const;
 
     void swapCells(const int, const int);
     void swapCells(const Cell&, const Cell&);
 
 
-
 signals:
     void widthChanged();
     void heightChanged();
+
 
 public slots:
     void moveTile(int);

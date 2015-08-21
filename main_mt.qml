@@ -29,7 +29,7 @@ ApplicationWindow {
             interactive: false
 
             move: Transition {
-                NumberAnimation { properties: "x,y"; duration: 800; easing.type: Easing.OutBounce }
+                NumberAnimation { properties: "x,y"; duration: 1500; easing.type: Easing.OutBounce }
             }
 
             delegate: Item {
@@ -37,6 +37,8 @@ ApplicationWindow {
 
                 height: view.cellHeight
                 width: view.cellWidth
+
+
                 TileForm {
                     id: tile
 
@@ -44,6 +46,11 @@ ApplicationWindow {
                     radius: 15
                     anchors.fill: parent
                     color: model.color
+                    opacity: model.opacity
+
+                    Behavior on opacity {
+                        NumberAnimation { duration: 1500; }
+                    }
 
                     Text {
                         anchors.centerIn: parent

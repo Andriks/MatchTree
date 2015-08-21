@@ -7,18 +7,27 @@ class Tile : public QObject
 {
     Q_OBJECT
 public:
-    explicit Tile(QObject *parent = 0, QString color="", QString type="");
+    explicit Tile(QObject *parent = 0, QString type = "", QString color = "", int opacity = 0);
+
+    QString getType() const;
+    void setType(const QString &type);
 
     QString getColor() const;
-    QString getType() const;
+    void setColor(const QString &color);
+
+    float getOpacity() const;
+    void setOpacity(const float &opacity);
+
 
 signals:
 
 public slots:
 
 private:
-    QString color_;
     QString type_;
+    QString color_;
+    float opacity_;
+
 
 };
 

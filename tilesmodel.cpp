@@ -14,16 +14,16 @@ TilesModel::Cell::Cell() :
 
 }
 
-TilesModel::Cell::Cell(int r, int c) :
-    row(r),
-    col(c)
+TilesModel::Cell::Cell(const Cell &cell):
+    row(cell.row),
+    col(cell.col)
 {
 
 }
 
-TilesModel::Cell::Cell(const TilesModel::Cell &cell):
-    row(cell.row),
-    col(cell.col)
+TilesModel::Cell::Cell(int r, int c) :
+    row(r),
+    col(c)
 {
 
 }
@@ -44,10 +44,10 @@ bool TilesModel::Cell::operator ==(const TilesModel::Cell cell)
 
 bool TilesModel::Cell::valid() const
 {
-    if ((row <= 0) || (row > width_))
+    if ((row <= 0) || (row > height_))
         return false;
 
-    if ((col <= 0) || (col > height_))
+    if ((col <= 0) || (col > width_))
         return false;
 
     return true;
@@ -68,8 +68,8 @@ void TilesModel::Cell::setStaticParams(int width, int height)
 
 
 TilesModel::TilesModel() :
-    width_(8),
-    height_(12),
+    width_(5),
+    height_(8),
     draged_cell_()
 {
     Cell::setStaticParams(width_, height_);
@@ -80,13 +80,13 @@ TilesModel::TilesModel() :
         int tile_type = std::rand() % 3;
         switch (tile_type) {
         case 0:
-            data_list_.push_back(new Tile(this, "yellow", "rectangle"));
+            data_list_.push_back(new Tile(this, "rectangle", "yellow", 1));
             break;
         case 1:
-            data_list_.push_back(new Tile(this, "green", "triangle"));
+            data_list_.push_back(new Tile(this, "triangle", "green", 1));
             break;
         case 2:
-            data_list_.push_back(new Tile(this, "blue", "circle"));
+            data_list_.push_back(new Tile(this, "circle", "blue", 1));
             break;
         default:
             break;
@@ -112,11 +112,14 @@ QVariant TilesModel::data(const QModelIndex & index, int role) const {
     const Tile *el = data_list_[index.row()];
 
     switch (role) {
+    case TypeRole:
+        return el->getType();
+        break;
     case ColorRole:
         return el->getColor();
         break;
-    case TypeRole:
-        return el->getType();
+    case OpacityRole:
+        return el->getOpacity();
         break;
     default:
         return QVariant();
@@ -127,8 +130,10 @@ QVariant TilesModel::data(const QModelIndex & index, int role) const {
 
 QHash<int, QByteArray> TilesModel::roleNames() const {
     QHash<int, QByteArray> roles;
+    roles[TypeRole] = "type";
     roles[ColorRole] = "color";
-    roles[TypeRole] = "form";
+    roles[OpacityRole] = "opacity";
+
     return roles;
 }
 
@@ -177,12 +182,64 @@ std::vector<TilesModel::Cell> TilesModel::cellsToMove(TilesModel::Cell p)
 
 std::vector<std::vector<TilesModel::Cell> > TilesModel::findMatches() const
 {
+    std::vector<std::vector<Cell> > res;
+    std::vector<Cell> one_match;
 
-    for (int row = 1; row > width_; row++) {
-        for (int col = 1; col > height_; col++) {
+    // vertical matches
+    for (int col = 1; col <= width_; col++) {
+        one_match.push_back(Cell(1, col));
 
+        for (int row = 2; row <= height_; row++) {
+            Cell cell(row, col);
+            Cell last_cell = one_match[one_match.size() - 1].getIndex();
+            Tile *last_tile = data_list_[last_cell.getIndex()];
+
+            if (last_tile->getType() == data_list_[cell.getIndex()]->getType()) {
+                one_match.push_back(cell);
+            } else {
+                if (one_match.size() >= 3) {
+                    res.push_back(one_match);
+                }
+
+                one_match.clear();
+                one_match.push_back(cell);
+            }
         }
+
+        if (one_match.size() >= 3)
+            res.push_back(one_match);
+
+        one_match.clear();
     }
+
+    // horisontal matches
+    for (int row = 1; row <= height_; row++) {
+        one_match.push_back(Cell(row, 1));
+
+        for (int col = 2; col <= width_; col++) {
+            Cell cell(row, col);
+            Cell last_cell = one_match[one_match.size() - 1].getIndex();
+            Tile *last_tile = data_list_[last_cell.getIndex()];
+
+            if (last_tile->getType() == data_list_[cell.getIndex()]->getType()) {
+                one_match.push_back(cell);
+            } else {
+                if (one_match.size() >= 3) {
+                    res.push_back(one_match);
+                }
+
+                one_match.clear();
+                one_match.push_back(cell);
+            }
+        }
+
+        if (one_match.size() >= 3)
+            res.push_back(one_match);
+
+        one_match.clear();
+    }
+
+    return res;
 }
 
 void TilesModel::swapCells(const int from, const int to)
@@ -221,18 +278,55 @@ void TilesModel::swapCells(const TilesModel::Cell &from, const TilesModel::Cell 
 
 void TilesModel::moveTile(int index)
 {
-    Cell curr_cell(index);
-    //qDebug() << index << "  |  " << cell.row << "," << cell.col << "  |  " << cell.getIndex();
+    std::vector< std::vector<Cell> > tmp = findMatches();
+    std::vector< std::vector<Cell> >::iterator it1;
 
-    if (!draged_cell_.valid()) {
-        draged_cell_ = Cell(index);
-    } else {
-        if (able_to_move(curr_cell)) {
-            swapCells(draged_cell_, curr_cell);
+    for (it1 = tmp.begin(); it1 != tmp.end(); it1++) {
+        std::vector<Cell>::iterator it2;
+        for (it2 = it1->begin(); it2 != it1->end(); it2++) {
+            Cell curr_cell((*it2));
+
+            beginResetModel();
+            data_list_[curr_cell.getIndex()]->setOpacity(0.5);
+            endResetModel();
         }
-
-        draged_cell_ = Cell();
     }
+
+    for (it1 = tmp.begin(); it1 != tmp.end(); it1++) {
+        std::vector<Cell>::iterator it2;
+        for (it2 = it1->begin(); it2 != it1->end(); it2++) {
+            Cell curr_cell((*it2));
+            Cell upper_cell(curr_cell.row - 1, curr_cell.col);
+
+            if (data_list_[curr_cell.getIndex()]->getOpacity() == 1)
+                continue;
+
+            while (upper_cell.valid()) {
+                if (data_list_[upper_cell.getIndex()]->getOpacity() != 1)
+                    break;
+
+                swapCells(curr_cell, upper_cell);
+
+                curr_cell = upper_cell;
+                upper_cell.row -= 1;
+            }
+        }
+    }
+
+
+
+
+//    Cell curr_cell(index);
+
+//    if (!draged_cell_.valid()) {
+//        draged_cell_ = Cell(index);
+//    } else {
+//        if (able_to_move(curr_cell)) {
+//            swapCells(draged_cell_, curr_cell);
+//        }
+
+//        draged_cell_ = Cell();
+//    }
 
 }
 
