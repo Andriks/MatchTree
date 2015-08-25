@@ -2,6 +2,7 @@
 #define COMMAND_H
 
 #include "cell.h"
+#include "tile.h"
 
 class Command
 {
@@ -16,39 +17,69 @@ public:
 class MoveCommand: public Command
 {
 public:
-    MoveCommand(Cell from, Cell to);
+    MoveCommand(Tile *from, Tile *to);
 
     virtual void exec();
 
-    Cell from() const;
-    void setFrom(const Cell &from);
+    Tile *from() const;
+    void setFrom(Tile *from);
 
-    Cell to() const;
-    void setTo(const Cell &to);
+    Tile *to() const;
+    void setTo(Tile *to);
 
 private:
-    Cell from_;
-    Cell to_;
+    Tile *from_;
+    Tile *to_;
+};
+
+//////////////////////////////////////////////////////////////
+class MoveUpCommand: public Command
+{
+public:
+    MoveUpCommand(Tile *target);
+
+    virtual void exec();
+
+    Tile *target() const;
+    void setTarget(Tile *target);
+
+private:
+    Tile *target_;
 };
 
 //////////////////////////////////////////////////////////////
 class OpacityCommand: public Command
 {
 public:
-    OpacityCommand(Cell target, float opacity);
+    OpacityCommand(Tile *target, float opacity);
 
     virtual void exec();
 
-    Cell target() const;
-    void setTarget(const Cell &target);
+    Tile *target() const;
+    void setTarget(Tile *target);
 
     float opacity() const;
     void setOpacity(float opacity);
 
 private:
-    Cell target_;
+    Tile *target_;
     float opacity_;
 
+};
+
+//////////////////////////////////////////////////////////////
+class CreateCommand: public Command
+{
+public:
+    CreateCommand(Tile *target);
+
+    virtual void exec();
+
+    Tile *target() const;
+    void setTarget(Tile *target);
+
+private:
+    Tile *target_;
 };
 
 

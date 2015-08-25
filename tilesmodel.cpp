@@ -82,56 +82,7 @@ QHash<int, QByteArray> TilesModel::roleNames() const {
 
 void TilesModel::someSlot()
 {
-    Package pack;
 
-    ///////////////////////////////////////////////////////////////////////////////
-    for (int i = 0; i < 4; i++) {
-        pack.push(new MoveCommand(Cell(i), Cell(i+1)));
-    }
-    pack_list_.push(pack);
-
-    ///////////////////////////////////////////////////////////////////////////////
-    pack.clear();
-    for (int i = 30; i < 35; i++) {
-        pack.push(new MoveCommand(Cell(i), Cell(i+1)));
-    }
-    pack_list_.push(pack);
-
-    ///////////////////////////////////////////////////////////////////////////////
-    for (int i = 20; i < 22; i++) {
-        pack.clear();
-        pack.push(new OpacityCommand(Cell(i), 0.5));
-        pack_list_.push(pack);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////
-    pack.clear();
-    for (int i = 20; i < 22; i++) {
-        for (int j = 1; j < 4; j++) {
-            pack.push(new MoveCommand(Cell(i - (j-1)*6), Cell(i - j*6)));
-        }
-    }
-    pack_list_.push(pack);
-
-    ///////////////////////////////////////////////////////////////////////////////
-    pack.clear();
-    for (int i = 20; i < 23; i++) {
-        pack.push(new OpacityCommand(Cell(i), 0.5));
-    }
-    pack_list_.push(pack);
-
-    ///////////////////////////////////////////////////////////////////////////////
-    pack.clear();
-    for (int i = 30; i < 33; i++) {
-        for (int j = 1; j < 4; j++) {
-            pack.push(new MoveCommand(Cell(i - (j-1)*6), Cell(i - j*6)));
-        }
-    }
-    pack_list_.push(pack);
-
-
-
-    execNextPackage();
 }
 
 bool TilesModel::able_to_move(Cell target_cell)
@@ -142,36 +93,25 @@ bool TilesModel::able_to_move(Cell target_cell)
     if (it == cells_to_move.end())
         return false;
 
-    // we cen move only in case of matchings after move
-//    Tile *target_tile = data_list_[target_cell];
-//    Tile *draget_tile = data_list_[draged_cell_];
-
 
     return true;
-
 }
 
-std::vector<Cell> TilesModel::cellsToMove(Cell p)
+std::vector<Cell> TilesModel::cellsToMove(Cell cell)
 {
     std::vector<Cell> res;
 
-    Cell cell;
+    if (cell.right().valid())
+        res.push_back(cell.right());
 
-    cell = Cell(p.row, p.col - 1);
-    if (cell.valid())
-        res.push_back(cell);
+    if (cell.left().valid())
+        res.push_back(cell.left());
 
-    cell = Cell(p.row, p.col + 1);
-    if (cell.valid())
-        res.push_back(cell);
+    if (cell.upper().valid())
+        res.push_back(cell.upper());
 
-    cell = Cell(p.row - 1, p.col);
-    if (cell.valid())
-        res.push_back(cell);
-
-    cell = Cell(p.row + 1, p.col);
-    if (cell.valid())
-        res.push_back(cell);
+    if (cell.lower().valid())
+        res.push_back(cell.lower());
 
 
     return res;
@@ -216,19 +156,6 @@ std::vector<std::vector<Tile *> > TilesModel::findMatches() const
             Cell cell(row, col);
             Tile *last_tile = one_match[one_match.size() - 1];
 
-            bool repit = false;
-            for (std::vector<std::vector<Tile *> >::iterator it1 = res.begin(); it1 != res.end(); it1++) {
-                for (std::vector<Tile *>::iterator it2 = it1->begin(); it2 != it1->end(); it2++) {
-                    if (*it2 == data_list_[cell.index()]) {
-                        repit = true;
-                    }
-                }
-            }
-
-            if (repit)
-                continue;
-
-
             if (last_tile->getType() == data_list_[cell.index()]->getType()) {
                 one_match.push_back(data_list_[cell.index()]);
             } else {
@@ -250,90 +177,32 @@ std::vector<std::vector<Tile *> > TilesModel::findMatches() const
     return res;
 }
 
-void TilesModel::removeMatches()
+void TilesModel::createPackages()
 {
     std::vector< std::vector<Tile *> > matches_list = findMatches();
     std::vector< std::vector<Tile *> >::iterator it1;
 
-//    while (matches_list.size()) {
 
-        for (it1 = matches_list.begin(); it1 != matches_list.end(); it1++) {
-            std::vector<Tile *>::iterator it2;
-            Package opacityPack;
-            Package movePack;
+    for (it1 = matches_list.begin(); it1 != matches_list.end(); it1++) {
+        std::vector<Tile *>::iterator it2;
 
-            for (it2 = it1->begin(); it2 != it1->end(); it2++) {
-                Cell curr_cell = Cell((*it2)->getIndex());
-                Cell upper_cell(curr_cell.row - 1, curr_cell.col);
+        Package opacityPack;
+        Package movePack;
+        Package createPack;
 
-
-                opacityPack.push(new OpacityCommand(curr_cell, 0.3));
-
-
-                while (upper_cell.valid()) {
-//                    if (data_list_[upper_cell.index()]->getOpacity() != 1)
-//                        break;
-
-//                    //swapCells(curr_cell, upper_cell);
-                    movePack.push(new MoveCommand(curr_cell, upper_cell));
-
-                    curr_cell = upper_cell;
-                    upper_cell.row -= 1;
-                }
-
-//                delete data_list_[curr_cell.index()];
-//                QString rand_type = getRandType();
-
-//                beginResetModel();
-//                data_list_[curr_cell.index()] = new Tile(this, rand_type, rand_type, curr_cell.index(), 1);
-//                endResetModel();
-            }
-
-            pack_list_.push(opacityPack);
-            pack_list_.push(movePack);
+        for (it2 = it1->begin(); it2 != it1->end(); it2++) {
+            opacityPack.push(new OpacityCommand(*it2, 0.0));
+            movePack.push(new MoveUpCommand(*it2));
+            createPack.push(new CreateCommand(*it2));
         }
 
-//        matches_list.clear();
-//        matches_list = findMatches();
-//    }
+        pack_list_.push(opacityPack);
+        pack_list_.push(movePack);
+        pack_list_.push(createPack);
+    }
 
-    execNextPackage();
-
-
-//    while (matches_list.size()) {
-
-//        for (it1 = matches_list.begin(); it1 != matches_list.end(); it1++) {
-//            std::vector<Tile *>::iterator it2;
-//            for (it2 = it1->begin(); it2 != it1->end(); it2++) {
-//                Cell curr_cell = Cell((*it2)->getIndex());
-//                Cell upper_cell(curr_cell.row - 1, curr_cell.col);
-
-//                beginResetModel();
-//                data_list_[curr_cell.index()]->setOpacity(0.5);
-//                endResetModel();
-
-//                while (upper_cell.valid()) {
-//                    if (data_list_[upper_cell.index()]->getOpacity() != 1)
-//                        break;
-
-//                    swapCells(curr_cell, upper_cell);
-
-//                    curr_cell = upper_cell;
-//                    upper_cell.row -= 1;
-//                }
-
-//                delete data_list_[curr_cell.index()];
-//                QString rand_type = getRandType();
-
-//                beginResetModel();
-//                data_list_[curr_cell.index()] = new Tile(this, rand_type, rand_type, curr_cell.index(), 1);
-//                endResetModel();
-//            }
-//        }
-
-//        matches_list.clear();
-//        matches_list = findMatches();
-//    }
+    if (pack_list_.size())
+        execNextPackage();
 
 }
 
@@ -362,17 +231,12 @@ void TilesModel::swapCells(const int from, const int to)
 
     }
 
-//    qDebug() << data_list_[from]->getIndex() << "  " << data_list_[from]->getColor() << " | " << data_list_[to]->getIndex()<< "  " << data_list_[to]->getColor();
 
     std::swap(data_list_[from], data_list_[to]);
     int tmp_index = data_list_[from]->getIndex();
     data_list_[from]->setIndex(data_list_[to]->getIndex());
     data_list_[to]->setIndex(tmp_index);
 
-    //QTimer::singleShot(1000);
-//    QThread::sleep(1);
-
-//    qDebug() << data_list_[from]->getIndex() << "  " << data_list_[from]->getColor() << " | " << data_list_[to]->getIndex()<< "  " << data_list_[to]->getColor();
 }
 
 void TilesModel::swapCells(const Cell &from, const Cell &to)
@@ -380,17 +244,22 @@ void TilesModel::swapCells(const Cell &from, const Cell &to)
     swapCells(from.index(), to.index());
 }
 
-void TilesModel::changeOpacity(const Cell &target, const float opacity)
+void TilesModel::changeOpacity(Tile *target, const float opacity)
 {
-//    beginResetModel();
-    data_list_[target.index()]->setOpacity(opacity);
-//    endResetModel();
+    target->setOpacity(opacity);
 
     QVector<int> vec;
     vec.push_back(OpacityRole);
-    emit dataChanged(createIndex(target.index(), 0), createIndex(target.index(), 0), vec);
+    emit dataChanged(createIndex(target->getIndex(), 0), createIndex(target->getIndex(), 0), vec);
 
 }
+
+//void TilesModel::opacityChangingFinished(const int lowBound, const int upBound)
+//{
+//    QVector<int> vec;
+//    vec.push_back(OpacityRole);
+//    emit dataChanged(createIndex(lowBound, 0), createIndex(upBound, 0), vec);
+//}
 
 
 void TilesModel::moveTile(int index)
@@ -402,7 +271,7 @@ void TilesModel::moveTile(int index)
     } else {
         if (able_to_move(curr_cell)) {
             swapCells(draged_cell_, curr_cell);
-            removeMatches();
+            createPackages();
         }
 
         draged_cell_ = Cell();
@@ -412,8 +281,10 @@ void TilesModel::moveTile(int index)
 
 void TilesModel::execNextPackage()
 {
-    if (pack_list_.empty())
+    if (pack_list_.empty()) {
+//        createPackages();
         return;
+    }
 
     Package pack = pack_list_.front();
     pack_list_.pop();

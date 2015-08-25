@@ -36,7 +36,8 @@ public:
     // interface for Command
     void swapCells(const int from, const int to);
     void swapCells(const Cell &from, const Cell &to);
-    void changeOpacity(const Cell &target, const float opacity);
+    void changeOpacity(Tile *target, const float opacity);
+//    void opacityChangingFinished(const int lowBound, const int upBound);
 
 
 signals:
@@ -48,7 +49,7 @@ public slots:
     void someSlot();
     void moveTile(int);
     void execNextPackage();
-    void removeMatches();       //tmp move to slots for testing
+    void createPackages();       //tmp move to slots for testing
 
     int width();
     void setWidth(const int);
@@ -64,10 +65,9 @@ private:
 
     // for game logic
     bool able_to_move(Cell);
-    std::vector<Cell> cellsToMove(Cell);
+    std::vector<Cell> cellsToMove(Cell cell);
 
     std::vector<std::vector<Tile *> > findMatches() const;
-
 
     QString getRandType();
 

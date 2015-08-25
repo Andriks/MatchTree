@@ -32,7 +32,7 @@ ApplicationWindow {
                 id: move_animation
                 NumberAnimation {
                     properties: "x,y"
-                    duration: 3000
+                    duration: 2000
 //                    easing.type: Easing.OutBounce
                 }
 
@@ -65,7 +65,7 @@ ApplicationWindow {
                     Behavior on opacity {
                         NumberAnimation {
                             id: opacity_animation
-                            duration: 3000
+                            duration: 500
 
                             onRunningChanged:
                             {
@@ -102,7 +102,7 @@ ApplicationWindow {
             }
             MenuItem {
                 text: qsTr("&rem matches")
-                onTriggered: dataModel.removeMatches();
+                onTriggered: dataModel.createPackages();
             }
             MenuItem {
                 text: qsTr("E&xit")

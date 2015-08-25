@@ -4,10 +4,6 @@
 #include <cmath>
 
 
-//int Cell::width_(0);
-//int Cell::height_(0);
-
-
 Cell::Cell() :
     row(0),
     col(0)
@@ -59,8 +55,23 @@ int Cell::index() const
     return ((row - 1) * TilesModel::Instance()->width()) + col - 1;
 }
 
-//void Cell::setStaticParams(int width, int height)
-//{
-//    width_ = width;
-//    height_ = height;
-//}
+Cell Cell::upper()
+{
+    return Cell(row - 1, col);
+}
+
+Cell Cell::lower()
+{
+    return Cell(row + 1, col);
+}
+
+Cell Cell::right()
+{
+    return Cell(row, col + 1);
+}
+
+Cell Cell::left()
+{
+    return Cell(row, col - 1);
+}
+

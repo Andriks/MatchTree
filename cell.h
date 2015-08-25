@@ -15,16 +15,16 @@ public:
     bool valid() const;
     int index() const;
 
-//    static void setStaticParams(int width, int height);
+    Cell upper();
+    Cell lower();
+    Cell right();
+    Cell left();
 
 // no need to do setter/getter for such simle private class
 public:
     int row;
     int col;
 
-//private:
-//    static int width_;
-//    static int height_;
 };
 
 #endif // CELL_H

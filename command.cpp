@@ -7,7 +7,7 @@ Command::Command()
 }
 
 
-MoveCommand::MoveCommand(Cell from, Cell to) :
+MoveCommand::MoveCommand(Tile *from, Tile *to) :
     from_(from),
     to_(to)
 {
@@ -17,31 +17,61 @@ MoveCommand::MoveCommand(Cell from, Cell to) :
 //////////////////////////////////////////////////////////////
 void MoveCommand::exec()
 {
-    TilesModel::Instance()->swapCells(from_, to_);
+        TilesModel::Instance()->swapCells(from_->getIndex(), to_->getIndex());
 }
 
-Cell MoveCommand::from() const
+Tile *MoveCommand::from() const
 {
     return from_;
 }
 
-void MoveCommand::setFrom(const Cell &from)
+void MoveCommand::setFrom(Tile *from)
 {
     from_ = from;
 }
-Cell MoveCommand::to() const
+Tile *MoveCommand::to() const
 {
     return to_;
 }
 
-void MoveCommand::setTo(const Cell &to)
+void MoveCommand::setTo(Tile *to)
 {
     to_ = to;
 }
 
 
 //////////////////////////////////////////////////////////////
-OpacityCommand::OpacityCommand(Cell target, float opacity) :
+MoveUpCommand::MoveUpCommand(Tile *target) :
+    target_(target)
+{
+
+}
+
+void MoveUpCommand::exec()
+{
+    Cell cell = Cell(target_->getIndex());
+//    Cell upper_cell = cell.upper();
+
+    while (cell.upper().valid()) {
+        TilesModel::Instance()->swapCells(cell, cell.upper());
+
+        cell = cell.upper();
+    }
+}
+
+Tile *MoveUpCommand::target() const
+{
+    return target_;
+}
+
+void MoveUpCommand::setTarget(Tile *target)
+{
+    target_ = target;
+}
+
+
+//////////////////////////////////////////////////////////////
+OpacityCommand::OpacityCommand(Tile *target, float opacity) :
     target_(target),
     opacity_(opacity)
 {
@@ -53,12 +83,12 @@ void OpacityCommand::exec()
     TilesModel::Instance()->changeOpacity(target_, opacity_);
 }
 
-Cell OpacityCommand::target() const
+Tile *OpacityCommand::target() const
 {
     return target_;
 }
 
-void OpacityCommand::setTarget(const Cell &target)
+void OpacityCommand::setTarget(Tile *target)
 {
     target_ = target;
 }
@@ -72,4 +102,27 @@ void OpacityCommand::setOpacity(float opacity)
     opacity_ = opacity;
 }
 
+
+
+//////////////////////////////////////////////////////////////
+CreateCommand::CreateCommand(Tile *target) :
+    target_(target)
+{
+
+}
+
+void CreateCommand::exec()
+{
+
+}
+
+Tile *CreateCommand::target() const
+{
+    return target_;
+}
+
+void CreateCommand::setTarget(Tile *target)
+{
+    target_ = target;
+}
 
