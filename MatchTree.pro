@@ -6,7 +6,9 @@ SOURCES += \
     tile.cpp \
     tilesmodel.cpp \
     main_mt.cpp \
-    cell.cpp
+    cell.cpp \
+    command.cpp \
+    package.cpp
 
 RESOURCES += qml.qrc
 
@@ -18,6 +20,7 @@ include(deployment.pri)
 
 HEADERS += \
     tile.h \
-    common_types.h \
     tilesmodel.h \
-    cell.h
+    cell.h \
+    command.h \
+    package.h

@@ -1,7 +1,9 @@
 #ifndef TILE_H
 #define TILE_H
 
-#include "common_types.h"
+#include <QObject>
+#include <QString>
+
 
 class Tile : public QObject
 {

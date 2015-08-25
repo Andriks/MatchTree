@@ -1,4 +1,5 @@
 #include "tilesmodel.h"
+#include "command.h"
 
 #include <QDebug>
 #include <QTimer>
@@ -81,9 +82,31 @@ QHash<int, QByteArray> TilesModel::roleNames() const {
 
 void TilesModel::someSlot()
 {
+    Package pack;
+
     for (int i = 0; i < 4; i++) {
-        swapCells(i, i+1);
+        pack.push(new MoveCommand(Cell(i), Cell(i+1)));
     }
+
+    pack_list_.push(pack);
+    pack.clear();
+
+    for (int i = 30; i < 35; i++) {
+        pack.push(new MoveCommand(Cell(i), Cell(i+1)));
+    }
+
+    pack_list_.push(pack);
+
+    for (int i = 20; i < 23; i++) {
+        pack.clear();
+        pack.push(new OpacityCommand(Cell(i), 0));
+        pack_list_.push(pack);
+    }
+
+
+
+//    pack_list_.push(pack);
+    execNextPackage();
 }
 
 bool TilesModel::able_to_move(Cell target_cell)
@@ -136,21 +159,21 @@ std::vector<std::vector<Tile *> > TilesModel::findMatches() const
 
     // vertical matches
     for (int col = 1; col <= width_; col++) {
-        one_match.push_back(data_list_[Cell(1, col).getIndex()]);
+        one_match.push_back(data_list_[Cell(1, col).index()]);
 
         for (int row = 2; row <= height_; row++) {
             Cell cell(row, col);
             Tile *last_tile = one_match[one_match.size() - 1];
 
-            if (last_tile->getType() == data_list_[cell.getIndex()]->getType()) {
-                one_match.push_back(data_list_[cell.getIndex()]);
+            if (last_tile->getType() == data_list_[cell.index()]->getType()) {
+                one_match.push_back(data_list_[cell.index()]);
             } else {
                 if (one_match.size() >= 3) {
                     res.push_back(one_match);
                 }
 
                 one_match.clear();
-                one_match.push_back(data_list_[cell.getIndex()]);
+                one_match.push_back(data_list_[cell.index()]);
             }
         }
 
@@ -162,21 +185,21 @@ std::vector<std::vector<Tile *> > TilesModel::findMatches() const
 
     // horisontal matches
     for (int row = 1; row <= height_; row++) {
-        one_match.push_back(data_list_[Cell(row, 1).getIndex()]);
+        one_match.push_back(data_list_[Cell(row, 1).index()]);
 
         for (int col = 2; col <= width_; col++) {
             Cell cell(row, col);
             Tile *last_tile = one_match[one_match.size() - 1];
 
-            if (last_tile->getType() == data_list_[cell.getIndex()]->getType()) {
-                one_match.push_back(data_list_[cell.getIndex()]);
+            if (last_tile->getType() == data_list_[cell.index()]->getType()) {
+                one_match.push_back(data_list_[cell.index()]);
             } else {
                 if (one_match.size() >= 3) {
                     res.push_back(one_match);
                 }
 
                 one_match.clear();
-                one_match.push_back(data_list_[cell.getIndex()]);
+                one_match.push_back(data_list_[cell.index()]);
             }
         }
 
@@ -203,11 +226,11 @@ void TilesModel::removeMatches()
                 Cell upper_cell(curr_cell.row - 1, curr_cell.col);
 
                 beginResetModel();
-                data_list_[curr_cell.getIndex()]->setOpacity(0.5);
+                data_list_[curr_cell.index()]->setOpacity(0.5);
                 endResetModel();
 
                 while (upper_cell.valid()) {
-                    if (data_list_[upper_cell.getIndex()]->getOpacity() != 1)
+                    if (data_list_[upper_cell.index()]->getOpacity() != 1)
                         break;
 
                     swapCells(curr_cell, upper_cell);
@@ -216,11 +239,11 @@ void TilesModel::removeMatches()
                     upper_cell.row -= 1;
                 }
 
-                delete data_list_[curr_cell.getIndex()];
+                delete data_list_[curr_cell.index()];
                 QString rand_type = getRandType();
 
                 beginResetModel();
-                data_list_[curr_cell.getIndex()] = new Tile(this, rand_type, rand_type, curr_cell.getIndex(), 1);
+                data_list_[curr_cell.index()] = new Tile(this, rand_type, rand_type, curr_cell.index(), 1);
                 endResetModel();
             }
         }
@@ -271,7 +294,14 @@ void TilesModel::swapCells(const int from, const int to)
 
 void TilesModel::swapCells(const Cell &from, const Cell &to)
 {
-    swapCells(from.getIndex(), to.getIndex());
+    swapCells(from.index(), to.index());
+}
+
+void TilesModel::changeOpacity(const Cell &target, const float opacity)
+{
+    beginResetModel();
+    data_list_[target.index()]->setOpacity(opacity);
+    endResetModel();
 }
 
 
@@ -292,8 +322,19 @@ void TilesModel::moveTile(int index)
 
 }
 
+void TilesModel::execNextPackage()
+{
+    if (pack_list_.empty())
+        return;
 
-int TilesModel::getWidth()
+    Package pack = pack_list_.front();
+    pack_list_.pop();
+
+    pack.exec();
+}
+
+
+int TilesModel::width()
 {
     return width_;
 }
@@ -304,7 +345,7 @@ void TilesModel::setWidth(const int val)
     emit widthChanged();
 }
 
-int TilesModel::getHeight()
+int TilesModel::height()
 {
     return height_;
 }

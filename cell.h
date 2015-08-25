@@ -8,12 +8,12 @@ public:
     Cell();
     Cell(const Cell &cell);
     Cell(int r, int c);
-    Cell(int index);
+    Cell(int _index);
 
     bool operator ==(const Cell);
 
     bool valid() const;
-    int getIndex() const;
+    int index() const;
 
 //    static void setStaticParams(int width, int height);
 

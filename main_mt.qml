@@ -29,9 +29,18 @@ ApplicationWindow {
             interactive: false
 
             move: Transition {
-                SequentialAnimation {
-                //ParallelAnimation {
-                    NumberAnimation { properties: "x,y"; duration: 1000; easing.type: Easing.OutBounce }
+                id: move_animation
+
+                NumberAnimation {
+                    properties: "x,y"
+                    duration: 1000
+                    easing.type: Easing.OutBounce
+                }
+
+                onRunningChanged:
+                {
+                    if (!move_animation.running)
+                       dataModel.execNextPackage();
                 }
             }
 
@@ -51,9 +60,29 @@ ApplicationWindow {
                     color: model.color
                     opacity: model.opacity
 
-                    Behavior on opacity {
-                        NumberAnimation { duration: 1000; }
+                    onOpacityChanged: opacity_animation.start()
+
+                    NumberAnimation {
+                        id: opacity_animation
+                        duration: 1000
+                        onRunningChanged:
+                        {
+                            if (!opacity_animation.running)
+                                dataModel.execNextPackage();
+                        }
                     }
+
+//                    Behavior on opacity {
+//                        NumberAnimation {
+//                            id: opacity_animation
+//                            duration: 1000
+//                            onRunningChanged:
+//                            {
+//                                if (!opacity_animation.running)
+//                                   dataModel.execNextPackage();
+//                            }
+//                        }
+//                    }
 
                     Text {
                         anchors.centerIn: parent

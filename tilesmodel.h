@@ -4,18 +4,19 @@
 #include <QAbstractListModel>
 
 #include <vector>
+#include <queue>
 
-#include "common_types.h"
 #include "tile.h"
 #include "cell.h"
+#include <package.h>
 
 
 
 class TilesModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(int width READ getWidth WRITE setWidth NOTIFY widthChanged)
-    Q_PROPERTY(int height READ getHeight WRITE setHeight NOTIFY heightChanged)
+    Q_PROPERTY(int width READ width WRITE setWidth NOTIFY widthChanged)
+    Q_PROPERTY(int height READ height WRITE setHeight NOTIFY heightChanged)
 
     ///////////////////////////////////////////////////////
     enum TileElemRoles {
@@ -32,6 +33,11 @@ public:
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
     QHash<int, QByteArray> roleNames() const;
 
+    // interface for Command
+    void swapCells(const int from, const int to);
+    void swapCells(const Cell &from, const Cell &to);
+    void changeOpacity(const Cell &target, const float opacity);
+
 
 signals:
     void widthChanged();
@@ -41,11 +47,12 @@ signals:
 public slots:
     void someSlot();
     void moveTile(int);
+    void execNextPackage();
 
-    int getWidth();
+    int width();
     void setWidth(const int);
 
-    int getHeight();
+    int height();
     void setHeight(const int);
 
 
@@ -61,13 +68,12 @@ private:
     std::vector<std::vector<Tile *> > findMatches() const;
     void removeMatches();
 
-    void swapCells(const int, const int);
-    void swapCells(const Cell&, const Cell&);
-
     QString getRandType();
+
 
 private:
     std::vector<Tile *> data_list_;
+    std::queue<Package> pack_list_;
 
     int width_;
     int height_;
