@@ -5,7 +5,8 @@ QT += qml quick widgets
 SOURCES += \
     tile.cpp \
     tilesmodel.cpp \
-    main_mt.cpp
+    main_mt.cpp \
+    cell.cpp
 
 RESOURCES += qml.qrc
 
@@ -18,4 +19,5 @@ include(deployment.pri)
 HEADERS += \
     tile.h \
     common_types.h \
-    tilesmodel.h
+    tilesmodel.h \
+    cell.h

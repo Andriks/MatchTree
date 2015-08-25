@@ -7,76 +7,11 @@
 #include <cmath>
 
 
-int TilesModel::Cell::width_(0);
-int TilesModel::Cell::height_(0);
-
-TilesModel::Cell::Cell() :
-    row(0),
-    col(0)
-{
-
-}
-
-TilesModel::Cell::Cell(const Cell &cell):
-    row(cell.row),
-    col(cell.col)
-{
-
-}
-
-TilesModel::Cell::Cell(int r, int c) :
-    row(r),
-    col(c)
-{
-
-}
-
-TilesModel::Cell::Cell(int index)
-{
-    row = std::ceil(index / width_) + 1;
-    col = (index + 1) - ((row - 1) * width_);
-}
-
-bool TilesModel::Cell::operator ==(const TilesModel::Cell cell)
-{
-    if ((row == cell.row) && (col == cell.col))
-        return true;
-
-    return false;
-}
-
-bool TilesModel::Cell::valid() const
-{
-    if ((row <= 0) || (row > height_))
-        return false;
-
-    if ((col <= 0) || (col > width_))
-        return false;
-
-    return true;
-}
-
-int TilesModel::Cell::getIndex() const
-{
-    return ((row - 1) * width_) + col - 1;
-}
-
-void TilesModel::Cell::setStaticParams(int width, int height)
-{
-    width_ = width;
-    height_ = height;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////
-
-
 TilesModel::TilesModel() :
     width_(6),
     height_(8),
     draged_cell_()
 {
-    Cell::setStaticParams(width_, height_);
-
     int dim_size = width_ * height_;
 
     for (int i = 0; i < dim_size; i++) {
@@ -168,7 +103,7 @@ bool TilesModel::able_to_move(Cell target_cell)
 
 }
 
-std::vector<TilesModel::Cell> TilesModel::cellsToMove(TilesModel::Cell p)
+std::vector<Cell> TilesModel::cellsToMove(Cell p)
 {
     std::vector<Cell> res;
 
@@ -334,7 +269,7 @@ void TilesModel::swapCells(const int from, const int to)
 //    qDebug() << data_list_[from]->getIndex() << "  " << data_list_[from]->getColor() << " | " << data_list_[to]->getIndex()<< "  " << data_list_[to]->getColor();
 }
 
-void TilesModel::swapCells(const TilesModel::Cell &from, const TilesModel::Cell &to)
+void TilesModel::swapCells(const Cell &from, const Cell &to)
 {
     swapCells(from.getIndex(), to.getIndex());
 }
