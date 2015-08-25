@@ -23,24 +23,27 @@ ApplicationWindow {
 
             anchors.fill: parent
             anchors.centerIn: parent
-            cellHeight: parent.height / model.height;
-            cellWidth: parent.width / model.width;
+            cellHeight: parent.height / dataModel.height;
+            cellWidth: parent.width / dataModel.width;
 
             interactive: false
 
             move: Transition {
                 id: move_animation
-
                 NumberAnimation {
                     properties: "x,y"
-                    duration: 1000
-                    easing.type: Easing.OutBounce
+                    duration: 3000
+//                    easing.type: Easing.OutBounce
                 }
 
                 onRunningChanged:
                 {
-                    if (!move_animation.running)
-                       dataModel.execNextPackage();
+                    if (!move_animation.running) {
+                       console.log("move stop")
+                        dataModel.execNextPackage();
+                    } else {
+                        console.log("move start")
+                    }
                 }
             }
 
@@ -50,9 +53,8 @@ ApplicationWindow {
                 height: view.cellHeight
                 width: view.cellWidth
 
-
-                TileForm {
-                    id: tile
+                Rectangle {
+                    id: tile_
 
                     anchors.margins: 5
                     radius: 15
@@ -60,35 +62,24 @@ ApplicationWindow {
                     color: model.color
                     opacity: model.opacity
 
-                    onOpacityChanged: opacity_animation.start()
+                    Behavior on opacity {
+                        NumberAnimation {
+                            id: opacity_animation
+                            duration: 3000
 
-                    NumberAnimation {
-                        id: opacity_animation
-                        duration: 1000
-                        onRunningChanged:
-                        {
-                            if (!opacity_animation.running)
-                                dataModel.execNextPackage();
+                            onRunningChanged:
+                            {
+                                if (!opacity_animation.running) {
+                                    console.log(model.index, "op stop");
+                                    dataModel.execNextPackage();
+                                } else {
+                                    console.log(model.index, "op start");
+                                }
+
+                            }
                         }
                     }
 
-//                    Behavior on opacity {
-//                        NumberAnimation {
-//                            id: opacity_animation
-//                            duration: 1000
-//                            onRunningChanged:
-//                            {
-//                                if (!opacity_animation.running)
-//                                   dataModel.execNextPackage();
-//                            }
-//                        }
-//                    }
-
-                    Text {
-                        anchors.centerIn: parent
-                        renderType: Text.NativeRendering
-                        text: model.name
-                    }
 
                     MouseArea {
                         anchors.fill: parent
@@ -107,11 +98,11 @@ ApplicationWindow {
             title: qsTr("&File")
             MenuItem {
                 text: qsTr("test")
-                onTriggered: dataModel.someSlot()
+                onTriggered: dataModel.someSlot();
             }
             MenuItem {
-                text: qsTr("&Open")
-                onTriggered: messageDialog.show(qsTr("Open action triggered"));
+                text: qsTr("&rem matches")
+                onTriggered: dataModel.removeMatches();
             }
             MenuItem {
                 text: qsTr("E&xit")

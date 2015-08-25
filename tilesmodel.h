@@ -8,7 +8,7 @@
 
 #include "tile.h"
 #include "cell.h"
-#include <package.h>
+#include "package.h"
 
 
 
@@ -48,6 +48,7 @@ public slots:
     void someSlot();
     void moveTile(int);
     void execNextPackage();
+    void removeMatches();       //tmp move to slots for testing
 
     int width();
     void setWidth(const int);
@@ -66,7 +67,7 @@ private:
     std::vector<Cell> cellsToMove(Cell);
 
     std::vector<std::vector<Tile *> > findMatches() const;
-    void removeMatches();
+
 
     QString getRandType();
 

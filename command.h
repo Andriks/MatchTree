@@ -35,7 +35,7 @@ private:
 class OpacityCommand: public Command
 {
 public:
-    OpacityCommand(Cell target, int opacity);
+    OpacityCommand(Cell target, float opacity);
 
     virtual void exec();
 

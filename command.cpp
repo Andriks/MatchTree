@@ -41,7 +41,7 @@ void MoveCommand::setTo(const Cell &to)
 
 
 //////////////////////////////////////////////////////////////
-OpacityCommand::OpacityCommand(Cell target, int opacity) :
+OpacityCommand::OpacityCommand(Cell target, float opacity) :
     target_(target),
     opacity_(opacity)
 {
