@@ -8,22 +8,18 @@
 #include <cmath>
 
 
+bool TilesModel::initialised_(false);
+
 TilesModel::TilesModel() :
     width_(4),
     height_(6),
     draged_cell_()
 {
-    int dim_size = width_ * height_;
-
-    for (int i = 0; i < dim_size; i++) {
-        QString rand_type = getRandType();
-        data_list_.push_back(new Tile(this, rand_type, rand_type, i, 1));
-    }
 }
 
 QString TilesModel::getRandType()
 {
-    int tile_type = std::rand() % 3;
+    int tile_type = std::rand() % types_.size();
     switch (tile_type) {
     case 0:
         return "yellow";
@@ -31,16 +27,87 @@ QString TilesModel::getRandType()
         return "red";
     case 2:
         return "blue";
+    case 3:
+        return "green";
+    case 4:
+        return "black";
+    case 5:
+        return "pink";
     default:
         return "";
     }
 }
+bool TilesModel::getInitialised()
+{
+    return initialised_;
+}
+
+void TilesModel::setInitialised(bool initialised)
+{
+    initialised_ = initialised;
+}
+
+std::vector<int> TilesModel::getTypes() const
+{
+    return types_;
+}
+
+void TilesModel::setTypes(const std::vector<int> &types)
+{
+    types_.clear();
+    for (int i = 0; i < types.size(); i++)
+        types_.push_back(types[i]);
+}
+
+int TilesModel::getMax_moves() const
+{
+    return max_moves_;
+}
+
+void TilesModel::setMax_moves(int max_moves)
+{
+    max_moves_ = max_moves;
+}
+
+int TilesModel::getMin_score() const
+{
+    return min_score_;
+}
+
+void TilesModel::setMin_score(int min_score)
+{
+    min_score_ = min_score;
+}
+
+int TilesModel::getElement_score() const
+{
+    return element_score_;
+}
+
+void TilesModel::setElement_score(int element_score)
+{
+    element_score_ = element_score;
+}
+
 
 
 TilesModel *TilesModel::Instance()
 {
     static TilesModel theSingleInstance;
     return &theSingleInstance;
+}
+
+void TilesModel::generate()
+{
+    if (!initialised_)
+        return;
+
+    int dim_size = width_ * height_;
+
+    for (int i = 0; i < dim_size; i++) {
+        QString rand_type = getRandType();
+        data_list_.push_back(new Tile(this, rand_type, rand_type, i, 1));
+    }
 }
 
 int TilesModel::rowCount(const QModelIndex & parent) const {

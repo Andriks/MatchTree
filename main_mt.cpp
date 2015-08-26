@@ -8,10 +8,14 @@
 #include <QtQml>
 
 #include "tilesmodel.h"
+#include "jsonparser.h"
 
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
+
+    JsonParser parser("../MatchTree/input.json");
+    parser.fillParamsIntoModel();
 
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:/main_mt.qml")));

@@ -8,7 +8,8 @@ SOURCES += \
     main_mt.cpp \
     cell.cpp \
     command.cpp \
-    package.cpp
+    package.cpp \
+    jsonparser.cpp
 
 RESOURCES += qml.qrc
 
@@ -23,4 +24,5 @@ HEADERS += \
     tilesmodel.h \
     cell.h \
     command.h \
-    package.h
+    package.h \
+    jsonparser.h

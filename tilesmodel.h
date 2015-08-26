@@ -27,6 +27,7 @@ class TilesModel : public QAbstractListModel
 
 public:
     static TilesModel *Instance();
+    void generate();
 
     // for QML Engine
     int rowCount(const QModelIndex & parent = QModelIndex()) const;
@@ -40,6 +41,21 @@ public:
     void createNewItem(int index);
     Tile *item(int index);
 
+    // setters / getters
+    int getElement_score() const;
+    void setElement_score(int element_score);
+
+    int getMin_score() const;
+    void setMin_score(int min_score);
+
+    int getMax_moves() const;
+    void setMax_moves(int max_moves);
+
+    std::vector<int> getTypes() const;
+    void setTypes(const std::vector<int> &types);
+
+    static bool getInitialised();
+    static void setInitialised(bool initialised);
 
 signals:
     void widthChanged();
@@ -52,6 +68,7 @@ public slots:
     void execNextPackage();
     void createPackages();       //tmp move to slots for testing
 
+    // setters / getters for qml engine
     int width();
     void setWidth(const int);
 
@@ -80,10 +97,14 @@ private:
     int width_;
     int height_;
     int element_score_;
-    int min_scores_;
+    int min_score_;
     int max_moves_;
 
+    std::vector<int> types_;
+
     Cell draged_cell_;
+
+    static bool initialised_;
 };
 
 #endif // TILESMODEL_H
