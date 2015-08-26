@@ -7,11 +7,20 @@ Command::Command()
 }
 
 
+//////////////////////////////////////////////////////////////
 SwapCommand::SwapCommand(Tile *from, Tile *to) :
     from_(from),
     to_(to)
 {
 
+}
+
+SwapCommand::SwapCommand(const Cell &from, const Cell &to) :
+    from_(NULL),
+    to_(NULL)
+{
+    from_ = TilesModel::Instance()->item(from.index());
+    to_ = TilesModel::Instance()->item(to.index());
 }
 
 //////////////////////////////////////////////////////////////
@@ -29,6 +38,7 @@ void SwapCommand::setFrom(Tile *from)
 {
     from_ = from;
 }
+
 Tile *SwapCommand::to() const
 {
     return to_;
@@ -51,11 +61,7 @@ void MoveUpCommand::exec()
 {
     Cell cell = Cell(target_->index());
 
-    if (!cell.upper().valid()) {
-        // TODO
-        return;
-    }
-
+    int swap_cnt = 0;
 
     while (cell.upper().valid()) {
         if (TilesModel::Instance()->item(cell.upper().index())->opacity() != 1.0)
@@ -64,7 +70,11 @@ void MoveUpCommand::exec()
         TilesModel::Instance()->swapCells(cell, cell.upper());
 
         cell = cell.upper();
+        swap_cnt++;
     }
+
+    if (swap_cnt == 0)
+        TilesModel::Instance()->execNextPackage();
 }
 
 Tile *MoveUpCommand::target() const
@@ -100,6 +110,7 @@ void OpacityCommand::setTarget(Tile *target)
 {
     target_ = target;
 }
+
 float OpacityCommand::opacity() const
 {
     return opacity_;

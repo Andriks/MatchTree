@@ -2,8 +2,6 @@
 #include "command.h"
 
 #include <QDebug>
-#include <QTimer>
-#include <QThread>
 
 #include <cmath>
 
@@ -11,11 +9,24 @@
 bool TilesModel::initialised_(false);
 
 TilesModel::TilesModel() :
+    exec_pack_cnt_(0),
     width_(4),
     height_(6),
     draged_cell_()
 {
 }
+
+int TilesModel::execPackCnt() const
+{
+    return exec_pack_cnt_;
+}
+
+void TilesModel::setExecPackCnt(int exec_pack_cnt)
+{
+    exec_pack_cnt_ = exec_pack_cnt;
+    emit execPackCntChanged();
+}
+
 
 QString TilesModel::getRandType()
 {
@@ -30,13 +41,64 @@ QString TilesModel::getRandType()
     case 3:
         return "green";
     case 4:
-        return "black";
-    case 5:
         return "pink";
+    case 5:
+        return "lightgreen";
     default:
         return "";
     }
+
+//    switch (tile_type) {
+//    case 0:
+//        return "qrc:/icon/icon/img1.png";
+//    case 1:
+//        return "qrc:/icon/icon/img2.png";
+//    case 2:
+//        return "qrc:/icon/icon/img3.png";
+//    case 3:
+//        return "qrc:/icon/icon/img4.png";
+//    case 4:
+//        return "qrc:/icon/icon/img5.png";
+//    case 5:
+//        return "qrc:/icon/icon/img6.png";
+//    case 6:
+//        return "qrc:/icon/icon/img7.png";
+//    default:
+//        return "";
+    //    }
 }
+
+bool TilesModel::checkForRepeating(Tile *tile, std::vector<std::vector<Tile *> > conteiner) const
+{
+    for (std::vector<std::vector<Tile *> >::iterator it1 = conteiner.begin(); it1 < conteiner.end(); it1++) {
+        for (std::vector<Tile *>::iterator it2 = it1->begin(); it2 != it1->end(); it2++) {
+            if (*it2 == tile) {
+                return true;
+            }
+        }
+    }
+}
+
+bool TilesModel::matchesExisting()
+{
+    std::vector< std::vector<Tile *> > matches_list = findMatches();
+    if (matches_list.empty())
+        return false;
+
+    return true;
+}
+
+int TilesModel::indexOfItem(const Tile *item) const
+{
+    for (int i = 0; i < data_list_.size(); i++) {
+        if (data_list_[i] == item) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
 bool TilesModel::getInitialised()
 {
     return initialised_;
@@ -90,7 +152,6 @@ void TilesModel::setElement_score(int element_score)
 }
 
 
-
 TilesModel *TilesModel::Instance()
 {
     static TilesModel theSingleInstance;
@@ -106,7 +167,7 @@ void TilesModel::generate()
 
     for (int i = 0; i < dim_size; i++) {
         QString rand_type = getRandType();
-        data_list_.push_back(new Tile(this, rand_type, rand_type, i, 1));
+        data_list_.push_back(new Tile(rand_type, rand_type, 1));
     }
 }
 
@@ -131,6 +192,9 @@ QVariant TilesModel::data(const QModelIndex & index, int role) const {
     case OpacityRole:
         return el->opacity();
         break;
+    case TextRole:
+        return el->text();
+        break;
     default:
         return QVariant();
         break;
@@ -143,13 +207,15 @@ QHash<int, QByteArray> TilesModel::roleNames() const {
     roles[TypeRole] = "type";
     roles[ColorRole] = "color";
     roles[OpacityRole] = "opacity";
+    roles[TextRole] = "text";
 
     return roles;
 }
 
 void TilesModel::someSlot()
 {
-
+    std::vector< std::vector<Tile *> > matches_list = findMatches();
+    qDebug() << matches_list.size();
 }
 
 bool TilesModel::able_to_move(Cell target_cell)
@@ -195,17 +261,18 @@ std::vector<std::vector<Tile *> > TilesModel::findMatches() const
 
         for (int row = 2; row <= height_; row++) {
             Cell cell(row, col);
-            Tile *last_tile = one_match[one_match.size() - 1];
+            Tile *last_tile = one_match.back();
+            Tile *curr_tile = data_list_[cell.index()];
 
-            if (last_tile->type() == data_list_[cell.index()]->type()) {
-                one_match.push_back(data_list_[cell.index()]);
+            if (last_tile->type() == curr_tile->type()) {
+                one_match.push_back(curr_tile);
             } else {
                 if (one_match.size() >= 3) {
                     res.push_back(one_match);
                 }
 
                 one_match.clear();
-                one_match.push_back(data_list_[cell.index()]);
+                one_match.push_back(curr_tile);
             }
         }
 
@@ -216,41 +283,46 @@ std::vector<std::vector<Tile *> > TilesModel::findMatches() const
     }
 
     // horisontal matches
+    std::vector<std::vector<Tile *> > hor_res;
     for (int row = 1; row <= height_; row++) {
         one_match.push_back(data_list_[Cell(row, 1).index()]);
 
         for (int col = 2; col <= width_; col++) {
             Cell cell(row, col);
-            Tile *last_tile = one_match[one_match.size() - 1];
+            Tile *last_tile = one_match.back();
+            Tile *curr_tile = data_list_[cell.index()];
 
-//            // avoiding processing the same tile twice
-//            bool repit = false;
-//            for (std::vector<std::vector<Tile *> >::iterator it1 = res.begin(); it1 < res.end(); it1++) {
-//                std::vector<Tile *>::iterator it2 = std::find(it1->begin(), it1->end(), data_list_[cell.index()]);
-//                if (it2 == it1->end())
-//                    repit = true;
-//            }
-//            if (repit)
-//                continue;
-
-
-            if (last_tile->type() == data_list_[cell.index()]->type()) {
-                one_match.push_back(data_list_[cell.index()]);
+            if (last_tile->type() == curr_tile->type()) {
+                one_match.push_back(curr_tile);
             } else {
                 if (one_match.size() >= 3) {
-                    res.push_back(one_match);
+                    hor_res.push_back(one_match);
                 }
 
                 one_match.clear();
-                one_match.push_back(data_list_[cell.index()]);
+                one_match.push_back(curr_tile);
             }
         }
 
         if (one_match.size() >= 3)
-            res.push_back(one_match);
+            hor_res.push_back(one_match);
 
         one_match.clear();
     }
+
+    // removing doubles to avoid processing the same tile twice
+    for (int i = 0; i < hor_res.size(); i++) {
+        std::vector<Tile *> one_hor_match = hor_res[i];
+        for (int j = 0; j < one_hor_match.size(); j++) {
+            if (checkForRepeating(one_hor_match[j], res)) {
+                one_hor_match.erase(one_hor_match.begin() + j);
+            }
+        }
+
+        res.push_back(one_hor_match);
+    }
+
+
 
     return res;
 }
@@ -258,9 +330,18 @@ std::vector<std::vector<Tile *> > TilesModel::findMatches() const
 void TilesModel::createPackages()
 {
     std::vector< std::vector<Tile *> > matches_list = findMatches();
+
+    for (int i = 0; i < matches_list.size(); i++) {
+        std::vector<Tile *> one_match = matches_list[i];
+        for (int j = 0; j < one_match.size(); j++) {
+            beginResetModel();
+            one_match[j]->setText("X");
+            endResetModel();
+        }
+    }
+
+
     std::vector< std::vector<Tile *> >::iterator it1;
-
-
     for (it1 = matches_list.begin(); it1 != matches_list.end(); it1++) {
         std::vector<Tile *>::iterator it2;
 
@@ -271,9 +352,9 @@ void TilesModel::createPackages()
         Package createPack;
 
         for (it2 = it1->begin(); it2 != it1->end(); it2++) {
-            opacityPack.clear();
+//            opacityPack.clear();
             opacityPack.push(new OpacityCommand(*it2, 0.0));
-            pack_list_.push(opacityPack);
+//            pack_list_.push(opacityPack);
 
             movePack.push(new MoveUpCommand(*it2));
 
@@ -282,14 +363,14 @@ void TilesModel::createPackages()
             createPack.clear();
         }
 
-//        pack_list_.push(opacityPack);
+        pack_list_.push(opacityPack);
         pack_list_.push(movePack);
 //        pack_list_.push(createPack);
+
+        // reversing creating of items (better visible effect)
         for (int i = tmp_createPack.size() - 1; i >= 0 ; i--) {
             pack_list_.push(tmp_createPack[i]);
         }
-
-
     }
 
     if (pack_list_.size())
@@ -322,12 +403,7 @@ void TilesModel::swapCells(const int from, const int to)
 
     }
 
-
     std::swap(data_list_[from], data_list_[to]);
-    int tmp_index = data_list_[from]->index();
-    data_list_[from]->setIndex(data_list_[to]->index());
-    data_list_[to]->setIndex(tmp_index);
-
 }
 
 void TilesModel::swapCells(const Cell &from, const Cell &to)
@@ -348,12 +424,13 @@ void TilesModel::changeOpacity(Tile *target, const float opacity)
 void TilesModel::createNewItem(int index)
 {
     beginRemoveRows(QModelIndex(), index, index);
+    delete data_list_[index];
     data_list_.erase(data_list_.begin() + index);
     endRemoveRows();
 
     beginInsertRows(QModelIndex(), index, index);
     QString type = getRandType();
-    data_list_.insert(data_list_.begin() + index, new Tile(this, type, type, index, 1));
+    data_list_.insert(data_list_.begin() + index, new Tile(type, type, 1));
     endInsertRows();
 }
 
@@ -371,18 +448,28 @@ void TilesModel::moveTile(int index)
     } else {
         if (able_to_move(curr_cell)) {
             swapCells(draged_cell_, curr_cell);
-            createPackages();
+
+            if (matchesExisting()) {
+                createPackages();
+            } else {
+                swapCells(draged_cell_, curr_cell);
+            }
         }
 
         draged_cell_ = Cell();
     }
 
+
 }
 
 void TilesModel::execNextPackage()
 {
+    if (exec_pack_cnt_ != 0)
+        return;
+
     if (pack_list_.empty()) {
-//        createPackages();
+//        someSlot();
+        createPackages();
         return;
     }
 
@@ -398,9 +485,9 @@ int TilesModel::width()
     return width_;
 }
 
-void TilesModel::setWidth(const int val)
+void TilesModel::setWidth(const int width)
 {
-    width_ = val;
+    width_ = width;
     emit widthChanged();
 }
 
@@ -409,9 +496,9 @@ int TilesModel::height()
     return height_;
 }
 
-void TilesModel::setHeight(const int val)
+void TilesModel::setHeight(const int height)
 {
-    height_ = val;
+    height_ = height;
     emit heightChanged();
 }
 

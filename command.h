@@ -18,6 +18,7 @@ class SwapCommand: public Command
 {
 public:
     SwapCommand(Tile *from, Tile *to);
+    SwapCommand(const Cell &from, const Cell &to);
 
     virtual void exec();
 

@@ -10,11 +10,71 @@ ApplicationWindow {
     height: 900
     visible: true
 
+    property int delay: 2000
+
+    //////////////////////////////////////////////////////////////////
+    Component {
+        id: highlight
+        Rectangle {
+            height: view.cellHeight
+            width: view.cellWidth
+            radius: 10
+            color: "lightgrey"
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////
+    Transition {
+        id: move_animation
+        NumberAnimation {
+            properties: "x,y"
+            duration: 1000 + delay
+            easing.type: Easing.OutCirc
+        }
+
+        onRunningChanged:
+        {
+            if (!move_animation.running) {
+//                console.log("move stop");
+                dataModel.execPackCnt--;
+                dataModel.execNextPackage();
+            } else {
+//                console.log("move start");
+                dataModel.execPackCnt++;
+            }
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////
+    Transition {
+        id: add_animation
+        NumberAnimation {
+            properties: "y"
+            duration: 500 + delay
+            easing.type: Easing.OutCirc
+        }
+
+        onRunningChanged:
+        {
+            if (!add_animation.running) {
+//                console.log("add stop");
+                dataModel.execPackCnt--;
+                dataModel.execNextPackage();
+            } else {
+//                console.log("add start");
+                dataModel.execPackCnt++;
+            }
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////
 
     Rectangle {
         width: parent.height; height: parent.width
         anchors.fill: parent
         anchors.centerIn: parent
+
+
 
         GridView {
             id: view
@@ -28,43 +88,12 @@ ApplicationWindow {
 
             interactive: false
 
-            move: Transition {
-                id: move_animation
-                NumberAnimation {
-                    properties: "x,y"
-                    duration: 500
-                    easing.type: Easing.OutCirc
-                }
+            highlight: highlight
+            highlightFollowsCurrentItem: true
 
-                onRunningChanged:
-                {
-                    if (!move_animation.running) {
-//                       console.log("move stop");
-                       dataModel.execNextPackage();
-                    } else {
-//                        console.log("move start");
-                    }
-                }
-            }
+            move: move_animation
+            add:add_animation
 
-            add: Transition {
-                id: add_animation
-                NumberAnimation {
-                    properties: "y"
-                    duration: 1000
-                    easing.type: Easing.OutCirc
-                }
-
-                onRunningChanged:
-                {
-                    if (!add_animation.running) {
-//                       console.log("add stop");
-                       dataModel.execNextPackage();
-                    } else {
-//                        console.log("add start");
-                    }
-                }
-            }
 
             delegate: Item {
                 property var view: GridView.view
@@ -78,31 +107,55 @@ ApplicationWindow {
                     anchors.margins: 5
                     radius: 15
                     anchors.fill: parent
+
+
+//                    Image {
+//                        height: view.cellHeight
+//                        width: view.cellWidth
+
+//                        anchors.fill: parent
+//                        source: model.type
+////                        opacity: model.opacity
+//                    }
                     color: model.color
                     opacity: model.opacity
 
                     Behavior on opacity {
                         NumberAnimation {
                             id: opacity_animation
-                            duration: 500
+                            duration: 500 + delay
 
                             onRunningChanged:
                             {
                                 if (!opacity_animation.running) {
-//                                    console.log(model.index, "op stop");
+//                                    console.log("op stop");
+                                    dataModel.execPackCnt--;
                                     dataModel.execNextPackage();
                                 } else {
-//                                    console.log(model.index, "op start");
+//                                    console.log("op start");
+                                    dataModel.execPackCnt++;
                                 }
-
                             }
                         }
                     }
 
+                    Text {
+                        x: 10; y: 10
+                        text: "%1".arg(model.index)
+                    }
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: model.text
+                    }
 
                     MouseArea {
                         anchors.fill: parent
-                        onClicked: dataModel.moveTile(model.index)
+                        onClicked:
+                        {
+                            view.currentIndex = model.index;
+                            dataModel.moveTile(model.index);
+                        }
                     }
                 }
             }
@@ -116,11 +169,11 @@ ApplicationWindow {
         Menu {
             title: qsTr("&File")
             MenuItem {
-                text: qsTr("test")
+                text: qsTr("some slot")
                 onTriggered: dataModel.someSlot();
             }
             MenuItem {
-                text: qsTr("&rem matches")
+                text: qsTr("rem matches")
                 onTriggered: dataModel.createPackages();
             }
             MenuItem {

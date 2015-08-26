@@ -1,6 +1,14 @@
 <RCC>
     <qresource prefix="/">
         <file>main_mt.qml</file>
-        <file>TileForm.qml</file>
+    </qresource>
+    <qresource prefix="/icon">
+        <file>icon/img1.png</file>
+        <file>icon/img2.png</file>
+        <file>icon/img3.png</file>
+        <file>icon/img4.png</file>
+        <file>icon/img5.png</file>
+        <file>icon/img6.png</file>
+        <file>icon/img7.png</file>
     </qresource>
 </RCC>

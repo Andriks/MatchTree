@@ -1,11 +1,11 @@
 #include "tile.h"
+#include "tilesmodel.h"
 
-Tile::Tile(QObject *parent, QString type, QString color, int index, float opacity) :
-    QObject(parent),
+Tile::Tile(QString type, QString color, float opacity) :
     type_(type),
     color_(color),
-    index_(index),
-    opacity_(opacity)
+    opacity_(opacity),
+    text_("")
 {
 
 }
@@ -41,13 +41,19 @@ void Tile::setOpacity(const float &opacity)
 }
 int Tile::index() const
 {
-    return index_;
+    return TilesModel::Instance()->indexOfItem(this);
 }
 
-void Tile::setIndex(int index)
+QString Tile::text() const
 {
-    index_ = index;
+    return text_;
 }
+
+void Tile::setText(const QString &text)
+{
+    text_ = text;
+}
+
 
 
 

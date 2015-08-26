@@ -1,15 +1,13 @@
 #ifndef TILE_H
 #define TILE_H
 
-#include <QObject>
 #include <QString>
 
 
-class Tile : public QObject
+class Tile
 {
-    Q_OBJECT
 public:
-    explicit Tile(QObject *parent = 0, QString type = "", QString color = "", int index = 0, float opacity = 0);
+    explicit Tile(QString type = "", QString color = "", float opacity = 0);
 
     QString type() const;
     void setType(const QString &type);
@@ -23,16 +21,15 @@ public:
     int index() const;
     void setIndex(int index);
 
-signals:
-
-public slots:
+    QString text() const;
+    void setText(const QString &text);
 
 private:
     QString type_;
     QString color_;
     float opacity_;
-    int index_;
 
+    QString text_; // tmp for testing
 
 };
 
