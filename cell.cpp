@@ -5,35 +5,56 @@
 
 
 Cell::Cell() :
-    row(0),
-    col(0)
+    row_(0),
+    col_(0)
 {
 
 }
 
 Cell::Cell(const Cell &cell):
-    row(cell.row),
-    col(cell.col)
+    row_(cell.row_),
+    col_(cell.col_)
 {
 
 }
 
-Cell::Cell(int r, int c) :
-    row(r),
-    col(c)
+Cell::Cell(int row, int column) :
+    row_(row),
+    col_(column)
 {
 
 }
 
-Cell::Cell(int _index)
+Cell::Cell(int index)
 {
-    row = std::ceil(_index / TilesModel::Instance()->width()) + 1;
-    col = (_index + 1) - ((row - 1) * TilesModel::Instance()->width());
+    row_ = std::ceil(index / TilesModel::Instance()->width()) + 1;
+    col_ = (index + 1) - ((row_ - 1) * TilesModel::Instance()->width());
+}
+
+
+int Cell::row() const
+{
+    return row_;
+}
+
+void Cell::setRow(int row)
+{
+    row_ = row;
+}
+
+int Cell::col() const
+{
+    return col_;
+}
+
+void Cell::setCol(int col)
+{
+    col_ = col;
 }
 
 bool Cell::operator ==(const Cell cell)
 {
-    if ((row == cell.row) && (col == cell.col))
+    if ((row_ == cell.row_) && (col_ == cell.col_))
         return true;
 
     return false;
@@ -41,10 +62,10 @@ bool Cell::operator ==(const Cell cell)
 
 bool Cell::valid() const
 {
-    if ((row <= 0) || (row > TilesModel::Instance()->height()))
+    if ((row_ <= 0) || (row_ > TilesModel::Instance()->height()))
         return false;
 
-    if ((col <= 0) || (col > TilesModel::Instance()->width()))
+    if ((col_ <= 0) || (col_ > TilesModel::Instance()->width()))
         return false;
 
     return true;
@@ -52,26 +73,26 @@ bool Cell::valid() const
 
 int Cell::index() const
 {
-    return ((row - 1) * TilesModel::Instance()->width()) + col - 1;
+    return ((row_ - 1) * TilesModel::Instance()->width()) + col_ - 1;
 }
 
 Cell Cell::upper()
 {
-    return Cell(row - 1, col);
+    return Cell(row_ - 1, col_);
 }
 
 Cell Cell::lower()
 {
-    return Cell(row + 1, col);
+    return Cell(row_ + 1, col_);
 }
 
 Cell Cell::right()
 {
-    return Cell(row, col + 1);
+    return Cell(row_, col_ + 1);
 }
 
 Cell Cell::left()
 {
-    return Cell(row, col - 1);
+    return Cell(row_, col_ - 1);
 }
 

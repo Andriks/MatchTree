@@ -7,8 +7,14 @@ class Cell
 public:
     Cell();
     Cell(const Cell &cell);
-    Cell(int r, int c);
-    Cell(int _index);
+    Cell(int row, int column);
+    Cell(int index);
+
+    int row() const;
+    void setRow(int row);
+
+    int col() const;
+    void setCol(int col);
 
     bool operator ==(const Cell);
 
@@ -20,11 +26,9 @@ public:
     Cell right();
     Cell left();
 
-// no need to do setter/getter for such simle private class
-public:
-    int row;
-    int col;
-
+private:
+    int row_;
+    int col_;
 };
 
 #endif // CELL_H
