@@ -9,8 +9,8 @@
 
 
 TilesModel::TilesModel() :
-    width_(6),
-    height_(8),
+    width_(4),
+    height_(6),
     draged_cell_()
 {
     int dim_size = width_ * height_;
@@ -28,7 +28,7 @@ QString TilesModel::getRandType()
     case 0:
         return "yellow";
     case 1:
-        return "green";
+        return "red";
     case 2:
         return "blue";
     default:
@@ -56,13 +56,13 @@ QVariant TilesModel::data(const QModelIndex & index, int role) const {
 
     switch (role) {
     case TypeRole:
-        return el->getType();
+        return el->type();
         break;
     case ColorRole:
-        return el->getColor();
+        return el->color();
         break;
     case OpacityRole:
-        return el->getOpacity();
+        return el->opacity();
         break;
     default:
         return QVariant();
@@ -130,7 +130,7 @@ std::vector<std::vector<Tile *> > TilesModel::findMatches() const
             Cell cell(row, col);
             Tile *last_tile = one_match[one_match.size() - 1];
 
-            if (last_tile->getType() == data_list_[cell.index()]->getType()) {
+            if (last_tile->type() == data_list_[cell.index()]->type()) {
                 one_match.push_back(data_list_[cell.index()]);
             } else {
                 if (one_match.size() >= 3) {
@@ -156,7 +156,18 @@ std::vector<std::vector<Tile *> > TilesModel::findMatches() const
             Cell cell(row, col);
             Tile *last_tile = one_match[one_match.size() - 1];
 
-            if (last_tile->getType() == data_list_[cell.index()]->getType()) {
+//            // avoiding processing the same tile twice
+//            bool repit = false;
+//            for (std::vector<std::vector<Tile *> >::iterator it1 = res.begin(); it1 < res.end(); it1++) {
+//                std::vector<Tile *>::iterator it2 = std::find(it1->begin(), it1->end(), data_list_[cell.index()]);
+//                if (it2 == it1->end())
+//                    repit = true;
+//            }
+//            if (repit)
+//                continue;
+
+
+            if (last_tile->type() == data_list_[cell.index()]->type()) {
                 one_match.push_back(data_list_[cell.index()]);
             } else {
                 if (one_match.size() >= 3) {
@@ -191,12 +202,15 @@ void TilesModel::createPackages()
         Package createPack;
 
         for (it2 = it1->begin(); it2 != it1->end(); it2++) {
+            opacityPack.clear();
             opacityPack.push(new OpacityCommand(*it2, 0.0));
+            pack_list_.push(opacityPack);
+
             movePack.push(new MoveUpCommand(*it2));
             createPack.push(new CreateCommand(*it2));
         }
 
-        pack_list_.push(opacityPack);
+//        pack_list_.push(opacityPack);
         pack_list_.push(movePack);
         pack_list_.push(createPack);
     }
@@ -233,8 +247,8 @@ void TilesModel::swapCells(const int from, const int to)
 
 
     std::swap(data_list_[from], data_list_[to]);
-    int tmp_index = data_list_[from]->getIndex();
-    data_list_[from]->setIndex(data_list_[to]->getIndex());
+    int tmp_index = data_list_[from]->index();
+    data_list_[from]->setIndex(data_list_[to]->index());
     data_list_[to]->setIndex(tmp_index);
 
 }
@@ -250,17 +264,26 @@ void TilesModel::changeOpacity(Tile *target, const float opacity)
 
     QVector<int> vec;
     vec.push_back(OpacityRole);
-    emit dataChanged(createIndex(target->getIndex(), 0), createIndex(target->getIndex(), 0), vec);
+    emit dataChanged(createIndex(target->index(), 0), createIndex(target->index(), 0), vec);
 
 }
 
-//void TilesModel::opacityChangingFinished(const int lowBound, const int upBound)
-//{
-//    QVector<int> vec;
-//    vec.push_back(OpacityRole);
-//    emit dataChanged(createIndex(lowBound, 0), createIndex(upBound, 0), vec);
-//}
+void TilesModel::createNewItem(int index)
+{
+    beginRemoveRows(QModelIndex(), index, index);
+    data_list_.erase(data_list_.begin() + index);
+    endRemoveRows();
 
+    beginInsertRows(QModelIndex(), index, index);
+    QString type = getRandType();
+    data_list_.insert(data_list_.begin() + index, new Tile(this, type, type, index, 1));
+    endInsertRows();
+}
+
+Tile *TilesModel::item(int index)
+{
+    return data_list_[index];
+}
 
 void TilesModel::moveTile(int index)
 {

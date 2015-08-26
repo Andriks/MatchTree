@@ -14,10 +14,10 @@ public:
 };
 
 //////////////////////////////////////////////////////////////
-class MoveCommand: public Command
+class SwapCommand: public Command
 {
 public:
-    MoveCommand(Tile *from, Tile *to);
+    SwapCommand(Tile *from, Tile *to);
 
     virtual void exec();
 

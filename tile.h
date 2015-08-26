@@ -11,16 +11,16 @@ class Tile : public QObject
 public:
     explicit Tile(QObject *parent = 0, QString type = "", QString color = "", int index = 0, float opacity = 0);
 
-    QString getType() const;
+    QString type() const;
     void setType(const QString &type);
 
-    QString getColor() const;
+    QString color() const;
     void setColor(const QString &color);
 
-    float getOpacity() const;
+    float opacity() const;
     void setOpacity(const float &opacity);
 
-    int getIndex() const;
+    int index() const;
     void setIndex(int index);
 
 signals:

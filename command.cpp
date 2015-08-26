@@ -7,7 +7,7 @@ Command::Command()
 }
 
 
-MoveCommand::MoveCommand(Tile *from, Tile *to) :
+SwapCommand::SwapCommand(Tile *from, Tile *to) :
     from_(from),
     to_(to)
 {
@@ -15,26 +15,26 @@ MoveCommand::MoveCommand(Tile *from, Tile *to) :
 }
 
 //////////////////////////////////////////////////////////////
-void MoveCommand::exec()
+void SwapCommand::exec()
 {
-        TilesModel::Instance()->swapCells(from_->getIndex(), to_->getIndex());
+    TilesModel::Instance()->swapCells(from_->index(), to_->index());
 }
 
-Tile *MoveCommand::from() const
+Tile *SwapCommand::from() const
 {
     return from_;
 }
 
-void MoveCommand::setFrom(Tile *from)
+void SwapCommand::setFrom(Tile *from)
 {
     from_ = from;
 }
-Tile *MoveCommand::to() const
+Tile *SwapCommand::to() const
 {
     return to_;
 }
 
-void MoveCommand::setTo(Tile *to)
+void SwapCommand::setTo(Tile *to)
 {
     to_ = to;
 }
@@ -49,10 +49,18 @@ MoveUpCommand::MoveUpCommand(Tile *target) :
 
 void MoveUpCommand::exec()
 {
-    Cell cell = Cell(target_->getIndex());
-//    Cell upper_cell = cell.upper();
+    Cell cell = Cell(target_->index());
+
+    if (!cell.upper().valid()) {
+        // TODO
+        return;
+    }
+
 
     while (cell.upper().valid()) {
+        if (TilesModel::Instance()->item(cell.upper().index())->opacity() != 1.0)
+            break;
+
         TilesModel::Instance()->swapCells(cell, cell.upper());
 
         cell = cell.upper();
@@ -103,7 +111,6 @@ void OpacityCommand::setOpacity(float opacity)
 }
 
 
-
 //////////////////////////////////////////////////////////////
 CreateCommand::CreateCommand(Tile *target) :
     target_(target)
@@ -113,7 +120,7 @@ CreateCommand::CreateCommand(Tile *target) :
 
 void CreateCommand::exec()
 {
-
+    TilesModel::Instance()->createNewItem(target_->index());
 }
 
 Tile *CreateCommand::target() const

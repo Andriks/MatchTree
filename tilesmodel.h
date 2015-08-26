@@ -37,7 +37,8 @@ public:
     void swapCells(const int from, const int to);
     void swapCells(const Cell &from, const Cell &to);
     void changeOpacity(Tile *target, const float opacity);
-//    void opacityChangingFinished(const int lowBound, const int upBound);
+    void createNewItem(int index);
+    Tile *item(int index);
 
 
 signals:

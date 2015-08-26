@@ -32,17 +32,36 @@ ApplicationWindow {
                 id: move_animation
                 NumberAnimation {
                     properties: "x,y"
-                    duration: 2000
-//                    easing.type: Easing.OutBounce
+                    duration: 3000
+                    easing.type: Easing.OutBounce
                 }
 
                 onRunningChanged:
                 {
                     if (!move_animation.running) {
-                       console.log("move stop")
-                        dataModel.execNextPackage();
+//                       console.log("move stop");
+                       dataModel.execNextPackage();
                     } else {
-                        console.log("move start")
+//                        console.log("move start");
+                    }
+                }
+            }
+
+            add: Transition {
+                id: add_animation
+                NumberAnimation {
+                    properties: "y"
+                    duration: 3000
+                    easing.type: Easing.OutBounce
+                }
+
+                onRunningChanged:
+                {
+                    if (!add_animation.running) {
+//                       console.log("add stop");
+                       dataModel.execNextPackage();
+                    } else {
+//                        console.log("add start");
                     }
                 }
             }
@@ -70,10 +89,10 @@ ApplicationWindow {
                             onRunningChanged:
                             {
                                 if (!opacity_animation.running) {
-                                    console.log(model.index, "op stop");
+//                                    console.log(model.index, "op stop");
                                     dataModel.execNextPackage();
                                 } else {
-                                    console.log(model.index, "op start");
+//                                    console.log(model.index, "op start");
                                 }
 
                             }

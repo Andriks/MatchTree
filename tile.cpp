@@ -10,7 +10,7 @@ Tile::Tile(QObject *parent, QString type, QString color, int index, float opacit
 
 }
 
-QString Tile::getType() const
+QString Tile::type() const
 {
     return type_;
 }
@@ -20,7 +20,7 @@ void Tile::setType(const QString &type)
     type_ = type;
 }
 
-QString Tile::getColor() const
+QString Tile::color() const
 {
     return color_;
 }
@@ -30,7 +30,7 @@ void Tile::setColor(const QString &color)
     color_ = color;
 }
 
-float Tile::getOpacity() const
+float Tile::opacity() const
 {
     return opacity_;
 }
@@ -39,7 +39,7 @@ void Tile::setOpacity(const float &opacity)
 {
     opacity_ = opacity;
 }
-int Tile::getIndex() const
+int Tile::index() const
 {
     return index_;
 }
