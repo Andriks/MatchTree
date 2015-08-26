@@ -32,8 +32,8 @@ ApplicationWindow {
                 id: move_animation
                 NumberAnimation {
                     properties: "x,y"
-                    duration: 3000
-                    easing.type: Easing.OutBounce
+                    duration: 500
+                    easing.type: Easing.OutCirc
                 }
 
                 onRunningChanged:
@@ -51,8 +51,8 @@ ApplicationWindow {
                 id: add_animation
                 NumberAnimation {
                     properties: "y"
-                    duration: 3000
-                    easing.type: Easing.OutBounce
+                    duration: 1000
+                    easing.type: Easing.OutCirc
                 }
 
                 onRunningChanged:

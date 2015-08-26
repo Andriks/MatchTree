@@ -197,6 +197,8 @@ void TilesModel::createPackages()
     for (it1 = matches_list.begin(); it1 != matches_list.end(); it1++) {
         std::vector<Tile *>::iterator it2;
 
+        std::vector<Package> tmp_createPack;
+
         Package opacityPack;
         Package movePack;
         Package createPack;
@@ -207,12 +209,20 @@ void TilesModel::createPackages()
             pack_list_.push(opacityPack);
 
             movePack.push(new MoveUpCommand(*it2));
+
             createPack.push(new CreateCommand(*it2));
+            tmp_createPack.push_back(createPack);
+            createPack.clear();
         }
 
 //        pack_list_.push(opacityPack);
         pack_list_.push(movePack);
-        pack_list_.push(createPack);
+//        pack_list_.push(createPack);
+        for (int i = tmp_createPack.size() - 1; i >= 0 ; i--) {
+            pack_list_.push(tmp_createPack[i]);
+        }
+
+
     }
 
     if (pack_list_.size())
