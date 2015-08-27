@@ -48,11 +48,18 @@ ApplicationWindow {
     //////////////////////////////////////////////////////////////////
     Transition {
         id: add_animation
-        NumberAnimation {
-            properties: "y"
-            duration: 500 + delay
-            easing.type: Easing.OutCirc
-        }
+//        SequentialAnimation {
+//            NumberAnimation {
+//                properties: "opasity"
+//                duration: 500 + delay
+//            }
+            NumberAnimation {
+                properties: "y"
+                duration: 500 + delay
+                easing.type: Easing.OutCirc
+            }
+
+//        }
 
         onRunningChanged:
         {
@@ -109,15 +116,14 @@ ApplicationWindow {
                     anchors.fill: parent
 
 
-//                    Image {
-//                        height: view.cellHeight
-//                        width: view.cellWidth
+                    Image {
+                        height: view.cellHeight
+                        width: view.cellWidth
 
-//                        anchors.fill: parent
-//                        source: model.type
-////                        opacity: model.opacity
-//                    }
-                    color: model.color
+                        anchors.fill: parent
+                        source: model.type
+                    }
+
                     opacity: model.opacity
 
                     Behavior on opacity {
@@ -147,6 +153,9 @@ ApplicationWindow {
                     Text {
                         anchors.centerIn: parent
                         text: model.text
+                        font.family: "Helvetica"
+                        font.pointSize: 56
+                        font.bold: true
                     }
 
                     MouseArea {

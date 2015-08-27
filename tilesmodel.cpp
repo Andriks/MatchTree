@@ -31,41 +31,31 @@ void TilesModel::setExecPackCnt(int exec_pack_cnt)
 QString TilesModel::getRandType()
 {
     int tile_type = std::rand() % types_.size();
+
     switch (tile_type) {
     case 0:
-        return "yellow";
+        return "qrc:/icon/icon/img1.png";
     case 1:
-        return "red";
+        return "qrc:/icon/icon/img2.png";
     case 2:
-        return "blue";
+        return "qrc:/icon/icon/img3.png";
     case 3:
-        return "green";
+        return "qrc:/icon/icon/img4.png";
     case 4:
-        return "pink";
+        return "qrc:/icon/icon/img5.png";
     case 5:
-        return "lightgreen";
+        return "qrc:/icon/icon/img6.png";
+    case 6:
+        return "qrc:/icon/icon/img7.png";
+    case 7:
+        return "qrc:/icon/icon/img8.png";
+    case 8:
+        return "qrc:/icon/icon/img9.png";
+    case 9:
+        return "qrc:/icon/icon/img10.png";
     default:
         return "";
     }
-
-//    switch (tile_type) {
-//    case 0:
-//        return "qrc:/icon/icon/img1.png";
-//    case 1:
-//        return "qrc:/icon/icon/img2.png";
-//    case 2:
-//        return "qrc:/icon/icon/img3.png";
-//    case 3:
-//        return "qrc:/icon/icon/img4.png";
-//    case 4:
-//        return "qrc:/icon/icon/img5.png";
-//    case 5:
-//        return "qrc:/icon/icon/img6.png";
-//    case 6:
-//        return "qrc:/icon/icon/img7.png";
-//    default:
-//        return "";
-    //    }
 }
 
 bool TilesModel::checkForRepeating(Tile *tile, std::vector<std::vector<Tile *> > conteiner) const
@@ -166,8 +156,7 @@ void TilesModel::generate()
     int dim_size = width_ * height_;
 
     for (int i = 0; i < dim_size; i++) {
-        QString rand_type = getRandType();
-        data_list_.push_back(new Tile(rand_type, rand_type, 1));
+        data_list_.push_back(new Tile(getRandType()));
     }
 }
 
@@ -429,9 +418,15 @@ void TilesModel::createNewItem(int index)
     endRemoveRows();
 
     beginInsertRows(QModelIndex(), index, index);
-    QString type = getRandType();
-    data_list_.insert(data_list_.begin() + index, new Tile(type, type, 1));
+    data_list_.insert(data_list_.begin() + index, new Tile(getRandType()));
     endInsertRows();
+
+//    changeOpacity(data_list_[index], 1);
+//    beginResetModel();
+//    data_list_[index]->setOpacity(1);
+//    endResetModel();
+
+
 }
 
 Tile *TilesModel::item(int index)

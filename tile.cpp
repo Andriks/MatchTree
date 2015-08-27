@@ -1,13 +1,19 @@
 #include "tile.h"
 #include "tilesmodel.h"
 
-Tile::Tile(QString type, QString color, float opacity) :
-    type_(type),
-    color_(color),
-    opacity_(opacity),
-    text_("")
-{
+Tile::Tile(QString type) :
+    type_(type)
 
+{
+    if (type_ == "") {
+        text_ = "X";
+        valid_ = false;
+        opacity_ = 0;
+    } else {
+        text_ = "";
+        valid_ = true;
+        opacity_ = 1;
+    }
 }
 
 QString Tile::type() const
@@ -53,6 +59,16 @@ void Tile::setText(const QString &text)
 {
     text_ = text;
 }
+bool Tile::valid() const
+{
+    return valid_;
+}
+
+void Tile::setValid(bool valid)
+{
+    valid_ = valid;
+}
+
 
 
 
