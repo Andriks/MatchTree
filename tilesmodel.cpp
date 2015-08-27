@@ -16,17 +16,31 @@ TilesModel::TilesModel() :
 {
 }
 
-int TilesModel::execPackCnt() const
+TilesModel *TilesModel::Instance()
 {
-    return exec_pack_cnt_;
+    static TilesModel theSingleInstance;
+    return &theSingleInstance;
 }
 
-void TilesModel::setExecPackCnt(int exec_pack_cnt)
+void TilesModel::generate()
 {
-    exec_pack_cnt_ = exec_pack_cnt;
-    emit execPackCntChanged();
-}
+    if (!initialised_)
+        return;
 
+    int dim_size = width_ * height_;
+
+    for (int i = 0; i < dim_size; i++) {
+        data_list_.push_back(new Tile(getRandType()));
+    }
+
+    dim_size += width_ * height_;
+
+    for (int i = width_ * height_; i < dim_size; i++) {
+//        data_list_.push_back(new Tile());
+        data_list_.push_back(new Tile(getRandType()));
+
+    }
+}
 
 QString TilesModel::getRandType()
 {
@@ -56,6 +70,18 @@ QString TilesModel::getRandType()
     default:
         return "";
     }
+}
+
+
+int TilesModel::execPackCnt() const
+{
+    return exec_pack_cnt_;
+}
+
+void TilesModel::setExecPackCnt(int exec_pack_cnt)
+{
+    exec_pack_cnt_ = exec_pack_cnt;
+    emit execPackCntChanged();
 }
 
 bool TilesModel::checkForRepeating(Tile *tile, std::vector<std::vector<Tile *> > conteiner) const
@@ -141,31 +167,6 @@ void TilesModel::setElement_score(int element_score)
     element_score_ = element_score;
 }
 
-
-TilesModel *TilesModel::Instance()
-{
-    static TilesModel theSingleInstance;
-    return &theSingleInstance;
-}
-
-void TilesModel::generate()
-{
-    if (!initialised_)
-        return;
-
-    int dim_size = width_ * height_;
-
-    for (int i = 0; i < dim_size; i++) {
-        data_list_.push_back(new Tile(getRandType()));
-    }
-
-    dim_size += width_ * height_;
-
-    for (int i = width_ * height_; i < dim_size; i++) {
-        data_list_.push_back(new Tile());
-
-    }
-}
 
 int TilesModel::rowCount(const QModelIndex & parent) const {
     return data_list_.size();
@@ -323,6 +324,23 @@ std::vector<std::vector<Tile *> > TilesModel::findMatches() const
     return res;
 }
 
+
+void TilesModel::execNextPackage()
+{
+    if (exec_pack_cnt_ != 0)
+        return;
+
+    if (pack_list_.empty()) {
+        createPackages();
+        return;
+    }
+
+    Package pack = pack_list_.front();
+    pack_list_.pop();
+
+    pack.exec();
+}
+
 void TilesModel::createPackages()
 {
     std::vector< std::vector<Tile *> > matches_list = findMatches();
@@ -347,33 +365,33 @@ void TilesModel::createPackages()
         Package opacityPack;
         Package movePack;
         Package createPack;
+        Package moveDownPack;
 
         for (it2 = it1->begin(); it2 != it1->end(); it2++) {
-//            opacityPack.clear();
             opacityPack.push(new OpacityCommand(*it2, 0.0));
-//            pack_list_.push(opacityPack);
-
             movePack.push(new MoveUpCommand(*it2));
 
             createPack.push(new CreateCommand(*it2));
-            tmp_createPack.push_back(createPack);
-            createPack.clear();
+//            tmp_createPack.push_back(createPack);
+//            createPack.clear();
 
-            createPack.push(new MoveDownCommand(*it2));
-            tmp_moveDownPack.push_back(createPack);
-            createPack.clear();
+//            moveDownPack.push(new MoveDownCommand(*it2));
+//            tmp_moveDownPack.push_back(moveDownPack);
+//            moveDownPack.clear();
 
         }
 
         pack_list_.push(opacityPack);
         pack_list_.push(movePack);
-//        pack_list_.push(createPack);
+        pack_list_.push(createPack);
+//        pack_list_.push(moveDownPack);
 
         // reversing creating of items (better visible effect)
-        for (int i = tmp_createPack.size() - 1; i >= 0 ; i--) {
-            pack_list_.push(tmp_createPack[i]);
-            pack_list_.push(tmp_moveDownPack[i]);
-        }
+//        for (int i = tmp_moveDownPack.size() - 1; i >= 0 ; i--) {
+//        for (int i = 0; i < tmp_moveDownPack.size(); i++) {
+//            pack_list_.push(tmp_createPack[i]);
+//            pack_list_.push(tmp_moveDownPack[i]);
+//        }
     }
 
     if (pack_list_.size())
@@ -426,22 +444,21 @@ void TilesModel::changeOpacity(Tile *target, const float opacity)
 
 void TilesModel::createNewItem(int index)
 {
-//    beginRemoveRows(QModelIndex(), index, index);
-//    delete data_list_[index];
-//    data_list_.erase(data_list_.begin() + index);
-//    endRemoveRows();
+    beginRemoveRows(QModelIndex(), index, index);
+    delete data_list_[index];
+    data_list_.erase(data_list_.begin() + index);
+    endRemoveRows();
+    beginInsertRows(QModelIndex(), index, index);
+    data_list_.insert(data_list_.begin() + index, new Tile(getRandType()));
+    endInsertRows();
 
-//    beginInsertRows(QModelIndex(), index, index);
-//    data_list_.insert(data_list_.begin() + index, new Tile(getRandType()));
-//    endInsertRows();
+//    data_list_[index]->setDefault(getRandType());
 
-    Tile *tile = data_list_[index];
-    tile->setType(getRandType());
-    tile->setValid(true);
-    tile->setOpacity(1);
-    tile->setText("");
-
-    execNextPackage();
+//    Tile *tile = data_list_[index];
+//    tile->setType(getRandType());
+//    tile->setValid(true);
+//    tile->setOpacity(1);
+//    tile->setText("");
 
 }
 
@@ -495,23 +512,6 @@ void TilesModel::moveTile(int index)
     }
 
 
-}
-
-void TilesModel::execNextPackage()
-{
-    if (exec_pack_cnt_ != 0)
-        return;
-
-    if (pack_list_.empty()) {
-//        someSlot();
-        createPackages();
-        return;
-    }
-
-    Package pack = pack_list_.front();
-    pack_list_.pop();
-
-    pack.exec();
 }
 
 

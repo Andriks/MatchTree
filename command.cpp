@@ -31,6 +31,11 @@ void SwapCommand::exec()
     TilesModel::Instance()->swapCells(from_->index(), to_->index());
 }
 
+bool SwapCommand::animated()
+{
+    return true;
+}
+
 Tile *SwapCommand::from() const
 {
     return from_;
@@ -63,17 +68,22 @@ void MoveUpCommand::exec()
 {
     Cell cell = Cell(target_->index());
 
-    int swap_cnt = 0;
+//    int swap_cnt = 0;
 
     while (cell.upper().valid()) {
         TilesModel::Instance()->swapCells(cell, cell.upper());
 
         cell = cell.upper();
-        swap_cnt++;
+//        swap_cnt++;
     }
 
-    if (swap_cnt == 0)
-        TilesModel::Instance()->execNextPackage();
+//    if (swap_cnt == 0)
+//        TilesModel::Instance()->execNextPackage();
+}
+
+bool MoveUpCommand::animated()
+{
+    return true;
 }
 
 Tile *MoveUpCommand::target() const
@@ -97,7 +107,7 @@ void MoveDownCommand::exec()
 {
     Cell cell = Cell(target_->index());
 
-    int swap_cnt = 0;
+//    int swap_cnt = 0;
 
     Tile *lower_tile = TilesModel::Instance()->item(cell.lower().index());
 
@@ -107,11 +117,16 @@ void MoveDownCommand::exec()
         cell = cell.lower();
         lower_tile = TilesModel::Instance()->item(cell.lower().index());
 
-        swap_cnt++;
+//        swap_cnt++;
     }
 
-    if (swap_cnt == 0)
-        TilesModel::Instance()->execNextPackage();
+//    if (swap_cnt == 0)
+//        TilesModel::Instance()->execNextPackage();
+}
+
+bool MoveDownCommand::animated()
+{
+    return true;
 }
 Tile *MoveDownCommand::target() const
 {
@@ -136,6 +151,11 @@ void OpacityCommand::exec()
 {
     target_->setValid(false);
     TilesModel::Instance()->changeOpacity(target_, opacity_);
+}
+
+bool OpacityCommand::animated()
+{
+    return true;
 }
 
 Tile *OpacityCommand::target() const
@@ -169,6 +189,11 @@ CreateCommand::CreateCommand(Tile *target) :
 void CreateCommand::exec()
 {
     TilesModel::Instance()->createNewItem(target_->index());
+}
+
+bool CreateCommand::animated()
+{
+    return false;
 }
 
 Tile *CreateCommand::target() const

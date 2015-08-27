@@ -9,6 +9,8 @@ class Tile
 public:
     explicit Tile(QString type = "");
 
+    void setDefault(QString type = "");
+
     QString type() const;
     void setType(const QString &type);
 

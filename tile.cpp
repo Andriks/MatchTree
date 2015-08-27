@@ -1,10 +1,15 @@
 #include "tile.h"
 #include "tilesmodel.h"
 
-Tile::Tile(QString type) :
-    type_(type)
-
+Tile::Tile(QString type)
 {
+    setDefault(type);
+}
+
+void Tile::setDefault(QString type)
+{
+    type_ = type;
+
     if (type_ == "") {
         text_ = "X";
         valid_ = false;

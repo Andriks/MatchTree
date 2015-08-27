@@ -86,10 +86,10 @@ ApplicationWindow {
             cellHeight: parent.height / dataModel.height;
             cellWidth: parent.width / dataModel.width;
 
-            interactive: false
+//            interactive: false
             verticalLayoutDirection: GridView.BottomToTop
 
-            highlight: highlight
+//            highlight: highlight
 //            highlightFollowsCurrentItem: true
 
             move: move_animation

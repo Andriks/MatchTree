@@ -10,6 +10,7 @@ public:
     Command();
 
     virtual void exec() = 0;
+    virtual bool animated() = 0;
 
 };
 
@@ -21,6 +22,7 @@ public:
     SwapCommand(const Cell &from, const Cell &to);
 
     virtual void exec();
+    virtual bool animated();
 
     Tile *from() const;
     void setFrom(Tile *from);
@@ -40,6 +42,7 @@ public:
     MoveUpCommand(Tile *target);
 
     virtual void exec();
+    virtual bool animated();
 
     Tile *target() const;
     void setTarget(Tile *target);
@@ -55,6 +58,7 @@ public:
     MoveDownCommand(Tile *target);
 
     virtual void exec();
+    virtual bool animated();
 
     Tile *target() const;
     void setTarget(Tile *target);
@@ -70,6 +74,7 @@ public:
     OpacityCommand(Tile *target, float opacity);
 
     virtual void exec();
+    virtual bool animated();
 
     Tile *target() const;
     void setTarget(Tile *target);
@@ -90,6 +95,7 @@ public:
     CreateCommand(Tile *target);
 
     virtual void exec();
+    virtual bool animated();
 
     Tile *target() const;
     void setTarget(Tile *target);
