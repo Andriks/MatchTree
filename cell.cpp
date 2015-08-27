@@ -62,7 +62,7 @@ bool Cell::operator ==(const Cell cell)
 
 bool Cell::valid() const
 {
-    if ((row_ <= 0) || (row_ > TilesModel::Instance()->height()))
+    if ((row_ <= 0) || (row_ > TilesModel::Instance()->height() * 2))
         return false;
 
     if ((col_ <= 0) || (col_ > TilesModel::Instance()->width()))
@@ -78,12 +78,12 @@ int Cell::index() const
 
 Cell Cell::upper()
 {
-    return Cell(row_ - 1, col_);
+    return Cell(row_ + 1, col_);
 }
 
 Cell Cell::lower()
 {
-    return Cell(row_ + 1, col_);
+    return Cell(row_ - 1, col_);
 }
 
 Cell Cell::right()

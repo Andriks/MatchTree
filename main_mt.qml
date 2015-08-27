@@ -10,7 +10,7 @@ ApplicationWindow {
     height: 900
     visible: true
 
-    property int delay: 2000
+    property int delay: 0
 
     //////////////////////////////////////////////////////////////////
     Component {
@@ -28,7 +28,7 @@ ApplicationWindow {
         id: move_animation
         NumberAnimation {
             properties: "x,y"
-            duration: 1000 + delay
+            duration: 500 + delay
             easing.type: Easing.OutCirc
         }
 
@@ -48,18 +48,11 @@ ApplicationWindow {
     //////////////////////////////////////////////////////////////////
     Transition {
         id: add_animation
-//        SequentialAnimation {
-//            NumberAnimation {
-//                properties: "opasity"
-//                duration: 500 + delay
-//            }
             NumberAnimation {
                 properties: "y"
-                duration: 500 + delay
+                duration: 250 + delay
                 easing.type: Easing.OutCirc
             }
-
-//        }
 
         onRunningChanged:
         {
@@ -94,12 +87,13 @@ ApplicationWindow {
             cellWidth: parent.width / dataModel.width;
 
             interactive: false
+            verticalLayoutDirection: GridView.BottomToTop
 
             highlight: highlight
-            highlightFollowsCurrentItem: true
+//            highlightFollowsCurrentItem: true
 
             move: move_animation
-            add:add_animation
+//            add:add_animation
 
 
             delegate: Item {
@@ -129,7 +123,7 @@ ApplicationWindow {
                     Behavior on opacity {
                         NumberAnimation {
                             id: opacity_animation
-                            duration: 500 + delay
+                            duration: 250 + delay
 
                             onRunningChanged:
                             {

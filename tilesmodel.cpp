@@ -158,6 +158,13 @@ void TilesModel::generate()
     for (int i = 0; i < dim_size; i++) {
         data_list_.push_back(new Tile(getRandType()));
     }
+
+    dim_size += width_ * height_;
+
+    for (int i = width_ * height_; i < dim_size; i++) {
+        data_list_.push_back(new Tile());
+
+    }
 }
 
 int TilesModel::rowCount(const QModelIndex & parent) const {
@@ -335,6 +342,7 @@ void TilesModel::createPackages()
         std::vector<Tile *>::iterator it2;
 
         std::vector<Package> tmp_createPack;
+        std::vector<Package> tmp_moveDownPack;
 
         Package opacityPack;
         Package movePack;
@@ -350,6 +358,11 @@ void TilesModel::createPackages()
             createPack.push(new CreateCommand(*it2));
             tmp_createPack.push_back(createPack);
             createPack.clear();
+
+            createPack.push(new MoveDownCommand(*it2));
+            tmp_moveDownPack.push_back(createPack);
+            createPack.clear();
+
         }
 
         pack_list_.push(opacityPack);
@@ -359,6 +372,7 @@ void TilesModel::createPackages()
         // reversing creating of items (better visible effect)
         for (int i = tmp_createPack.size() - 1; i >= 0 ; i--) {
             pack_list_.push(tmp_createPack[i]);
+            pack_list_.push(tmp_moveDownPack[i]);
         }
     }
 
@@ -412,20 +426,22 @@ void TilesModel::changeOpacity(Tile *target, const float opacity)
 
 void TilesModel::createNewItem(int index)
 {
-    beginRemoveRows(QModelIndex(), index, index);
-    delete data_list_[index];
-    data_list_.erase(data_list_.begin() + index);
-    endRemoveRows();
+//    beginRemoveRows(QModelIndex(), index, index);
+//    delete data_list_[index];
+//    data_list_.erase(data_list_.begin() + index);
+//    endRemoveRows();
 
-    beginInsertRows(QModelIndex(), index, index);
-    data_list_.insert(data_list_.begin() + index, new Tile(getRandType()));
-    endInsertRows();
+//    beginInsertRows(QModelIndex(), index, index);
+//    data_list_.insert(data_list_.begin() + index, new Tile(getRandType()));
+//    endInsertRows();
 
-//    changeOpacity(data_list_[index], 1);
-//    beginResetModel();
-//    data_list_[index]->setOpacity(1);
-//    endResetModel();
+    Tile *tile = data_list_[index];
+    tile->setType(getRandType());
+    tile->setValid(true);
+    tile->setOpacity(1);
+    tile->setText("");
 
+    execNextPackage();
 
 }
 
@@ -442,13 +458,37 @@ void TilesModel::moveTile(int index)
         draged_cell_ = Cell(index);
     } else {
         if (able_to_move(curr_cell)) {
-            swapCells(draged_cell_, curr_cell);
+            std::swap(data_list_[curr_cell.index()], data_list_[draged_cell_.index()]);
+            bool matches = matchesExisting();
+            std::swap(data_list_[curr_cell.index()], data_list_[draged_cell_.index()]);
 
-            if (matchesExisting()) {
+            if (matches) {
+                Package pack;
+                pack.push(new SwapCommand(curr_cell, draged_cell_));
+                pack_list_.push(pack);
+
                 createPackages();
             } else {
-                swapCells(draged_cell_, curr_cell);
+                Package pack;
+
+                pack.push(new SwapCommand(curr_cell, draged_cell_));
+                pack_list_.push(pack);
+                pack.clear();
+
+                pack.push(new SwapCommand(curr_cell, draged_cell_));
+                pack_list_.push(pack);
+
+                execNextPackage();
+
             }
+
+//            swapCells(draged_cell_, curr_cell);
+
+//            if (matchesExisting()) {
+//                createPackages();
+//            } else {
+//                swapCells(draged_cell_, curr_cell);
+//            }
         }
 
         draged_cell_ = Cell();

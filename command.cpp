@@ -1,6 +1,8 @@
 #include "command.h"
 #include "tilesmodel.h"
 
+#include "QDebug"
+
 Command::Command()
 {
 
@@ -64,9 +66,6 @@ void MoveUpCommand::exec()
     int swap_cnt = 0;
 
     while (cell.upper().valid()) {
-        if (TilesModel::Instance()->item(cell.upper().index())->opacity() != 1.0)
-            break;
-
         TilesModel::Instance()->swapCells(cell, cell.upper());
 
         cell = cell.upper();
@@ -87,6 +86,43 @@ void MoveUpCommand::setTarget(Tile *target)
     target_ = target;
 }
 
+//////////////////////////////////////////////////////////////
+MoveDownCommand::MoveDownCommand(Tile *target) :
+    target_(target)
+{
+
+}
+
+void MoveDownCommand::exec()
+{
+    Cell cell = Cell(target_->index());
+
+    int swap_cnt = 0;
+
+    Tile *lower_tile = TilesModel::Instance()->item(cell.lower().index());
+
+    while (!lower_tile->valid()) {
+        TilesModel::Instance()->swapCells(cell, cell.lower());
+
+        cell = cell.lower();
+        lower_tile = TilesModel::Instance()->item(cell.lower().index());
+
+        swap_cnt++;
+    }
+
+    if (swap_cnt == 0)
+        TilesModel::Instance()->execNextPackage();
+}
+Tile *MoveDownCommand::target() const
+{
+    return target_;
+}
+
+void MoveDownCommand::setTarget(Tile *target)
+{
+    target_ = target;
+}
+
 
 //////////////////////////////////////////////////////////////
 OpacityCommand::OpacityCommand(Tile *target, float opacity) :
@@ -98,6 +134,7 @@ OpacityCommand::OpacityCommand(Tile *target, float opacity) :
 
 void OpacityCommand::exec()
 {
+    target_->setValid(false);
     TilesModel::Instance()->changeOpacity(target_, opacity_);
 }
 
@@ -143,4 +180,5 @@ void CreateCommand::setTarget(Tile *target)
 {
     target_ = target;
 }
+
 

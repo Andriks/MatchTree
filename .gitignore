@@ -1,3 +1,7 @@
+# tmp objects
+*~
+~*
+
 # C++ objects and libs
 
 *.slo
