@@ -62,7 +62,7 @@ bool Cell::operator ==(const Cell cell)
 
 bool Cell::valid() const
 {
-    if ((row_ <= 0) || (row_ > TilesModel::Instance()->height() * 2))
+    if ((row_ <= 0) || (row_ > (TilesModel::Instance()->height() + 1)))
         return false;
 
     if ((col_ <= 0) || (col_ > TilesModel::Instance()->width()))

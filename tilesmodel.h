@@ -62,6 +62,7 @@ public:
     void changeOpacity(Tile *target, const float opacity);
     void createNewItem(int index);
     Tile *item(int index);
+    QString getRandType();
 
     // interface for Tile
     int indexOfItem(const Tile *item) const;
@@ -92,7 +93,6 @@ private:
     bool able_to_move(Cell);
     std::vector<Cell> cellsToMove(Cell cell);
     std::vector<std::vector<Tile *> > findMatches() const;
-    QString getRandType();
     bool checkForRepeating(Tile *tile, std::vector<std::vector<Tile *> > conteiner) const;
     bool matchesExisting();
 

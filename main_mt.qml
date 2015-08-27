@@ -29,7 +29,7 @@ ApplicationWindow {
         NumberAnimation {
             properties: "x,y"
             duration: 500 + delay
-            easing.type: Easing.OutCirc
+//            easing.type: Easing.OutCirc
         }
 
         onRunningChanged:
@@ -86,14 +86,13 @@ ApplicationWindow {
             cellHeight: parent.height / dataModel.height;
             cellWidth: parent.width / dataModel.width;
 
-//            interactive: false
+            interactive: false
             verticalLayoutDirection: GridView.BottomToTop
 
 //            highlight: highlight
 //            highlightFollowsCurrentItem: true
 
             move: move_animation
-//            add:add_animation
 
 
             delegate: Item {
@@ -156,7 +155,7 @@ ApplicationWindow {
                         anchors.fill: parent
                         onClicked:
                         {
-                            view.currentIndex = model.index;
+//                            view.currentIndex = model.index;
                             dataModel.moveTile(model.index);
                         }
                     }

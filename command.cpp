@@ -68,17 +68,11 @@ void MoveUpCommand::exec()
 {
     Cell cell = Cell(target_->index());
 
-//    int swap_cnt = 0;
-
     while (cell.upper().valid()) {
         TilesModel::Instance()->swapCells(cell, cell.upper());
 
         cell = cell.upper();
-//        swap_cnt++;
     }
-
-//    if (swap_cnt == 0)
-//        TilesModel::Instance()->execNextPackage();
 }
 
 bool MoveUpCommand::animated()
