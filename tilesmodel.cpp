@@ -16,6 +16,13 @@ TilesModel::TilesModel() :
 {
 }
 
+TilesModel::~TilesModel()
+{
+    for (int i = 0; i < data_list_.size(); i++) {
+        delete data_list_[i];
+    }
+}
+
 TilesModel *TilesModel::Instance()
 {
     static TilesModel theSingleInstance;

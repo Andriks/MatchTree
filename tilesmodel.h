@@ -28,6 +28,7 @@ class TilesModel : public QAbstractListModel
     };
 
 public:
+    ~TilesModel();
     static TilesModel *Instance();
     void generate();
 
