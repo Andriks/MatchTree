@@ -97,6 +97,7 @@ ApplicationWindow {
 
             interactive: false
             verticalLayoutDirection: GridView.BottomToTop
+            snapMode: GridView.SnapToRow
 
             move: move_animation
             moveDisplaced: moveDisplaced_animation
@@ -143,10 +144,10 @@ ApplicationWindow {
                         }
                     }
 
-//                    Text {
-//                        x: 10; y: 10
-//                        text: "%1".arg(model.index)
-//                    }
+                    Text {
+                        x: 10; y: 10
+                        text: "%1".arg(model.index)
+                    }
 
                     Text {
                         anchors.centerIn: parent
@@ -168,6 +169,7 @@ ApplicationWindow {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     statusBar: StatusBar {
+        id: status_bar
         RowLayout {
             anchors.fill: parent
             Label { text: dataModel.status }

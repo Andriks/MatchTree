@@ -14,6 +14,7 @@ public:
     void push(QSharedPointer<Command> comm);
     void exec();
     void clear();
+    size_t size();
 
 private:
     std::queue<QSharedPointer<Command> > comm_list_;

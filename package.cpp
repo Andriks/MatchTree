@@ -14,7 +14,7 @@ void Package::push(QSharedPointer<Command> comm)
 
 void Package::exec()
 {
-    bool animated;
+    bool animated = true;
 
     while (comm_list_.size()) {
         QSharedPointer<Command> comm = comm_list_.front();
@@ -33,5 +33,10 @@ void Package::clear()
     while (comm_list_.size()) {
         comm_list_.pop();
     }
+}
+
+size_t Package::size()
+{
+    return comm_list_.size();
 }
 

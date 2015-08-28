@@ -325,69 +325,56 @@ void TilesModel::createPackages()
 {
     std::vector< std::vector<QSharedPointer<Tile> > > matches_list = findMatches();
 
+    Package opacityPack;
     for (int i = 0; i < matches_list.size(); i++) {
         std::vector<QSharedPointer<Tile> > one_match = matches_list[i];
         for (int j = 0; j < one_match.size(); j++) {
             beginResetModel();
             one_match[j]->setText("X");
+            one_match[j]->setValid(false);
             endResetModel();
+
+            opacityPack.push(QSharedPointer<Command>(new OpacityCommand(one_match[j], 0.0)));
+            score_ += element_score_;
         }
     }
 
+    if (opacityPack.size())
+        pack_list_.push(opacityPack);
 
-    std::vector< std::vector<QSharedPointer<Tile> > >::iterator it1;
-    for (it1 = matches_list.begin(); it1 != matches_list.end(); it1++) {
-        std::vector<QSharedPointer<Tile> >::iterator it2;
 
-        std::vector<Package> tmp_movePack;
-        std::vector<Package> tmp_createPack;
-
-        Package opacityPack;
+    for (int iteration = 0; iteration <= height_; iteration++) {
         Package movePack;
         Package createPack;
 
-        // to provide parallel falling elements after removing horizontal matches
-        bool horizontal_match = false;
-        if (it1->size() > 1) {
-            Cell first_cell((*it1)[0]->index());
-            Cell second_cell((*it1)[1]->index());
-            if (first_cell.col() != second_cell.col()) {
-                horizontal_match = true;
+        for (int col = 1; col <= width_; col++) {
+            int num_in_match = 0;
+
+            for (int row = 1; row <= height_; row++) {
+                Cell cell(row, col);
+                QSharedPointer<Tile> tile = data_list_[cell.index()];
+
+                if (!tile->valid()) {
+                    if (num_in_match ==  iteration) {
+                        movePack.push(QSharedPointer<Command>(new MoveUpCommand(tile)));
+                        createPack.push(QSharedPointer<Command>(new RefreshCommand(tile)));
+
+                        break;
+                    }
+
+                    num_in_match++;
+                }
             }
         }
 
-        for (it2 = it1->begin(); it2 != it1->end(); it2++) {
-            opacityPack.push(QSharedPointer<Command>(new OpacityCommand(*it2, 0.0)));
-
-
-            if (horizontal_match) {
-                movePack.push(QSharedPointer<Command>(new MoveUpCommand(*it2)));
-                createPack.push(QSharedPointer<Command>(new RefreshCommand(*it2)));
-            } else {
-                movePack.push(QSharedPointer<Command>(new MoveUpCommand(*it2)));
-                tmp_movePack.push_back(movePack);
-                movePack.clear();
-
-                createPack.push(QSharedPointer<Command>(new RefreshCommand(*it2)));
-                tmp_createPack.push_back(createPack);
-                createPack.clear();
-            }
-
-            score_ += element_score_;
-        }
-
-        pack_list_.push(opacityPack);
-
-        if (horizontal_match) {
+        if (movePack.size())
             pack_list_.push(movePack);
+
+        if (createPack.size())
             pack_list_.push(createPack);
-        } else {
-            for (int i = 0; i < tmp_movePack.size(); i++) {
-                pack_list_.push(tmp_movePack[i]);
-                pack_list_.push(tmp_createPack[i]);
-            }
-        }
+
     }
+
 
     if (pack_list_.size())
         execNextPackage();
