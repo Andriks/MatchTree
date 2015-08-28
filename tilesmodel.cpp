@@ -462,6 +462,9 @@ QSharedPointer<Tile> TilesModel::item(int index)
 
 void TilesModel::moveTile(int index)
 {
+    if (exec_pack_cnt_ != 0)
+        return;
+
     Cell curr_cell(index);
 
     if (!draged_cell_.valid()) {
