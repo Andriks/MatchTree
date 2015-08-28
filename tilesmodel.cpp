@@ -29,16 +29,15 @@ void TilesModel::generate()
 
     int dim_size = width_ * height_;
 
-    for (int i = 0; i < dim_size; i++) {
+    int i;
+    for (i = 0; i < dim_size; i++) {
         data_list_.push_back(new Tile(getRandType()));
     }
 
-//    dim_size += width_ * height_;
-
-    for (int i = width_ * height_; i < dim_size + width_; i++) {
-//        data_list_.push_back(new Tile());
+    // one more row for invisible part
+    dim_size += width_;
+    for (i; i < dim_size; i++) {
         data_list_.push_back(new Tile(getRandType()));
-
     }
 }
 
@@ -103,12 +102,9 @@ int TilesModel::indexOfItem(const Tile *item) const
     return -1;
 }
 
-
-
 int TilesModel::rowCount(const QModelIndex & parent) const {
     return data_list_.size();
 }
-
 
 QVariant TilesModel::data(const QModelIndex & index, int role) const {
     if (index.row() < 0 || index.row() > data_list_.size())
@@ -303,6 +299,7 @@ void TilesModel::createPackages()
         Package movePack;
         Package createPack;
 
+        // to provide parallel falling elements after removing horizontal matches
         bool horizontal_match = false;
         if ((*it1).size() > 1) {
             Cell first_cell((*it1)[0]->index());
@@ -318,13 +315,13 @@ void TilesModel::createPackages()
 
             if (horizontal_match) {
                 movePack.push(new MoveUpCommand(*it2));
-                createPack.push(new CreateCommand(*it2));
+                createPack.push(new RefreshCommand(*it2));
             } else {
                 movePack.push(new MoveUpCommand(*it2));
                 tmp_movePack.push_back(movePack);
                 movePack.clear();
 
-                createPack.push(new CreateCommand(*it2));
+                createPack.push(new RefreshCommand(*it2));
                 tmp_createPack.push_back(createPack);
                 createPack.clear();
             }
@@ -392,7 +389,19 @@ void TilesModel::changeOpacity(Tile *target, const float opacity)
 
 }
 
-void TilesModel::createNewItem(int index)
+void TilesModel::createItem(int index)
+{
+    beginRemoveRows(QModelIndex(), index, index);
+    delete data_list_[index];
+    data_list_.erase(data_list_.begin() + index);
+    endRemoveRows();
+
+    beginInsertRows(QModelIndex(), index, index);
+    data_list_.insert(data_list_.begin() + index, new Tile(getRandType()));
+    endInsertRows();
+}
+
+void TilesModel::refreshItem(int index)
 {
     beginResetModel();
     data_list_[index]->setDefault(getRandType());

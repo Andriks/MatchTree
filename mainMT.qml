@@ -46,6 +46,15 @@ ApplicationWindow {
 
     //////////////////////////////////////////////////////////////////
     Transition {
+        id: moveDisplaced_animation
+        NumberAnimation {
+            properties: "x,y"
+            duration: 200 + delay
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////
+    Transition {
         id: add_animation
             NumberAnimation {
                 properties: "y"
@@ -92,6 +101,7 @@ ApplicationWindow {
 //            highlightFollowsCurrentItem: true
 
             move: move_animation
+            moveDisplaced: moveDisplaced_animation
 
 
             delegate: Item {
@@ -100,11 +110,11 @@ ApplicationWindow {
                 height: view.cellHeight
                 width: view.cellWidth
 
-                Rectangle {
+                Item {
                     id: tile_
 
                     anchors.margins: 5
-                    radius: 15
+                    //radius: 15
                     anchors.fill: parent
 
 

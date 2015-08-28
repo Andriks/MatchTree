@@ -62,7 +62,8 @@ public:
 
     void changeOpacity(Tile *target, const float opacity);
 
-    void createNewItem(int index);
+    void createItem(int index);
+    void refreshItem(int index);
 
     Tile *item(int index);
     QString getRandType();

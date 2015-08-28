@@ -104,5 +104,21 @@ private:
     Tile *target_;
 };
 
+//////////////////////////////////////////////////////////////
+class RefreshCommand: public Command
+{
+public:
+    RefreshCommand(Tile *target);
+
+    virtual void exec();
+    virtual bool animated();
+
+    Tile *target() const;
+    void setTarget(Tile *target);
+
+private:
+    Tile *target_;
+};
+
 
 #endif // COMMAND_H

@@ -99,23 +99,15 @@ MoveDownCommand::MoveDownCommand(Tile *target) :
 
 void MoveDownCommand::exec()
 {
-    Cell cell = Cell(target_->index());
-
-//    int swap_cnt = 0;
-
-    Tile *lower_tile = TilesModel::Instance()->item(cell.lower().index());
+    Cell curr_cell = Cell(target_->index());
+    Tile *lower_tile = TilesModel::Instance()->item(curr_cell.lower().index());
 
     while (!lower_tile->valid()) {
-        TilesModel::Instance()->swapCells(cell, cell.lower());
+        TilesModel::Instance()->swapCells(curr_cell, curr_cell.lower());
 
-        cell = cell.lower();
-        lower_tile = TilesModel::Instance()->item(cell.lower().index());
-
-//        swap_cnt++;
+        curr_cell = curr_cell.lower();
+        lower_tile = TilesModel::Instance()->item(curr_cell.lower().index());
     }
-
-//    if (swap_cnt == 0)
-//        TilesModel::Instance()->execNextPackage();
 }
 
 bool MoveDownCommand::animated()
@@ -182,7 +174,7 @@ CreateCommand::CreateCommand(Tile *target) :
 
 void CreateCommand::exec()
 {
-    TilesModel::Instance()->createNewItem(target_->index());
+    TilesModel::Instance()->createItem(target_->index());
 }
 
 bool CreateCommand::animated()
@@ -200,4 +192,29 @@ void CreateCommand::setTarget(Tile *target)
     target_ = target;
 }
 
+//////////////////////////////////////////////////////////////
+RefreshCommand::RefreshCommand(Tile *target) :
+    target_(target)
+{
 
+}
+
+void RefreshCommand::exec()
+{
+    TilesModel::Instance()->refreshItem(target_->index());
+}
+
+bool RefreshCommand::animated()
+{
+    return false;
+}
+
+Tile *RefreshCommand::target() const
+{
+    return target_;
+}
+
+void RefreshCommand::setTarget(Tile *target)
+{
+    target_ = target;
+}
