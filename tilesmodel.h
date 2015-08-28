@@ -18,6 +18,7 @@ class TilesModel : public QAbstractListModel
     Q_PROPERTY(int width READ width WRITE setWidth NOTIFY widthChanged)
     Q_PROPERTY(int height READ height WRITE setHeight NOTIFY heightChanged)
     Q_PROPERTY(int execPackCnt READ execPackCnt WRITE setExecPackCnt NOTIFY execPackCntChanged)
+    Q_PROPERTY(QString status READ status NOTIFY statusChanged)
 
     ///////////////////////////////////////////////////////
     enum TileElemRoles {
@@ -39,6 +40,7 @@ signals:
     void widthChanged();
     void heightChanged();
     void execPackCntChanged();
+    void statusChanged();
 
 
 public slots:
@@ -58,6 +60,8 @@ public slots:
 
     int execPackCnt() const;
     void setExecPackCnt(int exec_pack_cnt);
+
+    QString status();
 
 public:
     // interface for Command
@@ -124,6 +128,10 @@ private:
     int element_score_;
     int min_score_;
     int max_moves_;
+
+    int moves_cnt_;
+    int score_;
+
 
     Cell draged_cell_;
     int exec_pack_cnt_;

@@ -10,6 +10,8 @@ bool TilesModel::initialised_(false);
 
 TilesModel::TilesModel() :
     exec_pack_cnt_(0),
+    moves_cnt_(0),
+    score_(0),
     width_(4),
     height_(6),
     draged_cell_()
@@ -75,9 +77,6 @@ bool TilesModel::leadsToMatch(Tile *new_tile)
     for (int i = 0; i < 2; i++) {
         if (!left_cell.valid())
             break;
-
-//        if (left_cell.index() > (data_list_.size() - 1))
-//            break;
 
         if (data_list_[left_cell.index()]->type() != new_tile->type())
             break;
@@ -322,6 +321,8 @@ void TilesModel::execNextPackage()
     Package pack = pack_list_.front();
     pack_list_.pop();
 
+    emit statusChanged();
+
     pack.exec();
 }
 
@@ -377,6 +378,7 @@ void TilesModel::createPackages()
                 createPack.clear();
             }
 
+            score_ += element_score_;
         }
 
         pack_list_.push(opacityPack);
@@ -481,6 +483,9 @@ void TilesModel::moveTile(int index)
                 pack.push(new SwapCommand(curr_cell, draged_cell_));
                 pack_list_.push(pack);
 
+                moves_cnt_++;
+                emit statusChanged();
+
                 createPackages();
             } else {
                 Package pack;
@@ -495,14 +500,6 @@ void TilesModel::moveTile(int index)
                 execNextPackage();
 
             }
-
-//            swapCells(draged_cell_, curr_cell);
-
-//            if (matchesExisting()) {
-//                createPackages();
-//            } else {
-//                swapCells(draged_cell_, curr_cell);
-//            }
         }
 
         draged_cell_ = Cell();
@@ -543,6 +540,11 @@ void TilesModel::setExecPackCnt(int exec_pack_cnt)
 {
     exec_pack_cnt_ = exec_pack_cnt;
     emit execPackCntChanged();
+}
+
+QString TilesModel::status()
+{
+    return QString(" score: %1; moves: %2").arg(score_).arg(moves_cnt_);
 }
 
 bool TilesModel::getInitialised()
