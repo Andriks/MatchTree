@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/">
-        <file>main_mt.qml</file>
+        <file>mainMT.qml</file>
     </qresource>
     <qresource prefix="/icon">
         <file>icon/img1.png</file>

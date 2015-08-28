@@ -72,18 +72,6 @@ QString TilesModel::getRandType()
     }
 }
 
-
-int TilesModel::execPackCnt() const
-{
-    return exec_pack_cnt_;
-}
-
-void TilesModel::setExecPackCnt(int exec_pack_cnt)
-{
-    exec_pack_cnt_ = exec_pack_cnt;
-    emit execPackCntChanged();
-}
-
 bool TilesModel::checkForRepeating(Tile *tile, std::vector<std::vector<Tile *> > conteiner) const
 {
     for (std::vector<std::vector<Tile *> >::iterator it1 = conteiner.begin(); it1 < conteiner.end(); it1++) {
@@ -115,57 +103,6 @@ int TilesModel::indexOfItem(const Tile *item) const
     return -1;
 }
 
-bool TilesModel::getInitialised()
-{
-    return initialised_;
-}
-
-void TilesModel::setInitialised(bool initialised)
-{
-    initialised_ = initialised;
-}
-
-std::vector<int> TilesModel::getTypes() const
-{
-    return types_;
-}
-
-void TilesModel::setTypes(const std::vector<int> &types)
-{
-    types_.clear();
-    for (int i = 0; i < types.size(); i++)
-        types_.push_back(types[i]);
-}
-
-int TilesModel::getMax_moves() const
-{
-    return max_moves_;
-}
-
-void TilesModel::setMax_moves(int max_moves)
-{
-    max_moves_ = max_moves;
-}
-
-int TilesModel::getMin_score() const
-{
-    return min_score_;
-}
-
-void TilesModel::setMin_score(int min_score)
-{
-    min_score_ = min_score;
-}
-
-int TilesModel::getElement_score() const
-{
-    return element_score_;
-}
-
-void TilesModel::setElement_score(int element_score)
-{
-    element_score_ = element_score;
-}
 
 
 int TilesModel::rowCount(const QModelIndex & parent) const {
@@ -361,33 +298,49 @@ void TilesModel::createPackages()
 
         std::vector<Package> tmp_movePack;
         std::vector<Package> tmp_createPack;
-        std::vector<Package> tmp_moveDownPack;
 
         Package opacityPack;
         Package movePack;
         Package createPack;
-        Package moveDownPack;
+
+        bool horizontal_match = false;
+        if ((*it1).size() > 1) {
+            Cell first_cell((*it1)[0]->index());
+            Cell second_cell((*it1)[1]->index());
+            if (first_cell.col() != second_cell.col()) {
+                horizontal_match = true;
+            }
+        }
 
         for (it2 = it1->begin(); it2 != it1->end(); it2++) {
             opacityPack.push(new OpacityCommand(*it2, 0.0));
 
 
-            movePack.push(new MoveUpCommand(*it2));
-            tmp_movePack.push_back(movePack);
-            movePack.clear();
+            if (horizontal_match) {
+                movePack.push(new MoveUpCommand(*it2));
+                createPack.push(new CreateCommand(*it2));
+            } else {
+                movePack.push(new MoveUpCommand(*it2));
+                tmp_movePack.push_back(movePack);
+                movePack.clear();
 
-
-            createPack.push(new CreateCommand(*it2));
-            tmp_createPack.push_back(createPack);
-            createPack.clear();
+                createPack.push(new CreateCommand(*it2));
+                tmp_createPack.push_back(createPack);
+                createPack.clear();
+            }
 
         }
 
         pack_list_.push(opacityPack);
 
-        for (int i = 0; i < tmp_movePack.size(); i++) {
-            pack_list_.push(tmp_movePack[i]);
-            pack_list_.push(tmp_createPack[i]);
+        if (horizontal_match) {
+            pack_list_.push(movePack);
+            pack_list_.push(createPack);
+        } else {
+            for (int i = 0; i < tmp_movePack.size(); i++) {
+                pack_list_.push(tmp_movePack[i]);
+                pack_list_.push(tmp_createPack[i]);
+            }
         }
     }
 
@@ -441,14 +394,6 @@ void TilesModel::changeOpacity(Tile *target, const float opacity)
 
 void TilesModel::createNewItem(int index)
 {
-//    beginRemoveRows(QModelIndex(), index, index);
-//    delete data_list_[index];
-//    data_list_.erase(data_list_.begin() + index);
-//    endRemoveRows();
-//    beginInsertRows(QModelIndex(), index, index);
-//    data_list_.insert(data_list_.begin() + index, new Tile(getRandType()));
-//    endInsertRows();
-
     beginResetModel();
     data_list_[index]->setDefault(getRandType());
     endResetModel();
@@ -527,6 +472,69 @@ void TilesModel::setHeight(const int height)
 {
     height_ = height;
     emit heightChanged();
+}
+
+int TilesModel::execPackCnt() const
+{
+    return exec_pack_cnt_;
+}
+
+void TilesModel::setExecPackCnt(int exec_pack_cnt)
+{
+    exec_pack_cnt_ = exec_pack_cnt;
+    emit execPackCntChanged();
+}
+
+bool TilesModel::getInitialised()
+{
+    return initialised_;
+}
+
+void TilesModel::setInitialised(bool initialised)
+{
+    initialised_ = initialised;
+}
+
+std::vector<int> TilesModel::getTypes() const
+{
+    return types_;
+}
+
+void TilesModel::setTypes(const std::vector<int> &types)
+{
+    types_.clear();
+    for (int i = 0; i < types.size(); i++)
+        types_.push_back(types[i]);
+}
+
+int TilesModel::getMax_moves() const
+{
+    return max_moves_;
+}
+
+void TilesModel::setMax_moves(int max_moves)
+{
+    max_moves_ = max_moves;
+}
+
+int TilesModel::getMin_score() const
+{
+    return min_score_;
+}
+
+void TilesModel::setMin_score(int min_score)
+{
+    min_score_ = min_score;
+}
+
+int TilesModel::getElement_score() const
+{
+    return element_score_;
+}
+
+void TilesModel::setElement_score(int element_score)
+{
+    element_score_ = element_score;
 }
 
 

@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     parser.fillParamsIntoModel();
 
     QQmlApplicationEngine engine;
-    engine.load(QUrl(QStringLiteral("qrc:/main_mt.qml")));
+    engine.load(QUrl(QStringLiteral("qrc:/mainMT.qml")));
 
     TilesModel *model = TilesModel::Instance();
     engine.rootContext()->setContextProperty("dataModel", model);

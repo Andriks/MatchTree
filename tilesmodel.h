@@ -59,18 +59,24 @@ public:
     // interface for Command
     void swapCells(const int from, const int to);
     void swapCells(const Cell &from, const Cell &to);
+
     void changeOpacity(Tile *target, const float opacity);
+
     void createNewItem(int index);
+
     Tile *item(int index);
     QString getRandType();
 
+
     // interface for Tile
     int indexOfItem(const Tile *item) const;
+
 
     // for QML Engine
     int rowCount(const QModelIndex & parent = QModelIndex()) const;
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
     QHash<int, QByteArray> roleNames() const;
+
 
     // setters / getters
     int getElement_score() const;
@@ -92,6 +98,7 @@ private:
     // for game logic
     bool able_to_move(Cell);
     std::vector<Cell> cellsToMove(Cell cell);
+
     std::vector<std::vector<Tile *> > findMatches() const;
     bool checkForRepeating(Tile *tile, std::vector<std::vector<Tile *> > conteiner) const;
     bool matchesExisting();

@@ -28,8 +28,7 @@ ApplicationWindow {
         id: move_animation
         NumberAnimation {
             properties: "x,y"
-            duration: 500 + delay
-//            easing.type: Easing.OutCirc
+            duration: 200 + delay
         }
 
         onRunningChanged:
@@ -122,7 +121,7 @@ ApplicationWindow {
                     Behavior on opacity {
                         NumberAnimation {
                             id: opacity_animation
-                            duration: 250 + delay
+                            duration: 700 + delay
 
                             onRunningChanged:
                             {

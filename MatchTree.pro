@@ -5,11 +5,11 @@ QT += qml quick widgets
 SOURCES += \
     tile.cpp \
     tilesmodel.cpp \
-    main_mt.cpp \
     cell.cpp \
     command.cpp \
     package.cpp \
-    jsonparser.cpp
+    jsonparser.cpp \
+    mainMT.cpp
 
 RESOURCES += qml.qrc
 
