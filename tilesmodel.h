@@ -32,6 +32,9 @@ public:
     static TilesModel *Instance();
     void generate();
 
+private:
+    bool leadsToMatch(Tile *new_tile);
+
 signals:
     void widthChanged();
     void heightChanged();

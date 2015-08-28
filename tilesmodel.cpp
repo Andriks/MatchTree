@@ -39,6 +39,11 @@ void TilesModel::generate()
     int i;
     for (i = 0; i < dim_size; i++) {
         data_list_.push_back(new Tile(getRandType()));
+
+        // to avoid matches on start of game
+        while (leadsToMatch(data_list_[i])) {
+            data_list_[i]->setDefault(getRandType());
+        }
     }
 
     // one more row for invisible part
@@ -46,6 +51,45 @@ void TilesModel::generate()
     for (i; i < dim_size; i++) {
         data_list_.push_back(new Tile(getRandType()));
     }
+}
+
+bool TilesModel::leadsToMatch(Tile *new_tile)
+{
+    Cell lower_cell(Cell(new_tile->index()).lower());
+    Cell left_cell(Cell(new_tile->index()).left());
+
+    for (int i = 0; i < 2; i++) {
+        if (!lower_cell.valid())
+            break;
+
+        if (data_list_[lower_cell.index()]->type() != new_tile->type())
+            break;
+
+        lower_cell = lower_cell.lower();
+
+        // if we still don't occures break, we have match here
+        if (i == 1)
+            return true;
+    }
+
+    for (int i = 0; i < 2; i++) {
+        if (!left_cell.valid())
+            break;
+
+//        if (left_cell.index() > (data_list_.size() - 1))
+//            break;
+
+        if (data_list_[left_cell.index()]->type() != new_tile->type())
+            break;
+
+        left_cell = left_cell.left();
+
+        // if we still don't occures break, we have match here
+        if (i == 1)
+            return true;
+    }
+
+    return false;
 }
 
 QString TilesModel::getRandType()
