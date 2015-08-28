@@ -7,7 +7,7 @@ Package::Package()
 
 }
 
-void Package::push(Command *comm)
+void Package::push(QSharedPointer<Command> comm)
 {
     comm_list_.push(comm);
 }
@@ -17,12 +17,11 @@ void Package::exec()
     bool animated;
 
     while (comm_list_.size()) {
-        Command *comm = comm_list_.front();
+        QSharedPointer<Command> comm = comm_list_.front();
         comm_list_.pop();
         animated = comm->animated();
 
         comm->exec();
-        delete comm;
     }
 
     if (!animated)

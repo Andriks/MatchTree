@@ -10,7 +10,7 @@ Command::Command()
 
 
 //////////////////////////////////////////////////////////////
-SwapCommand::SwapCommand(Tile *from, Tile *to) :
+SwapCommand::SwapCommand(QSharedPointer<Tile> from, QSharedPointer<Tile> to) :
     from_(from),
     to_(to)
 {
@@ -36,29 +36,29 @@ bool SwapCommand::animated()
     return true;
 }
 
-Tile *SwapCommand::from() const
+QSharedPointer<Tile> SwapCommand::from() const
 {
     return from_;
 }
 
-void SwapCommand::setFrom(Tile *from)
+void SwapCommand::setFrom(QSharedPointer<Tile> from)
 {
     from_ = from;
 }
 
-Tile *SwapCommand::to() const
+QSharedPointer<Tile> SwapCommand::to() const
 {
     return to_;
 }
 
-void SwapCommand::setTo(Tile *to)
+void SwapCommand::setTo(QSharedPointer<Tile> to)
 {
     to_ = to;
 }
 
 
 //////////////////////////////////////////////////////////////
-MoveUpCommand::MoveUpCommand(Tile *target) :
+MoveUpCommand::MoveUpCommand(QSharedPointer<Tile> target) :
     target_(target)
 {
 
@@ -80,19 +80,19 @@ bool MoveUpCommand::animated()
     return true;
 }
 
-Tile *MoveUpCommand::target() const
+QSharedPointer<Tile> MoveUpCommand::target() const
 {
     return target_;
 }
 
-void MoveUpCommand::setTarget(Tile *target)
+void MoveUpCommand::setTarget(QSharedPointer<Tile> target)
 {
     target_ = target;
 }
 
 
 //////////////////////////////////////////////////////////////
-OpacityCommand::OpacityCommand(Tile *target, float opacity) :
+OpacityCommand::OpacityCommand(QSharedPointer<Tile> target, float opacity) :
     target_(target),
     opacity_(opacity)
 {
@@ -110,12 +110,12 @@ bool OpacityCommand::animated()
     return true;
 }
 
-Tile *OpacityCommand::target() const
+QSharedPointer<Tile> OpacityCommand::target() const
 {
     return target_;
 }
 
-void OpacityCommand::setTarget(Tile *target)
+void OpacityCommand::setTarget(QSharedPointer<Tile> target)
 {
     target_ = target;
 }
@@ -132,7 +132,7 @@ void OpacityCommand::setOpacity(float opacity)
 
 
 //////////////////////////////////////////////////////////////
-CreateCommand::CreateCommand(Tile *target) :
+CreateCommand::CreateCommand(QSharedPointer<Tile> target) :
     target_(target)
 {
 
@@ -148,18 +148,18 @@ bool CreateCommand::animated()
     return false;
 }
 
-Tile *CreateCommand::target() const
+QSharedPointer<Tile> CreateCommand::target() const
 {
     return target_;
 }
 
-void CreateCommand::setTarget(Tile *target)
+void CreateCommand::setTarget(QSharedPointer<Tile> target)
 {
     target_ = target;
 }
 
 //////////////////////////////////////////////////////////////
-RefreshCommand::RefreshCommand(Tile *target) :
+RefreshCommand::RefreshCommand(QSharedPointer<Tile> target) :
     target_(target)
 {
 
@@ -175,12 +175,12 @@ bool RefreshCommand::animated()
     return false;
 }
 
-Tile *RefreshCommand::target() const
+QSharedPointer<Tile> RefreshCommand::target() const
 {
     return target_;
 }
 
-void RefreshCommand::setTarget(Tile *target)
+void RefreshCommand::setTarget(QSharedPointer<Tile> target)
 {
     target_ = target;
 }

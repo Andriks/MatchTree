@@ -4,18 +4,19 @@
 #include "command.h"
 
 #include <queue>
+#include <QSharedPointer>
 
 class Package
 {
 public:
     Package();
 
-    void push(Command *comm);
+    void push(QSharedPointer<Command> comm);
     void exec();
     void clear();
 
 private:
-    std::queue<Command *> comm_list_;
+    std::queue<QSharedPointer<Command> > comm_list_;
 
 };
 

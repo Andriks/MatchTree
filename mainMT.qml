@@ -143,10 +143,10 @@ ApplicationWindow {
                         }
                     }
 
-                    Text {
-                        x: 10; y: 10
-                        text: "%1".arg(model.index)
-                    }
+//                    Text {
+//                        x: 10; y: 10
+//                        text: "%1".arg(model.index)
+//                    }
 
                     Text {
                         anchors.centerIn: parent
@@ -158,10 +158,7 @@ ApplicationWindow {
 
                     MouseArea {
                         anchors.fill: parent
-                        onClicked:
-                        {
-                            dataModel.moveTile(model.index);
-                        }
+                        onClicked: dataModel.moveTile(model.index);
                     }
                 }
             }

@@ -18,12 +18,6 @@ TilesModel::TilesModel() :
 {
 }
 
-TilesModel::~TilesModel()
-{
-    for (int i = 0; i < data_list_.size(); i++) {
-        delete data_list_[i];
-    }
-}
 
 TilesModel *TilesModel::Instance()
 {
@@ -40,7 +34,7 @@ void TilesModel::generate()
 
     int i;
     for (i = 0; i < dim_size; i++) {
-        data_list_.push_back(new Tile(getRandType()));
+        data_list_.push_back(QSharedPointer<Tile>(new Tile(getRandType())));
 
         // to avoid matches on start of game
         while (leadsToMatch(data_list_[i])) {
@@ -51,11 +45,12 @@ void TilesModel::generate()
     // one more row for invisible part
     dim_size += width_;
     for (i; i < dim_size; i++) {
-        data_list_.push_back(new Tile(getRandType()));
+
+        data_list_.push_back(QSharedPointer<Tile>(new Tile(getRandType())));
     }
 }
 
-bool TilesModel::leadsToMatch(Tile *new_tile)
+bool TilesModel::leadsToMatch(QSharedPointer<Tile> new_tile)
 {
     Cell lower_cell(Cell(new_tile->index()).lower());
     Cell left_cell(Cell(new_tile->index()).left());
@@ -121,10 +116,10 @@ QString TilesModel::getRandType()
     }
 }
 
-bool TilesModel::checkForRepeating(Tile *tile, std::vector<std::vector<Tile *> > conteiner) const
+bool TilesModel::checkForRepeating(QSharedPointer<Tile> tile, std::vector<std::vector<QSharedPointer<Tile> > > conteiner) const
 {
-    for (std::vector<std::vector<Tile *> >::iterator it1 = conteiner.begin(); it1 < conteiner.end(); it1++) {
-        for (std::vector<Tile *>::iterator it2 = it1->begin(); it2 != it1->end(); it2++) {
+    for (std::vector<std::vector<QSharedPointer<Tile> > >::iterator it1 = conteiner.begin(); it1 < conteiner.end(); it1++) {
+        for (std::vector<QSharedPointer<Tile> >::iterator it2 = it1->begin(); it2 != it1->end(); it2++) {
             if (*it2 == tile) {
                 return true;
             }
@@ -134,7 +129,7 @@ bool TilesModel::checkForRepeating(Tile *tile, std::vector<std::vector<Tile *> >
 
 bool TilesModel::matchesExisting()
 {
-    std::vector< std::vector<Tile *> > matches_list = findMatches();
+    std::vector< std::vector<QSharedPointer<Tile> > > matches_list = findMatches();
     if (matches_list.empty())
         return false;
 
@@ -160,20 +155,20 @@ QVariant TilesModel::data(const QModelIndex & index, int role) const {
     if (index.row() < 0 || index.row() > data_list_.size())
         return QVariant();
 
-    const Tile *el = data_list_[index.row()];
+    const QSharedPointer<Tile> tile = data_list_[index.row()];
 
     switch (role) {
     case TypeRole:
-        return el->type();
+        return tile->type();
         break;
     case ColorRole:
-        return el->color();
+        return tile->color();
         break;
     case OpacityRole:
-        return el->opacity();
+        return tile->opacity();
         break;
     case TextRole:
-        return el->text();
+        return tile->text();
         break;
     default:
         return QVariant();
@@ -194,7 +189,7 @@ QHash<int, QByteArray> TilesModel::roleNames() const {
 
 void TilesModel::someSlot()
 {
-    std::vector< std::vector<Tile *> > matches_list = findMatches();
+    std::vector< std::vector<QSharedPointer<Tile> > > matches_list = findMatches();
     qDebug() << matches_list.size();
 }
 
@@ -230,10 +225,10 @@ std::vector<Cell> TilesModel::cellsToMove(Cell cell)
     return res;
 }
 
-std::vector<std::vector<Tile *> > TilesModel::findMatches() const
+std::vector<std::vector<QSharedPointer<Tile> > > TilesModel::findMatches() const
 {
-    std::vector<std::vector<Tile *> > res;
-    std::vector<Tile *> one_match;
+    std::vector<std::vector<QSharedPointer<Tile> > > res;
+    std::vector<QSharedPointer<Tile> > one_match;
 
     // vertical matches
     for (int col = 1; col <= width_; col++) {
@@ -241,8 +236,8 @@ std::vector<std::vector<Tile *> > TilesModel::findMatches() const
 
         for (int row = 2; row <= height_; row++) {
             Cell cell(row, col);
-            Tile *last_tile = one_match.back();
-            Tile *curr_tile = data_list_[cell.index()];
+            QSharedPointer<Tile> last_tile = one_match.back();
+            QSharedPointer<Tile> curr_tile = data_list_[cell.index()];
 
             if (last_tile->type() == curr_tile->type()) {
                 one_match.push_back(curr_tile);
@@ -263,14 +258,14 @@ std::vector<std::vector<Tile *> > TilesModel::findMatches() const
     }
 
     // horisontal matches
-    std::vector<std::vector<Tile *> > hor_res;
+    std::vector<std::vector<QSharedPointer<Tile> > > hor_res;
     for (int row = 1; row <= height_; row++) {
         one_match.push_back(data_list_[Cell(row, 1).index()]);
 
         for (int col = 2; col <= width_; col++) {
             Cell cell(row, col);
-            Tile *last_tile = one_match.back();
-            Tile *curr_tile = data_list_[cell.index()];
+            QSharedPointer<Tile> last_tile = one_match.back();
+            QSharedPointer<Tile> curr_tile = data_list_[cell.index()];
 
             if (last_tile->type() == curr_tile->type()) {
                 one_match.push_back(curr_tile);
@@ -292,7 +287,7 @@ std::vector<std::vector<Tile *> > TilesModel::findMatches() const
 
     // removing doubles to avoid processing the same tile twice
     for (int i = 0; i < hor_res.size(); i++) {
-        std::vector<Tile *> one_hor_match = hor_res[i];
+        std::vector<QSharedPointer<Tile> > one_hor_match = hor_res[i];
         for (int j = 0; j < one_hor_match.size(); j++) {
             if (checkForRepeating(one_hor_match[j], res)) {
                 one_hor_match.erase(one_hor_match.begin() + j);
@@ -328,10 +323,10 @@ void TilesModel::execNextPackage()
 
 void TilesModel::createPackages()
 {
-    std::vector< std::vector<Tile *> > matches_list = findMatches();
+    std::vector< std::vector<QSharedPointer<Tile> > > matches_list = findMatches();
 
     for (int i = 0; i < matches_list.size(); i++) {
-        std::vector<Tile *> one_match = matches_list[i];
+        std::vector<QSharedPointer<Tile> > one_match = matches_list[i];
         for (int j = 0; j < one_match.size(); j++) {
             beginResetModel();
             one_match[j]->setText("X");
@@ -340,9 +335,9 @@ void TilesModel::createPackages()
     }
 
 
-    std::vector< std::vector<Tile *> >::iterator it1;
+    std::vector< std::vector<QSharedPointer<Tile> > >::iterator it1;
     for (it1 = matches_list.begin(); it1 != matches_list.end(); it1++) {
-        std::vector<Tile *>::iterator it2;
+        std::vector<QSharedPointer<Tile> >::iterator it2;
 
         std::vector<Package> tmp_movePack;
         std::vector<Package> tmp_createPack;
@@ -353,7 +348,7 @@ void TilesModel::createPackages()
 
         // to provide parallel falling elements after removing horizontal matches
         bool horizontal_match = false;
-        if ((*it1).size() > 1) {
+        if (it1->size() > 1) {
             Cell first_cell((*it1)[0]->index());
             Cell second_cell((*it1)[1]->index());
             if (first_cell.col() != second_cell.col()) {
@@ -362,18 +357,18 @@ void TilesModel::createPackages()
         }
 
         for (it2 = it1->begin(); it2 != it1->end(); it2++) {
-            opacityPack.push(new OpacityCommand(*it2, 0.0));
+            opacityPack.push(QSharedPointer<Command>(new OpacityCommand(*it2, 0.0)));
 
 
             if (horizontal_match) {
-                movePack.push(new MoveUpCommand(*it2));
-                createPack.push(new RefreshCommand(*it2));
+                movePack.push(QSharedPointer<Command>(new MoveUpCommand(*it2)));
+                createPack.push(QSharedPointer<Command>(new RefreshCommand(*it2)));
             } else {
-                movePack.push(new MoveUpCommand(*it2));
+                movePack.push(QSharedPointer<Command>(new MoveUpCommand(*it2)));
                 tmp_movePack.push_back(movePack);
                 movePack.clear();
 
-                createPack.push(new RefreshCommand(*it2));
+                createPack.push(QSharedPointer<Command>(new RefreshCommand(*it2)));
                 tmp_createPack.push_back(createPack);
                 createPack.clear();
             }
@@ -432,7 +427,7 @@ void TilesModel::swapCells(const Cell &from, const Cell &to)
     swapCells(from.index(), to.index());
 }
 
-void TilesModel::changeOpacity(Tile *target, const float opacity)
+void TilesModel::changeOpacity(QSharedPointer<Tile> target, const float opacity)
 {
     target->setOpacity(opacity);
 
@@ -445,12 +440,11 @@ void TilesModel::changeOpacity(Tile *target, const float opacity)
 void TilesModel::createItem(int index)
 {
     beginRemoveRows(QModelIndex(), index, index);
-    delete data_list_[index];
     data_list_.erase(data_list_.begin() + index);
     endRemoveRows();
 
     beginInsertRows(QModelIndex(), index, index);
-    data_list_.insert(data_list_.begin() + index, new Tile(getRandType()));
+    data_list_.insert(data_list_.begin() + index, QSharedPointer<Tile>(new Tile(getRandType())));
     endInsertRows();
 }
 
@@ -461,7 +455,7 @@ void TilesModel::refreshItem(int index)
     endResetModel();
 }
 
-Tile *TilesModel::item(int index)
+QSharedPointer<Tile> TilesModel::item(int index)
 {
     return data_list_[index];
 }
@@ -480,7 +474,7 @@ void TilesModel::moveTile(int index)
 
             if (matches) {
                 Package pack;
-                pack.push(new SwapCommand(curr_cell, draged_cell_));
+                pack.push(QSharedPointer<Command>(new SwapCommand(curr_cell, draged_cell_)));
                 pack_list_.push(pack);
 
                 moves_cnt_++;
@@ -490,11 +484,11 @@ void TilesModel::moveTile(int index)
             } else {
                 Package pack;
 
-                pack.push(new SwapCommand(curr_cell, draged_cell_));
+                pack.push(QSharedPointer<Command>(new SwapCommand(curr_cell, draged_cell_)));
                 pack_list_.push(pack);
                 pack.clear();
 
-                pack.push(new SwapCommand(curr_cell, draged_cell_));
+                pack.push(QSharedPointer<Command>(new SwapCommand(curr_cell, draged_cell_)));
                 pack_list_.push(pack);
 
                 execNextPackage();
@@ -504,8 +498,6 @@ void TilesModel::moveTile(int index)
 
         draged_cell_ = Cell();
     }
-
-
 }
 
 

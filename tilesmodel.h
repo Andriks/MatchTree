@@ -2,6 +2,7 @@
 #define TILESMODEL_H
 
 #include <QAbstractListModel>
+#include <QSharedPointer>
 
 #include <vector>
 #include <queue>
@@ -29,12 +30,11 @@ class TilesModel : public QAbstractListModel
     };
 
 public:
-    ~TilesModel();
     static TilesModel *Instance();
     void generate();
 
 private:
-    bool leadsToMatch(Tile *new_tile);
+    bool leadsToMatch(QSharedPointer<Tile> new_tile);
 
 signals:
     void widthChanged();
@@ -68,12 +68,12 @@ public:
     void swapCells(const int from, const int to);
     void swapCells(const Cell &from, const Cell &to);
 
-    void changeOpacity(Tile *target, const float opacity);
+    void changeOpacity(QSharedPointer<Tile> target, const float opacity);
 
     void createItem(int index);
     void refreshItem(int index);
 
-    Tile *item(int index);
+    QSharedPointer<Tile> item(int index);
     QString getRandType();
 
 
@@ -108,8 +108,8 @@ private:
     bool able_to_move(Cell);
     std::vector<Cell> cellsToMove(Cell cell);
 
-    std::vector<std::vector<Tile *> > findMatches() const;
-    bool checkForRepeating(Tile *tile, std::vector<std::vector<Tile *> > conteiner) const;
+    std::vector<std::vector<QSharedPointer<Tile> > > findMatches() const;
+    bool checkForRepeating(QSharedPointer<Tile> tile, std::vector<std::vector<QSharedPointer<Tile> > > conteiner) const;
     bool matchesExisting();
 
 
@@ -119,7 +119,7 @@ private:
     TilesModel& operator=(const TilesModel&);
 
 private:
-    std::vector<Tile *> data_list_;
+    std::vector<QSharedPointer<Tile> > data_list_;
     std::queue<Package> pack_list_;
     std::vector<int> types_;
 

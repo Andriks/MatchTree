@@ -4,6 +4,8 @@
 #include "cell.h"
 #include "tile.h"
 
+#include <QSharedPointer>
+
 class Command
 {
 public:
@@ -18,37 +20,37 @@ public:
 class SwapCommand: public Command
 {
 public:
-    SwapCommand(Tile *from, Tile *to);
+    SwapCommand(QSharedPointer<Tile> from, QSharedPointer<Tile> to);
     SwapCommand(const Cell &from, const Cell &to);
 
     virtual void exec();
     virtual bool animated();
 
-    Tile *from() const;
-    void setFrom(Tile *from);
+    QSharedPointer<Tile> from() const;
+    void setFrom(QSharedPointer<Tile> from);
 
-    Tile *to() const;
-    void setTo(Tile *to);
+    QSharedPointer<Tile> to() const;
+    void setTo(QSharedPointer<Tile> to);
 
 private:
-    Tile *from_;
-    Tile *to_;
+    QSharedPointer<Tile> from_;
+    QSharedPointer<Tile> to_;
 };
 
 //////////////////////////////////////////////////////////////
 class MoveUpCommand: public Command
 {
 public:
-    MoveUpCommand(Tile *target);
+    MoveUpCommand(QSharedPointer<Tile> target);
 
     virtual void exec();
     virtual bool animated();
 
-    Tile *target() const;
-    void setTarget(Tile *target);
+    QSharedPointer<Tile> target() const;
+    void setTarget(QSharedPointer<Tile> target);
 
 private:
-    Tile *target_;
+    QSharedPointer<Tile> target_;
 };
 
 
@@ -56,19 +58,19 @@ private:
 class OpacityCommand: public Command
 {
 public:
-    OpacityCommand(Tile *target, float opacity);
+    OpacityCommand(QSharedPointer<Tile> target, float opacity);
 
     virtual void exec();
     virtual bool animated();
 
-    Tile *target() const;
-    void setTarget(Tile *target);
+    QSharedPointer<Tile> target() const;
+    void setTarget(QSharedPointer<Tile> target);
 
     float opacity() const;
     void setOpacity(float opacity);
 
 private:
-    Tile *target_;
+    QSharedPointer<Tile> target_;
     float opacity_;
 
 };
@@ -77,32 +79,32 @@ private:
 class CreateCommand: public Command
 {
 public:
-    CreateCommand(Tile *target);
+    CreateCommand(QSharedPointer<Tile> target);
 
     virtual void exec();
     virtual bool animated();
 
-    Tile *target() const;
-    void setTarget(Tile *target);
+    QSharedPointer<Tile> target() const;
+    void setTarget(QSharedPointer<Tile> target);
 
 private:
-    Tile *target_;
+    QSharedPointer<Tile> target_;
 };
 
 //////////////////////////////////////////////////////////////
 class RefreshCommand: public Command
 {
 public:
-    RefreshCommand(Tile *target);
+    RefreshCommand(QSharedPointer<Tile> target);
 
     virtual void exec();
     virtual bool animated();
 
-    Tile *target() const;
-    void setTarget(Tile *target);
+    QSharedPointer<Tile> target() const;
+    void setTarget(QSharedPointer<Tile> target);
 
 private:
-    Tile *target_;
+    QSharedPointer<Tile> target_;
 };
 
 
