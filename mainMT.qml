@@ -98,9 +98,6 @@ ApplicationWindow {
             interactive: false
             verticalLayoutDirection: GridView.BottomToTop
 
-//            highlight: highlight
-//            highlightFollowsCurrentItem: true
-
             move: move_animation
             moveDisplaced: moveDisplaced_animation
 
@@ -115,9 +112,7 @@ ApplicationWindow {
                     id: tile_
 
                     anchors.margins: 5
-                    //radius: 15
                     anchors.fill: parent
-
 
                     Image {
                         height: view.cellHeight
@@ -165,7 +160,6 @@ ApplicationWindow {
                         anchors.fill: parent
                         onClicked:
                         {
-//                            view.currentIndex = model.index;
                             dataModel.moveTile(model.index);
                         }
                     }
@@ -176,31 +170,12 @@ ApplicationWindow {
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
-
-    menuBar: MenuBar {
-        Menu {
-            title: qsTr("&File")
-            MenuItem {
-                text: qsTr("some slot")
-                onTriggered: dataModel.someSlot();
-            }
-            MenuItem {
-                text: qsTr("rem matches")
-                onTriggered: dataModel.createPackages();
-            }
-            MenuItem {
-                text: qsTr("E&xit")
-                onTriggered: Qt.quit();
-            }
+    statusBar: StatusBar {
+        RowLayout {
+            anchors.fill: parent
+            Label { text: dataModel.status }
         }
     }
-
-    statusBar: StatusBar {
-            RowLayout {
-                anchors.fill: parent
-                Label { text: dataModel.status }
-            }
-        }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
 

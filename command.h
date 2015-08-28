@@ -51,21 +51,6 @@ private:
     Tile *target_;
 };
 
-//////////////////////////////////////////////////////////////
-class MoveDownCommand: public Command
-{
-public:
-    MoveDownCommand(Tile *target);
-
-    virtual void exec();
-    virtual bool animated();
-
-    Tile *target() const;
-    void setTarget(Tile *target);
-
-private:
-    Tile *target_;
-};
 
 //////////////////////////////////////////////////////////////
 class OpacityCommand: public Command

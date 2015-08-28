@@ -90,40 +90,6 @@ void MoveUpCommand::setTarget(Tile *target)
     target_ = target;
 }
 
-//////////////////////////////////////////////////////////////
-MoveDownCommand::MoveDownCommand(Tile *target) :
-    target_(target)
-{
-
-}
-
-void MoveDownCommand::exec()
-{
-    Cell curr_cell = Cell(target_->index());
-    Tile *lower_tile = TilesModel::Instance()->item(curr_cell.lower().index());
-
-    while (!lower_tile->valid()) {
-        TilesModel::Instance()->swapCells(curr_cell, curr_cell.lower());
-
-        curr_cell = curr_cell.lower();
-        lower_tile = TilesModel::Instance()->item(curr_cell.lower().index());
-    }
-}
-
-bool MoveDownCommand::animated()
-{
-    return true;
-}
-Tile *MoveDownCommand::target() const
-{
-    return target_;
-}
-
-void MoveDownCommand::setTarget(Tile *target)
-{
-    target_ = target;
-}
-
 
 //////////////////////////////////////////////////////////////
 OpacityCommand::OpacityCommand(Tile *target, float opacity) :
