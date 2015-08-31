@@ -1,8 +1,7 @@
 #ifndef JSONPARSER_H
 #define JSONPARSER_H
 
-#include <vector>
-
+#include <QVector>
 #include <QString>
 
 class JsonParser
@@ -12,7 +11,7 @@ public:
     void fillParamsIntoModel();
 
 private:
-    std::vector<int> types_;
+    QVector<int> types_;
 
     int width_;
     int height_;

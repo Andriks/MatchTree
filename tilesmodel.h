@@ -5,8 +5,8 @@
 #include <QSharedPointer>
 #include <QTimer>
 
-#include <vector>
-#include <queue>
+#include <QVector>
+#include <QQueue>
 
 #include "tile.h"
 #include "cell.h"
@@ -103,8 +103,8 @@ public:
     int getMax_moves() const;
     void setMax_moves(int max_moves);
 
-    std::vector<int> getTypes() const;
-    void setTypes(const std::vector<int> &types);
+    QVector<int> getTypes() const;
+    void setTypes(const QVector<int> &types);
 
     static bool getInitialised();
     static void setInitialised(bool initialised);
@@ -118,10 +118,10 @@ public:
 private:
     // for game logic
     bool able_to_move(Cell);
-    std::vector<Cell> cellsToMove(Cell cell);
+    QVector<Cell> cellsToMove(Cell cell);
 
-    std::vector<std::vector<QSharedPointer<Tile> > > findMatches() const;
-    bool checkForRepeating(QSharedPointer<Tile> tile, std::vector<std::vector<QSharedPointer<Tile> > > conteiner) const;
+    QVector<QVector<QSharedPointer<Tile> > > findMatches() const;
+    bool checkForRepeating(QSharedPointer<Tile> tile, QVector<QVector<QSharedPointer<Tile> > > conteiner) const;
     bool matchesExisting();
 
 
@@ -133,9 +133,9 @@ private:
 private:
     QObject *root_;
 
-    std::vector<QSharedPointer<Tile> > data_list_;
-    std::queue<Package> pack_list_;
-    std::vector<int> types_;
+    QVector<QSharedPointer<Tile> > data_list_;
+    QQueue<Package> pack_list_;
+    QVector<int> types_;
 
     int width_;
     int height_;

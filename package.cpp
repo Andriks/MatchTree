@@ -9,7 +9,7 @@ Package::Package()
 
 void Package::push(QSharedPointer<Command> comm)
 {
-    comm_list_.push(comm);
+    comm_list_.enqueue(comm);
 }
 
 void Package::exec()
@@ -17,8 +17,7 @@ void Package::exec()
     bool animated = true;
 
     while (comm_list_.size()) {
-        QSharedPointer<Command> comm = comm_list_.front();
-        comm_list_.pop();
+        QSharedPointer<Command> comm = comm_list_.dequeue();
         animated = comm->animated();
 
         comm->exec();
@@ -31,7 +30,7 @@ void Package::exec()
 void Package::clear()
 {
     while (comm_list_.size()) {
-        comm_list_.pop();
+        comm_list_.dequeue();
     }
 }
 

@@ -3,7 +3,7 @@
 
 #include "command.h"
 
-#include <queue>
+#include <QQueue>
 #include <QSharedPointer>
 
 class Package
@@ -17,7 +17,7 @@ public:
     size_t size();
 
 private:
-    std::queue<QSharedPointer<Command> > comm_list_;
+    QQueue<QSharedPointer<Command> > comm_list_;
 
 };
 

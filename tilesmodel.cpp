@@ -29,19 +29,6 @@ void TilesModel::setRoot(QObject *root)
     root_ = root;
 }
 
-
-//float TilesModel::scale() const
-//{
-//    return draged_cell_scale_;
-//}
-
-//void TilesModel::setScale(float draged_cell_scale)
-//{
-//    draged_cell_scale_ = draged_cell_scale;
-//    emit scaleChanged();
-//}
-
-
 TilesModel *TilesModel::Instance()
 {
     static TilesModel theSingleInstance;
@@ -139,10 +126,10 @@ QString TilesModel::getRandType()
     }
 }
 
-bool TilesModel::checkForRepeating(QSharedPointer<Tile> tile, std::vector<std::vector<QSharedPointer<Tile> > > conteiner) const
+bool TilesModel::checkForRepeating(QSharedPointer<Tile> tile, QVector<QVector<QSharedPointer<Tile> > > conteiner) const
 {
-    for (std::vector<std::vector<QSharedPointer<Tile> > >::iterator it1 = conteiner.begin(); it1 < conteiner.end(); it1++) {
-        for (std::vector<QSharedPointer<Tile> >::iterator it2 = it1->begin(); it2 != it1->end(); it2++) {
+    for (QVector<QVector<QSharedPointer<Tile> > >::iterator it1 = conteiner.begin(); it1 < conteiner.end(); it1++) {
+        for (QVector<QSharedPointer<Tile> >::iterator it2 = it1->begin(); it2 != it1->end(); it2++) {
             if (*it2 == tile) {
                 return true;
             }
@@ -152,7 +139,7 @@ bool TilesModel::checkForRepeating(QSharedPointer<Tile> tile, std::vector<std::v
 
 bool TilesModel::matchesExisting()
 {
-    std::vector< std::vector<QSharedPointer<Tile> > > matches_list = findMatches();
+    QVector< QVector<QSharedPointer<Tile> > > matches_list = findMatches();
     if (matches_list.empty())
         return false;
 
@@ -230,8 +217,8 @@ void TilesModel::someSlot(int index)
 bool TilesModel::able_to_move(Cell target_cell)
 {
     // we can move only one cell to right, left, up or down
-    std::vector<Cell> cells_to_move = cellsToMove(draged_cell_);
-    std::vector<Cell>::iterator it = std::find(cells_to_move.begin(), cells_to_move.end(), target_cell);
+    QVector<Cell> cells_to_move = cellsToMove(draged_cell_);
+    QVector<Cell>::iterator it = std::find(cells_to_move.begin(), cells_to_move.end(), target_cell);
     if (it == cells_to_move.end())
         return false;
 
@@ -239,9 +226,9 @@ bool TilesModel::able_to_move(Cell target_cell)
     return true;
 }
 
-std::vector<Cell> TilesModel::cellsToMove(Cell cell)
+QVector<Cell> TilesModel::cellsToMove(Cell cell)
 {
-    std::vector<Cell> res;
+    QVector<Cell> res;
 
     if (cell.right().valid())
         res.push_back(cell.right());
@@ -259,10 +246,10 @@ std::vector<Cell> TilesModel::cellsToMove(Cell cell)
     return res;
 }
 
-std::vector<std::vector<QSharedPointer<Tile> > > TilesModel::findMatches() const
+QVector<QVector<QSharedPointer<Tile> > > TilesModel::findMatches() const
 {
-    std::vector<std::vector<QSharedPointer<Tile> > > res;
-    std::vector<QSharedPointer<Tile> > one_match;
+    QVector<QVector<QSharedPointer<Tile> > > res;
+    QVector<QSharedPointer<Tile> > one_match;
 
     // vertical matches
     for (int col = 1; col <= width_; col++) {
@@ -292,7 +279,7 @@ std::vector<std::vector<QSharedPointer<Tile> > > TilesModel::findMatches() const
     }
 
     // horisontal matches
-    std::vector<std::vector<QSharedPointer<Tile> > > hor_res;
+    QVector<QVector<QSharedPointer<Tile> > > hor_res;
     for (int row = 1; row <= height_; row++) {
         one_match.push_back(data_list_[Cell(row, 1).index()]);
 
@@ -321,7 +308,7 @@ std::vector<std::vector<QSharedPointer<Tile> > > TilesModel::findMatches() const
 
     // removing doubles to avoid processing the same tile twice
     for (int i = 0; i < hor_res.size(); i++) {
-        std::vector<QSharedPointer<Tile> > one_hor_match = hor_res[i];
+        QVector<QSharedPointer<Tile> > one_hor_match = hor_res[i];
         for (int j = 0; j < one_hor_match.size(); j++) {
             if (checkForRepeating(one_hor_match[j], res)) {
                 one_hor_match.erase(one_hor_match.begin() + j);
@@ -348,7 +335,7 @@ void TilesModel::execNextPackage()
     }
 
     Package pack = pack_list_.front();
-    pack_list_.pop();
+    pack_list_.dequeue();
 
     emit statusChanged();
 
@@ -357,11 +344,11 @@ void TilesModel::execNextPackage()
 
 void TilesModel::createPackages()
 {
-    std::vector< std::vector<QSharedPointer<Tile> > > matches_list = findMatches();
+    QVector< QVector<QSharedPointer<Tile> > > matches_list = findMatches();
 
     Package opacityPack;
     for (int i = 0; i < matches_list.size(); i++) {
-        std::vector<QSharedPointer<Tile> > one_match = matches_list[i];
+        QVector<QSharedPointer<Tile> > one_match = matches_list[i];
         for (int j = 0; j < one_match.size(); j++) {
             beginResetModel();
             one_match[j]->setText("X");
@@ -374,7 +361,7 @@ void TilesModel::createPackages()
     }
 
     if (opacityPack.size())
-        pack_list_.push(opacityPack);
+        pack_list_.enqueue(opacityPack);
 
 
     for (int iteration = 0; iteration <= height_; iteration++) {
@@ -402,10 +389,10 @@ void TilesModel::createPackages()
         }
 
         if (movePack.size())
-            pack_list_.push(movePack);
+            pack_list_.enqueue(movePack);
 
         if (createPack.size())
-            pack_list_.push(createPack);
+            pack_list_.enqueue(createPack);
 
     }
 
@@ -517,7 +504,7 @@ void TilesModel::moveTile(int index)
             if (matches) {
                 Package pack;
                 pack.push(QSharedPointer<Command>(new SwapCommand(curr_cell, draged_cell_)));
-                pack_list_.push(pack);
+                pack_list_.enqueue(pack);
 
                 moves_cnt_++;
                 emit statusChanged();
@@ -527,11 +514,11 @@ void TilesModel::moveTile(int index)
                 Package pack;
 
                 pack.push(QSharedPointer<Command>(new SwapCommand(curr_cell, draged_cell_)));
-                pack_list_.push(pack);
+                pack_list_.enqueue(pack);
                 pack.clear();
 
                 pack.push(QSharedPointer<Command>(new SwapCommand(curr_cell, draged_cell_)));
-                pack_list_.push(pack);
+                pack_list_.enqueue(pack);
 
                 execNextPackage();
 
@@ -612,12 +599,12 @@ void TilesModel::setInitialised(bool initialised)
     initialised_ = initialised;
 }
 
-std::vector<int> TilesModel::getTypes() const
+QVector<int> TilesModel::getTypes() const
 {
     return types_;
 }
 
-void TilesModel::setTypes(const std::vector<int> &types)
+void TilesModel::setTypes(const QVector<int> &types)
 {
     types_.clear();
     for (int i = 0; i < types.size(); i++)
