@@ -14,19 +14,8 @@ TilesModel::TilesModel() :
     m_height(6),
     m_movesCount(0),
     m_score(0),
-    m_ExecPackCounter(0),
     m_DragedCell()
 {
-}
-
-QObject *TilesModel::getRoot() const
-{
-    return m_root;
-}
-
-void TilesModel::setRoot(QObject *root)
-{
-    m_root = root;
 }
 
 TilesModel *TilesModel::Instance()
@@ -304,20 +293,20 @@ QVector<QVector<QSharedPointer<Tile> > > TilesModel::findMatches() const
 
 void TilesModel::execNextPackage()
 {
-    if (m_ExecPackCounter != 0)
-        return;
-
     if (m_packList.empty()) {
         createPackages();
         return;
     }
 
-    Package pack = m_packList.front();
-    m_packList.dequeue();
+    Package pack = m_packList.dequeue();
+    pack.exec();
+    setPackDelay(pack.delay());
 
     emit statusChanged();
 
-    pack.exec();
+    QObject *pack_timer = m_root->findChild<QObject *>("pack_timer");
+    QMetaObject::invokeMethod(pack_timer, "start");
+
 }
 
 void TilesModel::createPackages()
@@ -455,9 +444,6 @@ QSharedPointer<Tile> TilesModel::item(int index)
 
 void TilesModel::moveTile(int index)
 {
-    if (m_ExecPackCounter != 0)
-        return;
-
     Cell curr_cell(index);
 
     // for providing animated scale effect for draged tile
@@ -549,17 +535,6 @@ void TilesModel::setHeight(const int height)
     emit heightChanged();
 }
 
-int TilesModel::execPackCnt() const
-{
-    return m_ExecPackCounter;
-}
-
-void TilesModel::setExecPackCnt(int exec_pack_cnt)
-{
-    m_ExecPackCounter = exec_pack_cnt;
-    emit execPackCntChanged();
-}
-
 QString TilesModel::status()
 {
     return QString(" score: %1; moves: %2").arg(m_score).arg(m_movesCount);
@@ -617,4 +592,23 @@ void TilesModel::setElement_score(int element_score)
     m_elementScore = element_score;
 }
 
+int TilesModel::packDelay() const
+{
+    return m_packDelay;
+}
 
+void TilesModel::setPackDelay(int packDelay)
+{
+    m_packDelay = packDelay;
+    emit packDelayChanged();
+}
+
+QObject *TilesModel::getRoot() const
+{
+    return m_root;
+}
+
+void TilesModel::setRoot(QObject *root)
+{
+    m_root = root;
+}

@@ -31,9 +31,10 @@ void SwapCommand::exec()
     TilesModel::Instance()->swapCells(m_from->index(), m_to->index());
 }
 
-bool SwapCommand::animated()
+
+int SwapCommand::delay()
 {
-    return true;
+    return 200;
 }
 
 QSharedPointer<Tile> SwapCommand::from() const
@@ -75,9 +76,9 @@ void MoveUpCommand::exec()
     }
 }
 
-bool MoveUpCommand::animated()
+int MoveUpCommand::delay()
 {
-    return true;
+    return 200;
 }
 
 QSharedPointer<Tile> MoveUpCommand::target() const
@@ -105,9 +106,9 @@ void OpacityCommand::exec()
     TilesModel::Instance()->changeOpacity(m_target, m_opacity);
 }
 
-bool OpacityCommand::animated()
+int OpacityCommand::delay()
 {
-    return true;
+    return 700;
 }
 
 QSharedPointer<Tile> OpacityCommand::target() const
@@ -145,9 +146,9 @@ void ScaleCommand::exec()
     TilesModel::Instance()->changeScale(m_target, m_scale);
 }
 
-bool ScaleCommand::animated()
+int ScaleCommand::delay()
 {
-    return true;
+    return 300;
 }
 
 QSharedPointer<Tile> ScaleCommand::target() const
@@ -182,9 +183,9 @@ void CreateCommand::exec()
     TilesModel::Instance()->createItem(m_target->index());
 }
 
-bool CreateCommand::animated()
+int CreateCommand::delay()
 {
-    return false;
+    return 0;
 }
 
 QSharedPointer<Tile> CreateCommand::target() const
@@ -209,9 +210,9 @@ void RefreshCommand::exec()
     TilesModel::Instance()->refreshItem(m_target->index());
 }
 
-bool RefreshCommand::animated()
+int RefreshCommand::delay()
 {
-    return false;
+    return 0;
 }
 
 QSharedPointer<Tile> RefreshCommand::target() const

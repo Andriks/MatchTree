@@ -32,16 +32,6 @@ ApplicationWindow {
             duration: 200 + delay
             easing.type: "OutBack"
         }
-
-        onRunningChanged:
-        {
-            if (!move_animation.running) {
-                dataModel.execPackCnt--;
-                dataModel.execNextPackage();
-            } else {
-                dataModel.execPackCnt++;
-            }
-        }
     }
 
     //////////////////////////////////////////////////////////////////
@@ -57,21 +47,32 @@ ApplicationWindow {
     //////////////////////////////////////////////////////////////////
     Transition {
         id: add_animation
-            NumberAnimation {
-                properties: "y"
-                duration: 250 + delay
-                easing.type: Easing.OutCirc
-            }
-
-        onRunningChanged:
-        {
-            if (!add_animation.running) {
-                dataModel.execPackCnt--;
-                dataModel.execNextPackage();
-            } else {
-                dataModel.execPackCnt++;
-            }
+        NumberAnimation {
+            properties: "y"
+            duration: 200 + delay
+            easing.type: Easing.OutCirc
         }
+    }
+
+    //////////////////////////////////////////////////////////////////
+
+    Timer {
+        id: pack_timer
+        objectName: "pack_timer"
+        interval: dataModel.packDelay
+        onTriggered:
+        {
+
+            dataModel.execNextPackage()
+        }
+    }
+
+    Timer {
+        id: scale_timer
+        objectName: "scale_timer"
+        interval: 250
+        repeat: true
+        onTriggered: dataModel.provideScaleAnimation()
     }
 
     //////////////////////////////////////////////////////////////////
@@ -125,16 +126,6 @@ ApplicationWindow {
                         NumberAnimation {
                             id: opacity_animation
                             duration: 700 + delay
-
-                            onRunningChanged:
-                            {
-                                if (!opacity_animation.running) {
-                                    dataModel.execPackCnt--;
-                                    dataModel.execNextPackage();
-                                } else {
-                                    dataModel.execPackCnt++;
-                                }
-                            }
                         }
                     }
 
@@ -145,11 +136,6 @@ ApplicationWindow {
                         }
                     }
 
-//                    Text {
-//                        x: 10; y: 10
-//                        text: "%1".arg(model.index)
-//                    }
-
                     MouseArea {
                         anchors.fill: parent
                         onClicked: dataModel.moveTile(model.index)
@@ -157,16 +143,6 @@ ApplicationWindow {
                 }
             }
         }
-    }
-
-
-
-    Timer {
-        id: scale_timer
-        objectName: "scale_timer"
-        interval: 250
-        repeat: true
-        onTriggered: dataModel.provideScaleAnimation()
     }
 
 

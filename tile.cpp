@@ -64,12 +64,3 @@ void Tile::setScale(float scale)
     m_scale = scale;
 }
 
-
-
-
-
-
-
-
-
-

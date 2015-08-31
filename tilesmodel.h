@@ -19,7 +19,7 @@ class TilesModel : public QAbstractListModel
     Q_OBJECT
     Q_PROPERTY(int width READ width WRITE setWidth NOTIFY widthChanged)
     Q_PROPERTY(int height READ height WRITE setHeight NOTIFY heightChanged)
-    Q_PROPERTY(int execPackCnt READ execPackCnt WRITE setExecPackCnt NOTIFY execPackCntChanged)
+    Q_PROPERTY(int packDelay READ packDelay WRITE setPackDelay NOTIFY packDelayChanged)
     Q_PROPERTY(QString status READ status NOTIFY statusChanged)
 
     ///////////////////////////////////////////////////////
@@ -29,19 +29,20 @@ class TilesModel : public QAbstractListModel
         ScaleRole
     };
 
+    // for singleton
+    TilesModel();
+    TilesModel(const TilesModel&);
+    TilesModel& operator=(const TilesModel&);
+
 public:
     static TilesModel *Instance();
+    // start generating items (without matches)
     void generate();
 
-private:
-    bool leadsToMatch(QSharedPointer<Tile> new_tile);
 
-signals:
-    void widthChanged();
-    void heightChanged();
-    void execPackCntChanged();
-    void statusChanged();
-    void scaleChanged();
+private:
+    // check for generate()
+    bool leadsToMatch(QSharedPointer<Tile> new_tile);
 
 
 public slots:
@@ -51,18 +52,6 @@ public slots:
     void execNextPackage();
     void createPackages();       //tmp move to slots for testing
 
-
-    // setters / getters for qml engine
-    int width();
-    void setWidth(const int width);
-
-    int height();
-    void setHeight(const int height);
-
-    int execPackCnt() const;
-    void setExecPackCnt(int exec_pack_cnt);
-
-    QString status();
 
 public:
     // interface for Command
@@ -89,6 +78,33 @@ public:
     QHash<int, QByteArray> roleNames() const;
 
 
+private:
+    // for game logic
+    bool able_to_move(Cell);
+    QVector<Cell> cellsToMove(Cell cell);
+
+    // returns vector of hor / vert matches
+    QVector<QVector<QSharedPointer<Tile> > > findMatches() const;
+    // checks for repeating tiles in matches
+    bool checkForRepeating(QSharedPointer<Tile> tile, QVector<QVector<QSharedPointer<Tile> > > conteiner) const;
+    bool matchesExisting();
+
+
+public slots:
+    // setters / getters for qml engine
+    int width();
+    void setWidth(const int width);
+
+    int height();
+    void setHeight(const int height);
+
+    int packDelay() const;
+    void setPackDelay(int packDelay);
+
+    QString status();
+
+
+public:
     // setters / getters
     int getElement_score() const;
     void setElement_score(int element_score);
@@ -108,20 +124,14 @@ public:
     QObject *getRoot() const;
     void setRoot(QObject *root);
 
-private:
-    // for game logic
-    bool able_to_move(Cell);
-    QVector<Cell> cellsToMove(Cell cell);
 
-    QVector<QVector<QSharedPointer<Tile> > > findMatches() const;
-    bool checkForRepeating(QSharedPointer<Tile> tile, QVector<QVector<QSharedPointer<Tile> > > conteiner) const;
-    bool matchesExisting();
+signals:
+    void widthChanged();
+    void heightChanged();
+    void packDelayChanged();
+    void statusChanged();
+    void scaleChanged();
 
-
-    // for singleton
-    TilesModel();
-    TilesModel(const TilesModel&);
-    TilesModel& operator=(const TilesModel&);
 
 private:
     QObject *m_root;
@@ -139,8 +149,9 @@ private:
     int m_movesCount;
     int m_score;
 
-    int m_ExecPackCounter;
     Cell m_DragedCell;
+
+    int m_packDelay;
 
     static bool m_initialised;
 };

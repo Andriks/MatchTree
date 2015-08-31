@@ -11,13 +11,18 @@ class Package
 public:
     Package();
 
-    void push(QSharedPointer<Command> comm);
     void exec();
+
+    void push(QSharedPointer<Command> comm);
     void clear();
     size_t size();
 
+    int delay() const;
+    void setDelay(int delay);
+
 private:
     QQueue<QSharedPointer<Command> > m_commList;
+    int m_delay;
 
 };
 

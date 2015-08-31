@@ -1,8 +1,11 @@
 #include "package.h"
 #include "tilesmodel.h"
 
+#include <cmath>
 
-Package::Package()
+
+Package::Package() :
+    m_delay(0)
 {
 
 }
@@ -14,17 +17,13 @@ void Package::push(QSharedPointer<Command> comm)
 
 void Package::exec()
 {
-    bool animated = true;
 
     while (m_commList.size()) {
         QSharedPointer<Command> comm = m_commList.dequeue();
-        animated = comm->animated();
+        m_delay = std::max(m_delay, comm->delay());
 
         comm->exec();
     }
-
-    if (!animated)
-        TilesModel::Instance()->execNextPackage();
 }
 
 void Package::clear()
@@ -38,4 +37,14 @@ size_t Package::size()
 {
     return m_commList.size();
 }
+int Package::delay() const
+{
+    return m_delay;
+}
+
+void Package::setDelay(int delay)
+{
+    m_delay = delay;
+}
+
 
