@@ -78,12 +78,13 @@ ApplicationWindow {
 
     //////////////////////////////////////////////////////////////////
 
+
     Rectangle {
         width: parent.height; height: parent.width
         anchors.fill: parent
         anchors.centerIn: parent
 
-
+        color: "#f1ead8"
 
         GridView {
             id: view
@@ -124,6 +125,7 @@ ApplicationWindow {
                     }
 
                     opacity: model.opacity
+                    scale: model.scale
 
                     Behavior on opacity {
                         NumberAnimation {
@@ -144,6 +146,13 @@ ApplicationWindow {
                         }
                     }
 
+                    Behavior on scale {
+                        NumberAnimation {
+                            id: scale_animation
+                            duration: 300
+                        }
+                    }
+
                     Text {
                         x: 10; y: 10
                         text: "%1".arg(model.index)
@@ -159,11 +168,21 @@ ApplicationWindow {
 
                     MouseArea {
                         anchors.fill: parent
-                        onClicked: dataModel.moveTile(model.index);
+                        onClicked: dataModel.moveTile(model.index)
                     }
                 }
             }
         }
+    }
+
+
+
+    Timer {
+        id: scale_timer
+        objectName: "scale_timer"
+        interval: 300
+        repeat: true
+        onTriggered: dataModel.provideScaleAnimation()
     }
 
 

@@ -29,6 +29,9 @@ public:
     bool valid() const;
     void setValid(bool valid);
 
+    float scale() const;
+    void setScale(float scale);
+
 private:
     QString type_;
     bool valid_;
@@ -37,6 +40,7 @@ private:
     float opacity_;
 
     QString text_; // tmp for testing
+    float scale_;
 
 };
 

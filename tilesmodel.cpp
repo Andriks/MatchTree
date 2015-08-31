@@ -9,6 +9,7 @@
 bool TilesModel::initialised_(false);
 
 TilesModel::TilesModel() :
+    root_(NULL),
     exec_pack_cnt_(0),
     moves_cnt_(0),
     score_(0),
@@ -17,6 +18,28 @@ TilesModel::TilesModel() :
     draged_cell_()
 {
 }
+
+QObject *TilesModel::getRoot() const
+{
+    return root_;
+}
+
+void TilesModel::setRoot(QObject *root)
+{
+    root_ = root;
+}
+
+
+//float TilesModel::scale() const
+//{
+//    return draged_cell_scale_;
+//}
+
+//void TilesModel::setScale(float draged_cell_scale)
+//{
+//    draged_cell_scale_ = draged_cell_scale;
+//    emit scaleChanged();
+//}
 
 
 TilesModel *TilesModel::Instance()
@@ -170,6 +193,9 @@ QVariant TilesModel::data(const QModelIndex & index, int role) const {
     case TextRole:
         return tile->text();
         break;
+    case ScaleRole:
+        return tile->scale();
+        break;
     default:
         return QVariant();
         break;
@@ -183,14 +209,22 @@ QHash<int, QByteArray> TilesModel::roleNames() const {
     roles[ColorRole] = "color";
     roles[OpacityRole] = "opacity";
     roles[TextRole] = "text";
+    roles[ScaleRole] = "scale";
 
     return roles;
 }
 
-void TilesModel::someSlot()
+void TilesModel::someSlot(int index)
 {
-    std::vector< std::vector<QSharedPointer<Tile> > > matches_list = findMatches();
-    qDebug() << matches_list.size();
+    QSharedPointer<Tile> tile = data_list_[index];
+    float scale = tile->scale();
+    if (scale > 1) {
+        scale = scale / 1.5;
+    } else {
+        scale = scale * 1.5;
+    }
+
+    changeScale(tile, scale);
 }
 
 bool TilesModel::able_to_move(Cell target_cell)
@@ -424,6 +458,15 @@ void TilesModel::changeOpacity(QSharedPointer<Tile> target, const float opacity)
 
 }
 
+void TilesModel::changeScale(QSharedPointer<Tile> target, const float scale)
+{
+    target->setScale(scale);
+
+    QVector<int> vec;
+    vec.push_back(ScaleRole);
+    emit dataChanged(createIndex(target->index(), 0), createIndex(target->index(), 0), vec);
+}
+
 void TilesModel::createItem(int index)
 {
     beginRemoveRows(QModelIndex(), index, index);
@@ -454,10 +497,19 @@ void TilesModel::moveTile(int index)
 
     Cell curr_cell(index);
 
+    // for providing animated scale effect for draged tile
+    QObject *scale_timer = root_->findChild<QObject *>("scale_timer");
+
     if (!draged_cell_.valid()) {
         draged_cell_ = Cell(index);
+
+        QMetaObject::invokeMethod(scale_timer, "start");
+
     } else {
         if (able_to_move(curr_cell)) {
+            changeScale(data_list_[draged_cell_.index()], 1);
+            QMetaObject::invokeMethod(scale_timer, "stop");
+
             std::swap(data_list_[curr_cell.index()], data_list_[draged_cell_.index()]);
             bool matches = matchesExisting();
             std::swap(data_list_[curr_cell.index()], data_list_[draged_cell_.index()]);
@@ -484,10 +536,31 @@ void TilesModel::moveTile(int index)
                 execNextPackage();
 
             }
+
+            draged_cell_ = Cell();
+
+        } else {
+            changeScale(data_list_[draged_cell_.index()], 1);
+            draged_cell_ = Cell(index);
         }
 
-        draged_cell_ = Cell();
     }
+}
+
+void TilesModel::provideScaleAnimation()
+{
+    if (!draged_cell_.valid())
+        return;
+
+    QSharedPointer<Tile> tile = data_list_[draged_cell_.index()];
+    float scale = tile->scale();
+    if (scale > 1) {
+        scale = scale / 1.5;
+    } else {
+        scale = scale * 1.5;
+    }
+
+    changeScale(tile, scale);
 }
 
 

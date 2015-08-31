@@ -14,10 +14,12 @@ void Tile::setDefault(QString type)
         text_ = "X";
         valid_ = false;
         opacity_ = 0;
+        scale_ = 1;
     } else {
         text_ = "";
         valid_ = true;
         opacity_ = 1;
+        scale_ = 1;
     }
 }
 
@@ -73,6 +75,16 @@ void Tile::setValid(bool valid)
 {
     valid_ = valid;
 }
+float Tile::scale() const
+{
+    return scale_;
+}
+
+void Tile::setScale(float scale)
+{
+    scale_ = scale;
+}
+
 
 
 

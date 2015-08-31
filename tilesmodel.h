@@ -3,6 +3,7 @@
 
 #include <QAbstractListModel>
 #include <QSharedPointer>
+#include <QTimer>
 
 #include <vector>
 #include <queue>
@@ -20,13 +21,15 @@ class TilesModel : public QAbstractListModel
     Q_PROPERTY(int height READ height WRITE setHeight NOTIFY heightChanged)
     Q_PROPERTY(int execPackCnt READ execPackCnt WRITE setExecPackCnt NOTIFY execPackCntChanged)
     Q_PROPERTY(QString status READ status NOTIFY statusChanged)
+//    Q_PROPERTY(float scale READ scale WRITE setScale NOTIFY scaleChanged)
 
     ///////////////////////////////////////////////////////
     enum TileElemRoles {
         TypeRole = Qt::UserRole + 1,
         ColorRole,
         OpacityRole,
-        TextRole
+        TextRole,
+        ScaleRole
     };
 
 public:
@@ -41,15 +44,17 @@ signals:
     void heightChanged();
     void execPackCntChanged();
     void statusChanged();
+    void scaleChanged();
 
 
 public slots:
     void moveTile(int index);
+    void provideScaleAnimation();
 
     void execNextPackage();
     void createPackages();       //tmp move to slots for testing
 
-    void someSlot();
+    void someSlot(int index);
 
     // setters / getters for qml engine
     int width();
@@ -69,6 +74,7 @@ public:
     void swapCells(const Cell &from, const Cell &to);
 
     void changeOpacity(QSharedPointer<Tile> target, const float opacity);
+    void changeScale(QSharedPointer<Tile> target, const float scale);
 
     void createItem(int index);
     void refreshItem(int index);
@@ -103,6 +109,12 @@ public:
     static bool getInitialised();
     static void setInitialised(bool initialised);
 
+//    float scale() const;
+//    void setScale(float draged_cell_scale);
+
+    QObject *getRoot() const;
+    void setRoot(QObject *root);
+
 private:
     // for game logic
     bool able_to_move(Cell);
@@ -119,6 +131,8 @@ private:
     TilesModel& operator=(const TilesModel&);
 
 private:
+    QObject *root_;
+
     std::vector<QSharedPointer<Tile> > data_list_;
     std::queue<Package> pack_list_;
     std::vector<int> types_;
@@ -132,9 +146,11 @@ private:
     int moves_cnt_;
     int score_;
 
+    int exec_pack_cnt_;
 
     Cell draged_cell_;
-    int exec_pack_cnt_;
+//    float draged_cell_scale_;
+    QTimer draged_cell_timer_;
 
     static bool initialised_;
 };
