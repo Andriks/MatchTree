@@ -5,56 +5,56 @@
 
 
 Cell::Cell() :
-    row_(0),
-    col_(0)
+    m_row(0),
+    m_col(0)
 {
 
 }
 
 Cell::Cell(const Cell &cell):
-    row_(cell.row_),
-    col_(cell.col_)
+    m_row(cell.m_row),
+    m_col(cell.m_col)
 {
 
 }
 
 Cell::Cell(int row, int column) :
-    row_(row),
-    col_(column)
+    m_row(row),
+    m_col(column)
 {
 
 }
 
 Cell::Cell(int index)
 {
-    row_ = std::ceil(index / TilesModel::Instance()->width()) + 1;
-    col_ = (index + 1) - ((row_ - 1) * TilesModel::Instance()->width());
+    m_row = std::ceil(index / TilesModel::Instance()->width()) + 1;
+    m_col = (index + 1) - ((m_row - 1) * TilesModel::Instance()->width());
 }
 
 
 int Cell::row() const
 {
-    return row_;
+    return m_row;
 }
 
 void Cell::setRow(int row)
 {
-    row_ = row;
+    m_row = row;
 }
 
 int Cell::col() const
 {
-    return col_;
+    return m_col;
 }
 
 void Cell::setCol(int col)
 {
-    col_ = col;
+    m_col = col;
 }
 
 bool Cell::operator ==(const Cell cell)
 {
-    if ((row_ == cell.row_) && (col_ == cell.col_))
+    if ((m_row == cell.m_row) && (m_col == cell.m_col))
         return true;
 
     return false;
@@ -62,10 +62,10 @@ bool Cell::operator ==(const Cell cell)
 
 bool Cell::valid() const
 {
-    if ((row_ <= 0) || (row_ > (TilesModel::Instance()->height() + 1)))
+    if ((m_row <= 0) || (m_row > (TilesModel::Instance()->height() + 1)))
         return false;
 
-    if ((col_ <= 0) || (col_ > TilesModel::Instance()->width()))
+    if ((m_col <= 0) || (m_col > TilesModel::Instance()->width()))
         return false;
 
     return true;
@@ -73,26 +73,26 @@ bool Cell::valid() const
 
 int Cell::index() const
 {
-    return ((row_ - 1) * TilesModel::Instance()->width()) + col_ - 1;
+    return ((m_row - 1) * TilesModel::Instance()->width()) + m_col - 1;
 }
 
 Cell Cell::upper()
 {
-    return Cell(row_ + 1, col_);
+    return Cell(m_row + 1, m_col);
 }
 
 Cell Cell::lower()
 {
-    return Cell(row_ - 1, col_);
+    return Cell(m_row - 1, m_col);
 }
 
 Cell Cell::right()
 {
-    return Cell(row_, col_ + 1);
+    return Cell(m_row, m_col + 1);
 }
 
 Cell Cell::left()
 {
-    return Cell(row_, col_ - 1);
+    return Cell(m_row, m_col - 1);
 }
 

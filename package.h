@@ -17,7 +17,7 @@ public:
     size_t size();
 
 private:
-    QQueue<QSharedPointer<Command> > comm_list_;
+    QQueue<QSharedPointer<Command> > m_commList;
 
 };
 

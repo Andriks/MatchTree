@@ -27,8 +27,8 @@ public:
     Cell left();
 
 private:
-    int row_;
-    int col_;
+    int m_row;
+    int m_col;
 };
 
 #endif // CELL_H

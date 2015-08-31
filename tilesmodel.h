@@ -21,14 +21,11 @@ class TilesModel : public QAbstractListModel
     Q_PROPERTY(int height READ height WRITE setHeight NOTIFY heightChanged)
     Q_PROPERTY(int execPackCnt READ execPackCnt WRITE setExecPackCnt NOTIFY execPackCntChanged)
     Q_PROPERTY(QString status READ status NOTIFY statusChanged)
-//    Q_PROPERTY(float scale READ scale WRITE setScale NOTIFY scaleChanged)
 
     ///////////////////////////////////////////////////////
     enum TileElemRoles {
         TypeRole = Qt::UserRole + 1,
-        ColorRole,
         OpacityRole,
-        TextRole,
         ScaleRole
     };
 
@@ -54,7 +51,6 @@ public slots:
     void execNextPackage();
     void createPackages();       //tmp move to slots for testing
 
-    void someSlot(int index);
 
     // setters / getters for qml engine
     int width();
@@ -109,9 +105,6 @@ public:
     static bool getInitialised();
     static void setInitialised(bool initialised);
 
-//    float scale() const;
-//    void setScale(float draged_cell_scale);
-
     QObject *getRoot() const;
     void setRoot(QObject *root);
 
@@ -131,28 +124,25 @@ private:
     TilesModel& operator=(const TilesModel&);
 
 private:
-    QObject *root_;
+    QObject *m_root;
 
-    QVector<QSharedPointer<Tile> > data_list_;
-    QQueue<Package> pack_list_;
-    QVector<int> types_;
+    QVector<QSharedPointer<Tile> > m_dataList;
+    QQueue<Package> m_packList;
+    QVector<int> m_types;
 
-    int width_;
-    int height_;
-    int element_score_;
-    int min_score_;
-    int max_moves_;
+    int m_width;
+    int m_height;
+    int m_elementScore;
+    int m_minScore;
+    int m_maxMovesCount;
 
-    int moves_cnt_;
-    int score_;
+    int m_movesCount;
+    int m_score;
 
-    int exec_pack_cnt_;
+    int m_ExecPackCounter;
+    Cell m_DragedCell;
 
-    Cell draged_cell_;
-//    float draged_cell_scale_;
-    QTimer draged_cell_timer_;
-
-    static bool initialised_;
+    static bool m_initialised;
 };
 
 #endif // TILESMODEL_H

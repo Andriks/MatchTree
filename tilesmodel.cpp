@@ -6,27 +6,27 @@
 #include <cmath>
 
 
-bool TilesModel::initialised_(false);
+bool TilesModel::m_initialised(false);
 
 TilesModel::TilesModel() :
-    root_(NULL),
-    exec_pack_cnt_(0),
-    moves_cnt_(0),
-    score_(0),
-    width_(4),
-    height_(6),
-    draged_cell_()
+    m_root(NULL),
+    m_width(4),
+    m_height(6),
+    m_movesCount(0),
+    m_score(0),
+    m_ExecPackCounter(0),
+    m_DragedCell()
 {
 }
 
 QObject *TilesModel::getRoot() const
 {
-    return root_;
+    return m_root;
 }
 
 void TilesModel::setRoot(QObject *root)
 {
-    root_ = root;
+    m_root = root;
 }
 
 TilesModel *TilesModel::Instance()
@@ -37,26 +37,26 @@ TilesModel *TilesModel::Instance()
 
 void TilesModel::generate()
 {
-    if (!initialised_)
+    if (!m_initialised)
         return;
 
-    int dim_size = width_ * height_;
+    int dim_size = m_width * m_height;
 
     int i;
     for (i = 0; i < dim_size; i++) {
-        data_list_.push_back(QSharedPointer<Tile>(new Tile(getRandType())));
+        m_dataList.push_back(QSharedPointer<Tile>(new Tile(getRandType())));
 
         // to avoid matches on start of game
-        while (leadsToMatch(data_list_[i])) {
-            data_list_[i]->setDefault(getRandType());
+        while (leadsToMatch(m_dataList[i])) {
+            m_dataList[i]->setDefault(getRandType());
         }
     }
 
     // one more row for invisible part
-    dim_size += width_;
+    dim_size += m_width;
     for (i; i < dim_size; i++) {
 
-        data_list_.push_back(QSharedPointer<Tile>(new Tile(getRandType())));
+        m_dataList.push_back(QSharedPointer<Tile>(new Tile(getRandType())));
     }
 }
 
@@ -69,7 +69,7 @@ bool TilesModel::leadsToMatch(QSharedPointer<Tile> new_tile)
         if (!lower_cell.valid())
             break;
 
-        if (data_list_[lower_cell.index()]->type() != new_tile->type())
+        if (m_dataList[lower_cell.index()]->type() != new_tile->type())
             break;
 
         lower_cell = lower_cell.lower();
@@ -83,7 +83,7 @@ bool TilesModel::leadsToMatch(QSharedPointer<Tile> new_tile)
         if (!left_cell.valid())
             break;
 
-        if (data_list_[left_cell.index()]->type() != new_tile->type())
+        if (m_dataList[left_cell.index()]->type() != new_tile->type())
             break;
 
         left_cell = left_cell.left();
@@ -98,7 +98,7 @@ bool TilesModel::leadsToMatch(QSharedPointer<Tile> new_tile)
 
 QString TilesModel::getRandType()
 {
-    int tile_type = std::rand() % types_.size();
+    int tile_type = std::rand() % m_types.size();
 
     switch (tile_type) {
     case 0:
@@ -148,8 +148,8 @@ bool TilesModel::matchesExisting()
 
 int TilesModel::indexOfItem(const Tile *item) const
 {
-    for (int i = 0; i < data_list_.size(); i++) {
-        if (data_list_[i] == item) {
+    for (int i = 0; i < m_dataList.size(); i++) {
+        if (m_dataList[i] == item) {
             return i;
         }
     }
@@ -158,27 +158,21 @@ int TilesModel::indexOfItem(const Tile *item) const
 }
 
 int TilesModel::rowCount(const QModelIndex & parent) const {
-    return data_list_.size();
+    return m_dataList.size();
 }
 
 QVariant TilesModel::data(const QModelIndex & index, int role) const {
-    if (index.row() < 0 || index.row() > data_list_.size())
+    if (index.row() < 0 || index.row() > m_dataList.size())
         return QVariant();
 
-    const QSharedPointer<Tile> tile = data_list_[index.row()];
+    const QSharedPointer<Tile> tile = m_dataList[index.row()];
 
     switch (role) {
     case TypeRole:
         return tile->type();
         break;
-    case ColorRole:
-        return tile->color();
-        break;
     case OpacityRole:
         return tile->opacity();
-        break;
-    case TextRole:
-        return tile->text();
         break;
     case ScaleRole:
         return tile->scale();
@@ -189,35 +183,19 @@ QVariant TilesModel::data(const QModelIndex & index, int role) const {
     }
 }
 
-
 QHash<int, QByteArray> TilesModel::roleNames() const {
     QHash<int, QByteArray> roles;
     roles[TypeRole] = "type";
-    roles[ColorRole] = "color";
     roles[OpacityRole] = "opacity";
-    roles[TextRole] = "text";
     roles[ScaleRole] = "scale";
 
     return roles;
 }
 
-void TilesModel::someSlot(int index)
-{
-    QSharedPointer<Tile> tile = data_list_[index];
-    float scale = tile->scale();
-    if (scale > 1) {
-        scale = scale / 1.5;
-    } else {
-        scale = scale * 1.5;
-    }
-
-    changeScale(tile, scale);
-}
-
 bool TilesModel::able_to_move(Cell target_cell)
 {
     // we can move only one cell to right, left, up or down
-    QVector<Cell> cells_to_move = cellsToMove(draged_cell_);
+    QVector<Cell> cells_to_move = cellsToMove(m_DragedCell);
     QVector<Cell>::iterator it = std::find(cells_to_move.begin(), cells_to_move.end(), target_cell);
     if (it == cells_to_move.end())
         return false;
@@ -252,13 +230,13 @@ QVector<QVector<QSharedPointer<Tile> > > TilesModel::findMatches() const
     QVector<QSharedPointer<Tile> > one_match;
 
     // vertical matches
-    for (int col = 1; col <= width_; col++) {
-        one_match.push_back(data_list_[Cell(1, col).index()]);
+    for (int col = 1; col <= m_width; col++) {
+        one_match.push_back(m_dataList[Cell(1, col).index()]);
 
-        for (int row = 2; row <= height_; row++) {
+        for (int row = 2; row <= m_height; row++) {
             Cell cell(row, col);
             QSharedPointer<Tile> last_tile = one_match.back();
-            QSharedPointer<Tile> curr_tile = data_list_[cell.index()];
+            QSharedPointer<Tile> curr_tile = m_dataList[cell.index()];
 
             if (last_tile->type() == curr_tile->type()) {
                 one_match.push_back(curr_tile);
@@ -280,13 +258,13 @@ QVector<QVector<QSharedPointer<Tile> > > TilesModel::findMatches() const
 
     // horisontal matches
     QVector<QVector<QSharedPointer<Tile> > > hor_res;
-    for (int row = 1; row <= height_; row++) {
-        one_match.push_back(data_list_[Cell(row, 1).index()]);
+    for (int row = 1; row <= m_height; row++) {
+        one_match.push_back(m_dataList[Cell(row, 1).index()]);
 
-        for (int col = 2; col <= width_; col++) {
+        for (int col = 2; col <= m_width; col++) {
             Cell cell(row, col);
             QSharedPointer<Tile> last_tile = one_match.back();
-            QSharedPointer<Tile> curr_tile = data_list_[cell.index()];
+            QSharedPointer<Tile> curr_tile = m_dataList[cell.index()];
 
             if (last_tile->type() == curr_tile->type()) {
                 one_match.push_back(curr_tile);
@@ -326,16 +304,16 @@ QVector<QVector<QSharedPointer<Tile> > > TilesModel::findMatches() const
 
 void TilesModel::execNextPackage()
 {
-    if (exec_pack_cnt_ != 0)
+    if (m_ExecPackCounter != 0)
         return;
 
-    if (pack_list_.empty()) {
+    if (m_packList.empty()) {
         createPackages();
         return;
     }
 
-    Package pack = pack_list_.front();
-    pack_list_.dequeue();
+    Package pack = m_packList.front();
+    m_packList.dequeue();
 
     emit statusChanged();
 
@@ -350,30 +328,28 @@ void TilesModel::createPackages()
     for (int i = 0; i < matches_list.size(); i++) {
         QVector<QSharedPointer<Tile> > one_match = matches_list[i];
         for (int j = 0; j < one_match.size(); j++) {
-            beginResetModel();
-            one_match[j]->setText("X");
             one_match[j]->setValid(false);
-            endResetModel();
 
+            opacityPack.push(QSharedPointer<Command>(new ScaleCommand(one_match[j], 0.8)));
             opacityPack.push(QSharedPointer<Command>(new OpacityCommand(one_match[j], 0.0)));
-            score_ += element_score_;
+            m_score += m_elementScore;
         }
     }
 
     if (opacityPack.size())
-        pack_list_.enqueue(opacityPack);
+        m_packList.enqueue(opacityPack);
 
 
-    for (int iteration = 0; iteration <= height_; iteration++) {
+    for (int iteration = 0; iteration <= m_height; iteration++) {
         Package movePack;
         Package createPack;
 
-        for (int col = 1; col <= width_; col++) {
+        for (int col = 1; col <= m_width; col++) {
             int num_in_match = 0;
 
-            for (int row = 1; row <= height_; row++) {
+            for (int row = 1; row <= m_height; row++) {
                 Cell cell(row, col);
-                QSharedPointer<Tile> tile = data_list_[cell.index()];
+                QSharedPointer<Tile> tile = m_dataList[cell.index()];
 
                 if (!tile->valid()) {
                     if (num_in_match ==  iteration) {
@@ -389,15 +365,15 @@ void TilesModel::createPackages()
         }
 
         if (movePack.size())
-            pack_list_.enqueue(movePack);
+            m_packList.enqueue(movePack);
 
         if (createPack.size())
-            pack_list_.enqueue(createPack);
+            m_packList.enqueue(createPack);
 
     }
 
 
-    if (pack_list_.size())
+    if (m_packList.size())
         execNextPackage();
 
 }
@@ -427,7 +403,7 @@ void TilesModel::swapCells(const int from, const int to)
 
     }
 
-    std::swap(data_list_[from], data_list_[to]);
+    qSwap(m_dataList[from], m_dataList[to]);
 }
 
 void TilesModel::swapCells(const Cell &from, const Cell &to)
@@ -457,78 +433,78 @@ void TilesModel::changeScale(QSharedPointer<Tile> target, const float scale)
 void TilesModel::createItem(int index)
 {
     beginRemoveRows(QModelIndex(), index, index);
-    data_list_.erase(data_list_.begin() + index);
+    m_dataList.erase(m_dataList.begin() + index);
     endRemoveRows();
 
     beginInsertRows(QModelIndex(), index, index);
-    data_list_.insert(data_list_.begin() + index, QSharedPointer<Tile>(new Tile(getRandType())));
+    m_dataList.insert(m_dataList.begin() + index, QSharedPointer<Tile>(new Tile(getRandType())));
     endInsertRows();
 }
 
 void TilesModel::refreshItem(int index)
 {
     beginResetModel();
-    data_list_[index]->setDefault(getRandType());
+    m_dataList[index]->setDefault(getRandType());
     endResetModel();
 }
 
 QSharedPointer<Tile> TilesModel::item(int index)
 {
-    return data_list_[index];
+    return m_dataList[index];
 }
 
 void TilesModel::moveTile(int index)
 {
-    if (exec_pack_cnt_ != 0)
+    if (m_ExecPackCounter != 0)
         return;
 
     Cell curr_cell(index);
 
     // for providing animated scale effect for draged tile
-    QObject *scale_timer = root_->findChild<QObject *>("scale_timer");
+    QObject *scale_timer = m_root->findChild<QObject *>("scale_timer");
 
-    if (!draged_cell_.valid()) {
-        draged_cell_ = Cell(index);
+    if (!m_DragedCell.valid()) {
+        m_DragedCell = Cell(index);
 
         QMetaObject::invokeMethod(scale_timer, "start");
 
     } else {
         if (able_to_move(curr_cell)) {
-            changeScale(data_list_[draged_cell_.index()], 1);
+            changeScale(m_dataList[m_DragedCell.index()], 1);
             QMetaObject::invokeMethod(scale_timer, "stop");
 
-            std::swap(data_list_[curr_cell.index()], data_list_[draged_cell_.index()]);
+            std::swap(m_dataList[curr_cell.index()], m_dataList[m_DragedCell.index()]);
             bool matches = matchesExisting();
-            std::swap(data_list_[curr_cell.index()], data_list_[draged_cell_.index()]);
+            std::swap(m_dataList[curr_cell.index()], m_dataList[m_DragedCell.index()]);
 
             if (matches) {
                 Package pack;
-                pack.push(QSharedPointer<Command>(new SwapCommand(curr_cell, draged_cell_)));
-                pack_list_.enqueue(pack);
+                pack.push(QSharedPointer<Command>(new SwapCommand(curr_cell, m_DragedCell)));
+                m_packList.enqueue(pack);
 
-                moves_cnt_++;
+                m_movesCount++;
                 emit statusChanged();
 
                 createPackages();
             } else {
                 Package pack;
 
-                pack.push(QSharedPointer<Command>(new SwapCommand(curr_cell, draged_cell_)));
-                pack_list_.enqueue(pack);
+                pack.push(QSharedPointer<Command>(new SwapCommand(curr_cell, m_DragedCell)));
+                m_packList.enqueue(pack);
                 pack.clear();
 
-                pack.push(QSharedPointer<Command>(new SwapCommand(curr_cell, draged_cell_)));
-                pack_list_.enqueue(pack);
+                pack.push(QSharedPointer<Command>(new SwapCommand(curr_cell, m_DragedCell)));
+                m_packList.enqueue(pack);
 
                 execNextPackage();
 
             }
 
-            draged_cell_ = Cell();
+            m_DragedCell = Cell();
 
         } else {
-            changeScale(data_list_[draged_cell_.index()], 1);
-            draged_cell_ = Cell(index);
+            changeScale(m_dataList[m_DragedCell.index()], 1);
+            m_DragedCell = Cell(index);
         }
 
     }
@@ -536,15 +512,15 @@ void TilesModel::moveTile(int index)
 
 void TilesModel::provideScaleAnimation()
 {
-    if (!draged_cell_.valid())
+    if (!m_DragedCell.valid())
         return;
 
-    QSharedPointer<Tile> tile = data_list_[draged_cell_.index()];
+    QSharedPointer<Tile> tile = m_dataList[m_DragedCell.index()];
     float scale = tile->scale();
     if (scale > 1) {
-        scale = scale / 1.5;
+        scale = scale / 1.2;
     } else {
-        scale = scale * 1.5;
+        scale = scale * 1.2;
     }
 
     changeScale(tile, scale);
@@ -553,92 +529,92 @@ void TilesModel::provideScaleAnimation()
 
 int TilesModel::width()
 {
-    return width_;
+    return m_width;
 }
 
 void TilesModel::setWidth(const int width)
 {
-    width_ = width;
+    m_width = width;
     emit widthChanged();
 }
 
 int TilesModel::height()
 {
-    return height_;
+    return m_height;
 }
 
 void TilesModel::setHeight(const int height)
 {
-    height_ = height;
+    m_height = height;
     emit heightChanged();
 }
 
 int TilesModel::execPackCnt() const
 {
-    return exec_pack_cnt_;
+    return m_ExecPackCounter;
 }
 
 void TilesModel::setExecPackCnt(int exec_pack_cnt)
 {
-    exec_pack_cnt_ = exec_pack_cnt;
+    m_ExecPackCounter = exec_pack_cnt;
     emit execPackCntChanged();
 }
 
 QString TilesModel::status()
 {
-    return QString(" score: %1; moves: %2").arg(score_).arg(moves_cnt_);
+    return QString(" score: %1; moves: %2").arg(m_score).arg(m_movesCount);
 }
 
 bool TilesModel::getInitialised()
 {
-    return initialised_;
+    return m_initialised;
 }
 
 void TilesModel::setInitialised(bool initialised)
 {
-    initialised_ = initialised;
+    m_initialised = initialised;
 }
 
 QVector<int> TilesModel::getTypes() const
 {
-    return types_;
+    return m_types;
 }
 
 void TilesModel::setTypes(const QVector<int> &types)
 {
-    types_.clear();
+    m_types.clear();
     for (int i = 0; i < types.size(); i++)
-        types_.push_back(types[i]);
+        m_types.push_back(types[i]);
 }
 
 int TilesModel::getMax_moves() const
 {
-    return max_moves_;
+    return m_maxMovesCount;
 }
 
 void TilesModel::setMax_moves(int max_moves)
 {
-    max_moves_ = max_moves;
+    m_maxMovesCount = max_moves;
 }
 
 int TilesModel::getMin_score() const
 {
-    return min_score_;
+    return m_minScore;
 }
 
 void TilesModel::setMin_score(int min_score)
 {
-    min_score_ = min_score;
+    m_minScore = min_score;
 }
 
 int TilesModel::getElement_score() const
 {
-    return element_score_;
+    return m_elementScore;
 }
 
 void TilesModel::setElement_score(int element_score)
 {
-    element_score_ = element_score;
+    m_elementScore = element_score;
 }
 
 

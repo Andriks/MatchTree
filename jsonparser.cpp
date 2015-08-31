@@ -36,28 +36,28 @@ JsonParser::JsonParser(QString file_pas)
 
     QJsonObject jsonObject = json_doc.object();
 
-    width_ = jsonObject["width"].toInt();
-    height_ = jsonObject["height"].toInt();
-    element_score_ = jsonObject["elementScore"].toInt();
-    min_score_ = jsonObject["minScore"].toInt();
-    max_moves_ = jsonObject["maxMoves"].toInt();
+    m_width = jsonObject["width"].toInt();
+    m_height = jsonObject["height"].toInt();
+    m_elementScore = jsonObject["elementScore"].toInt();
+    m_minScore = jsonObject["minScore"].toInt();
+    m_maxMoves = jsonObject["maxMoves"].toInt();
 
 
     QJsonArray jsonArray = jsonObject["types"].toArray();
     foreach (const QJsonValue & value, jsonArray) {
         int arr_item = value.toInt();
-        types_.push_back(arr_item);
+        m_types.push_back(arr_item);
     }
 }
 
 void JsonParser::fillParamsIntoModel()
 {
-    TilesModel::Instance()->setWidth(width_);
-    TilesModel::Instance()->setHeight(height_);
-    TilesModel::Instance()->setElement_score(element_score_);
-    TilesModel::Instance()->setMin_score(min_score_);
-    TilesModel::Instance()->setMax_moves(max_moves_);
-    TilesModel::Instance()->setTypes(types_);
+    TilesModel::Instance()->setWidth(m_width);
+    TilesModel::Instance()->setHeight(m_height);
+    TilesModel::Instance()->setElement_score(m_elementScore);
+    TilesModel::Instance()->setMin_score(m_minScore);
+    TilesModel::Instance()->setMax_moves(m_maxMoves);
+    TilesModel::Instance()->setTypes(m_types);
 
     TilesModel::Instance()->setInitialised(true);
 

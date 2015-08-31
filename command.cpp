@@ -11,24 +11,24 @@ Command::Command()
 
 //////////////////////////////////////////////////////////////
 SwapCommand::SwapCommand(QSharedPointer<Tile> from, QSharedPointer<Tile> to) :
-    from_(from),
-    to_(to)
+    m_from(from),
+    m_to(to)
 {
 
 }
 
 SwapCommand::SwapCommand(const Cell &from, const Cell &to) :
-    from_(NULL),
-    to_(NULL)
+    m_from(NULL),
+    m_to(NULL)
 {
-    from_ = TilesModel::Instance()->item(from.index());
-    to_ = TilesModel::Instance()->item(to.index());
+    m_from = TilesModel::Instance()->item(from.index());
+    m_to = TilesModel::Instance()->item(to.index());
 }
 
 //////////////////////////////////////////////////////////////
 void SwapCommand::exec()
 {
-    TilesModel::Instance()->swapCells(from_->index(), to_->index());
+    TilesModel::Instance()->swapCells(m_from->index(), m_to->index());
 }
 
 bool SwapCommand::animated()
@@ -38,35 +38,35 @@ bool SwapCommand::animated()
 
 QSharedPointer<Tile> SwapCommand::from() const
 {
-    return from_;
+    return m_from;
 }
 
 void SwapCommand::setFrom(QSharedPointer<Tile> from)
 {
-    from_ = from;
+    m_from = from;
 }
 
 QSharedPointer<Tile> SwapCommand::to() const
 {
-    return to_;
+    return m_to;
 }
 
 void SwapCommand::setTo(QSharedPointer<Tile> to)
 {
-    to_ = to;
+    m_to = to;
 }
 
 
 //////////////////////////////////////////////////////////////
 MoveUpCommand::MoveUpCommand(QSharedPointer<Tile> target) :
-    target_(target)
+    m_target(target)
 {
 
 }
 
 void MoveUpCommand::exec()
 {
-    Cell cell = Cell(target_->index());
+    Cell cell = Cell(m_target->index());
 
     while (cell.upper().valid()) {
         TilesModel::Instance()->swapCells(cell, cell.upper());
@@ -82,27 +82,27 @@ bool MoveUpCommand::animated()
 
 QSharedPointer<Tile> MoveUpCommand::target() const
 {
-    return target_;
+    return m_target;
 }
 
 void MoveUpCommand::setTarget(QSharedPointer<Tile> target)
 {
-    target_ = target;
+    m_target = target;
 }
 
 
 //////////////////////////////////////////////////////////////
 OpacityCommand::OpacityCommand(QSharedPointer<Tile> target, float opacity) :
-    target_(target),
-    opacity_(opacity)
+    m_target(target),
+    m_opacity(opacity)
 {
 
 }
 
 void OpacityCommand::exec()
 {
-    target_->setValid(false);
-    TilesModel::Instance()->changeOpacity(target_, opacity_);
+    m_target->setValid(false);
+    TilesModel::Instance()->changeOpacity(m_target, m_opacity);
 }
 
 bool OpacityCommand::animated()
@@ -112,35 +112,74 @@ bool OpacityCommand::animated()
 
 QSharedPointer<Tile> OpacityCommand::target() const
 {
-    return target_;
+    return m_target;
 }
 
 void OpacityCommand::setTarget(QSharedPointer<Tile> target)
 {
-    target_ = target;
+    m_target = target;
 }
 
 float OpacityCommand::opacity() const
 {
-    return opacity_;
+    return m_opacity;
 }
 
 void OpacityCommand::setOpacity(float opacity)
 {
-    opacity_ = opacity;
+    m_opacity = opacity;
+}
+
+
+//////////////////////////////////////////////////////////////
+ScaleCommand::ScaleCommand(QSharedPointer<Tile> target, float scale) :
+    m_target(target),
+    m_scale(scale)
+{
+
+}
+
+void ScaleCommand::exec()
+{
+    m_target->setValid(false);
+    TilesModel::Instance()->changeScale(m_target, m_scale);
+}
+
+bool ScaleCommand::animated()
+{
+    return true;
+}
+
+QSharedPointer<Tile> ScaleCommand::target() const
+{
+    return m_target;
+}
+
+void ScaleCommand::setTarget(QSharedPointer<Tile> target)
+{
+    m_target = target;
+}
+float ScaleCommand::scale() const
+{
+    return m_scale;
+}
+
+void ScaleCommand::setScale(float scale)
+{
+    m_scale = scale;
 }
 
 
 //////////////////////////////////////////////////////////////
 CreateCommand::CreateCommand(QSharedPointer<Tile> target) :
-    target_(target)
+    m_target(target)
 {
 
 }
 
 void CreateCommand::exec()
 {
-    TilesModel::Instance()->createItem(target_->index());
+    TilesModel::Instance()->createItem(m_target->index());
 }
 
 bool CreateCommand::animated()
@@ -150,24 +189,24 @@ bool CreateCommand::animated()
 
 QSharedPointer<Tile> CreateCommand::target() const
 {
-    return target_;
+    return m_target;
 }
 
 void CreateCommand::setTarget(QSharedPointer<Tile> target)
 {
-    target_ = target;
+    m_target = target;
 }
 
 //////////////////////////////////////////////////////////////
 RefreshCommand::RefreshCommand(QSharedPointer<Tile> target) :
-    target_(target)
+    m_target(target)
 {
 
 }
 
 void RefreshCommand::exec()
 {
-    TilesModel::Instance()->refreshItem(target_->index());
+    TilesModel::Instance()->refreshItem(m_target->index());
 }
 
 bool RefreshCommand::animated()
@@ -177,10 +216,10 @@ bool RefreshCommand::animated()
 
 QSharedPointer<Tile> RefreshCommand::target() const
 {
-    return target_;
+    return m_target;
 }
 
 void RefreshCommand::setTarget(QSharedPointer<Tile> target)
 {
-    target_ = target;
+    m_target = target;
 }

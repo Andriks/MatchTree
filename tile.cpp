@@ -8,81 +8,60 @@ Tile::Tile(QString type)
 
 void Tile::setDefault(QString type)
 {
-    type_ = type;
+    m_type = type;
 
-    if (type_ == "") {
-        text_ = "X";
-        valid_ = false;
-        opacity_ = 0;
-        scale_ = 1;
+    if (m_type == "") {
+        m_valid = false;
+        m_opacity = 0;
+        m_scale = 1;
     } else {
-        text_ = "";
-        valid_ = true;
-        opacity_ = 1;
-        scale_ = 1;
+        m_valid = true;
+        m_opacity = 1;
+        m_scale = 1;
     }
 }
 
 QString Tile::type() const
 {
-    return type_;
+    return m_type;
 }
 
 void Tile::setType(const QString &type)
 {
-    type_ = type;
-}
-
-QString Tile::color() const
-{
-    return color_;
-}
-
-void Tile::setColor(const QString &color)
-{
-    color_ = color;
+    m_type = type;
 }
 
 float Tile::opacity() const
 {
-    return opacity_;
+    return m_opacity;
 }
 
 void Tile::setOpacity(const float &opacity)
 {
-    opacity_ = opacity;
+    m_opacity = opacity;
 }
 int Tile::index() const
 {
     return TilesModel::Instance()->indexOfItem(this);
 }
 
-QString Tile::text() const
-{
-    return text_;
-}
-
-void Tile::setText(const QString &text)
-{
-    text_ = text;
-}
 bool Tile::valid() const
 {
-    return valid_;
+    return m_valid;
 }
 
 void Tile::setValid(bool valid)
 {
-    valid_ = valid;
+    m_valid = valid;
 }
 float Tile::scale() const
 {
-    return scale_;
+    return m_scale;
 }
 
 void Tile::setScale(float scale)
 {
-    scale_ = scale;
+    m_scale = scale;
 }
 
 

@@ -30,16 +30,15 @@ ApplicationWindow {
         NumberAnimation {
             properties: "x,y"
             duration: 200 + delay
+            easing.type: "OutBack"
         }
 
         onRunningChanged:
         {
             if (!move_animation.running) {
-//                console.log("move stop");
                 dataModel.execPackCnt--;
                 dataModel.execNextPackage();
             } else {
-//                console.log("move start");
                 dataModel.execPackCnt++;
             }
         }
@@ -51,6 +50,7 @@ ApplicationWindow {
         NumberAnimation {
             properties: "x,y"
             duration: 200 + delay
+            easing.type: "OutBack"
         }
     }
 
@@ -66,18 +66,15 @@ ApplicationWindow {
         onRunningChanged:
         {
             if (!add_animation.running) {
-//                console.log("add stop");
                 dataModel.execPackCnt--;
                 dataModel.execNextPackage();
             } else {
-//                console.log("add start");
                 dataModel.execPackCnt++;
             }
         }
     }
 
     //////////////////////////////////////////////////////////////////
-
 
     Rectangle {
         width: parent.height; height: parent.width
@@ -111,9 +108,6 @@ ApplicationWindow {
                 width: view.cellWidth
 
                 Item {
-                    id: tile_
-
-                    anchors.margins: 5
                     anchors.fill: parent
 
                     Image {
@@ -135,11 +129,9 @@ ApplicationWindow {
                             onRunningChanged:
                             {
                                 if (!opacity_animation.running) {
-//                                    console.log("op stop");
                                     dataModel.execPackCnt--;
                                     dataModel.execNextPackage();
                                 } else {
-//                                    console.log("op start");
                                     dataModel.execPackCnt++;
                                 }
                             }
@@ -153,18 +145,10 @@ ApplicationWindow {
                         }
                     }
 
-                    Text {
-                        x: 10; y: 10
-                        text: "%1".arg(model.index)
-                    }
-
-                    Text {
-                        anchors.centerIn: parent
-                        text: model.text
-                        font.family: "Helvetica"
-                        font.pointSize: 56
-                        font.bold: true
-                    }
+//                    Text {
+//                        x: 10; y: 10
+//                        text: "%1".arg(model.index)
+//                    }
 
                     MouseArea {
                         anchors.fill: parent
@@ -180,7 +164,7 @@ ApplicationWindow {
     Timer {
         id: scale_timer
         objectName: "scale_timer"
-        interval: 300
+        interval: 250
         repeat: true
         onTriggered: dataModel.provideScaleAnimation()
     }

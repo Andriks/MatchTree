@@ -14,17 +14,11 @@ public:
     QString type() const;
     void setType(const QString &type);
 
-    QString color() const;
-    void setColor(const QString &color);
-
     float opacity() const;
     void setOpacity(const float &opacity);
 
     int index() const;
     void setIndex(int index);
-
-    QString text() const;
-    void setText(const QString &text);
 
     bool valid() const;
     void setValid(bool valid);
@@ -33,14 +27,12 @@ public:
     void setScale(float scale);
 
 private:
-    QString type_;
-    bool valid_;
+    QString m_type;
+    bool m_valid;
 
-    QString color_;
-    float opacity_;
+    float m_opacity;
 
-    QString text_; // tmp for testing
-    float scale_;
+    float m_scale;
 
 };
 

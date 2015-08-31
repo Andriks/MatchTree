@@ -9,15 +9,15 @@ Package::Package()
 
 void Package::push(QSharedPointer<Command> comm)
 {
-    comm_list_.enqueue(comm);
+    m_commList.enqueue(comm);
 }
 
 void Package::exec()
 {
     bool animated = true;
 
-    while (comm_list_.size()) {
-        QSharedPointer<Command> comm = comm_list_.dequeue();
+    while (m_commList.size()) {
+        QSharedPointer<Command> comm = m_commList.dequeue();
         animated = comm->animated();
 
         comm->exec();
@@ -29,13 +29,13 @@ void Package::exec()
 
 void Package::clear()
 {
-    while (comm_list_.size()) {
-        comm_list_.dequeue();
+    while (m_commList.size()) {
+        m_commList.dequeue();
     }
 }
 
 size_t Package::size()
 {
-    return comm_list_.size();
+    return m_commList.size();
 }
 

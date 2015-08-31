@@ -11,13 +11,13 @@ public:
     void fillParamsIntoModel();
 
 private:
-    QVector<int> types_;
+    QVector<int> m_types;
 
-    int width_;
-    int height_;
-    int element_score_;
-    int min_score_;
-    int max_moves_;
+    int m_width;
+    int m_height;
+    int m_elementScore;
+    int m_minScore;
+    int m_maxMoves;
 
 };
 

@@ -33,8 +33,8 @@ public:
     void setTo(QSharedPointer<Tile> to);
 
 private:
-    QSharedPointer<Tile> from_;
-    QSharedPointer<Tile> to_;
+    QSharedPointer<Tile> m_from;
+    QSharedPointer<Tile> m_to;
 };
 
 //////////////////////////////////////////////////////////////
@@ -50,7 +50,7 @@ public:
     void setTarget(QSharedPointer<Tile> target);
 
 private:
-    QSharedPointer<Tile> target_;
+    QSharedPointer<Tile> m_target;
 };
 
 
@@ -70,8 +70,30 @@ public:
     void setOpacity(float opacity);
 
 private:
-    QSharedPointer<Tile> target_;
-    float opacity_;
+    QSharedPointer<Tile> m_target;
+    float m_opacity;
+
+};
+
+//////////////////////////////////////////////////////////////
+class ScaleCommand: public Command
+{
+public:
+    ScaleCommand(QSharedPointer<Tile> target, float scale);
+
+    virtual void exec();
+    virtual bool animated();
+
+    QSharedPointer<Tile> target() const;
+    void setTarget(QSharedPointer<Tile> target);
+
+
+    float scale() const;
+    void setScale(float scale);
+
+private:
+    QSharedPointer<Tile> m_target;
+    float m_scale;
 
 };
 
@@ -88,7 +110,7 @@ public:
     void setTarget(QSharedPointer<Tile> target);
 
 private:
-    QSharedPointer<Tile> target_;
+    QSharedPointer<Tile> m_target;
 };
 
 //////////////////////////////////////////////////////////////
@@ -104,7 +126,7 @@ public:
     void setTarget(QSharedPointer<Tile> target);
 
 private:
-    QSharedPointer<Tile> target_;
+    QSharedPointer<Tile> m_target;
 };
 
 
