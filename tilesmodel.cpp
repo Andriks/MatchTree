@@ -14,8 +14,8 @@ TilesModel::TilesModel() :
     m_height(6),
     m_movesCount(0),
     m_score(0),
-    m_ExecPackCounter(0),
-    m_DragedCell()
+    m_execPackCnt(0),
+    m_dragedCell()
 {
 }
 
@@ -146,6 +146,20 @@ bool TilesModel::matchesExisting()
     return true;
 }
 
+TilesModel::GameResult TilesModel::gameResult()
+{
+    if (m_movesCount >= m_maxMovesCount) {
+        if (m_score >= m_minScore) {
+            return Win;
+        }
+        else {
+            return Lose;
+        }
+    }
+
+    return NotFinished;
+}
+
 int TilesModel::indexOfItem(const Tile *item) const
 {
     for (int i = 0; i < m_dataList.size(); i++) {
@@ -195,7 +209,7 @@ QHash<int, QByteArray> TilesModel::roleNames() const {
 bool TilesModel::able_to_move(Cell target_cell)
 {
     // we can move only one cell to right, left, up or down
-    QVector<Cell> cells_to_move = cellsToMove(m_DragedCell);
+    QVector<Cell> cells_to_move = cellsToMove(m_dragedCell);
     QVector<Cell>::iterator it = std::find(cells_to_move.begin(), cells_to_move.end(), target_cell);
     if (it == cells_to_move.end())
         return false;
@@ -297,14 +311,13 @@ QVector<QVector<QSharedPointer<Tile> > > TilesModel::findMatches() const
     }
 
 
-
     return res;
 }
 
 
 void TilesModel::execNextPackage()
 {
-    if (m_ExecPackCounter != 0)
+    if (m_execPackCnt != 0)
         return;
 
     if (m_packList.empty()) {
@@ -312,12 +325,24 @@ void TilesModel::execNextPackage()
         return;
     }
 
-    Package pack = m_packList.front();
-    m_packList.dequeue();
+    Package pack = m_packList.dequeue();
+    pack.exec();
 
     emit statusChanged();
 
-    pack.exec();
+    if (m_packList.empty()) {
+        QObject *messageDialog = m_root->findChild<QObject *>("messageDialog");
+        switch (gameResult()) {
+        case Win:
+            QMetaObject::invokeMethod(messageDialog, "show", Q_ARG(QString, "Win"));
+            break;
+        case Lose:
+            QMetaObject::invokeMethod(messageDialog, "show", Q_ARG(QString, "Lose"));
+            break;
+        default:
+            break;
+        }
+    }
 }
 
 void TilesModel::createPackages()
@@ -455,7 +480,7 @@ QSharedPointer<Tile> TilesModel::item(int index)
 
 void TilesModel::moveTile(int index)
 {
-    if (m_ExecPackCounter != 0)
+    if (m_execPackCnt != 0)
         return;
 
     Cell curr_cell(index);
@@ -463,23 +488,23 @@ void TilesModel::moveTile(int index)
     // for providing animated scale effect for draged tile
     QObject *scale_timer = m_root->findChild<QObject *>("scale_timer");
 
-    if (!m_DragedCell.valid()) {
-        m_DragedCell = Cell(index);
+    if (!m_dragedCell.valid()) {
+        m_dragedCell = Cell(index);
 
         QMetaObject::invokeMethod(scale_timer, "start");
 
     } else {
         if (able_to_move(curr_cell)) {
-            changeScale(m_dataList[m_DragedCell.index()], 1);
+            changeScale(m_dataList[m_dragedCell.index()], 1);
             QMetaObject::invokeMethod(scale_timer, "stop");
 
-            std::swap(m_dataList[curr_cell.index()], m_dataList[m_DragedCell.index()]);
+            qSwap(m_dataList[curr_cell.index()], m_dataList[m_dragedCell.index()]);
             bool matches = matchesExisting();
-            std::swap(m_dataList[curr_cell.index()], m_dataList[m_DragedCell.index()]);
+            qSwap(m_dataList[curr_cell.index()], m_dataList[m_dragedCell.index()]);
 
             if (matches) {
                 Package pack;
-                pack.push(QSharedPointer<Command>(new SwapCommand(curr_cell, m_DragedCell)));
+                pack.push(QSharedPointer<Command>(new SwapCommand(curr_cell, m_dragedCell)));
                 m_packList.enqueue(pack);
 
                 m_movesCount++;
@@ -489,22 +514,22 @@ void TilesModel::moveTile(int index)
             } else {
                 Package pack;
 
-                pack.push(QSharedPointer<Command>(new SwapCommand(curr_cell, m_DragedCell)));
+                pack.push(QSharedPointer<Command>(new SwapCommand(curr_cell, m_dragedCell)));
                 m_packList.enqueue(pack);
                 pack.clear();
 
-                pack.push(QSharedPointer<Command>(new SwapCommand(curr_cell, m_DragedCell)));
+                pack.push(QSharedPointer<Command>(new SwapCommand(curr_cell, m_dragedCell)));
                 m_packList.enqueue(pack);
 
                 execNextPackage();
 
             }
 
-            m_DragedCell = Cell();
+            m_dragedCell = Cell();
 
         } else {
-            changeScale(m_dataList[m_DragedCell.index()], 1);
-            m_DragedCell = Cell(index);
+            changeScale(m_dataList[m_dragedCell.index()], 1);
+            m_dragedCell = Cell(index);
         }
 
     }
@@ -512,10 +537,10 @@ void TilesModel::moveTile(int index)
 
 void TilesModel::provideScaleAnimation()
 {
-    if (!m_DragedCell.valid())
+    if (!m_dragedCell.valid())
         return;
 
-    QSharedPointer<Tile> tile = m_dataList[m_DragedCell.index()];
+    QSharedPointer<Tile> tile = m_dataList[m_dragedCell.index()];
     float scale = tile->scale();
     if (scale > 1) {
         scale = scale / 1.2;
@@ -551,12 +576,12 @@ void TilesModel::setHeight(const int height)
 
 int TilesModel::execPackCnt() const
 {
-    return m_ExecPackCounter;
+    return m_execPackCnt;
 }
 
-void TilesModel::setExecPackCnt(int exec_pack_cnt)
+void TilesModel::setExecPackCnt(int execPackCnt)
 {
-    m_ExecPackCounter = exec_pack_cnt;
+    m_execPackCnt = execPackCnt;
     emit execPackCntChanged();
 }
 
@@ -587,32 +612,32 @@ void TilesModel::setTypes(const QVector<int> &types)
         m_types.push_back(types[i]);
 }
 
-int TilesModel::getMax_moves() const
+int TilesModel::maxMoves() const
 {
     return m_maxMovesCount;
 }
 
-void TilesModel::setMax_moves(int max_moves)
+void TilesModel::setMaxMoves(int maxMoves)
 {
-    m_maxMovesCount = max_moves;
+    m_maxMovesCount = maxMoves;
 }
 
-int TilesModel::getMin_score() const
+int TilesModel::minScore() const
 {
     return m_minScore;
 }
 
-void TilesModel::setMin_score(int min_score)
+void TilesModel::setMinScore(int minScore)
 {
-    m_minScore = min_score;
+    m_minScore = minScore;
 }
 
-int TilesModel::getElement_score() const
+int TilesModel::elementScore() const
 {
     return m_elementScore;
 }
 
-void TilesModel::setElement_score(int element_score)
+void TilesModel::setElementScore(int element_score)
 {
     m_elementScore = element_score;
 }

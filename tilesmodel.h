@@ -3,7 +3,6 @@
 
 #include <QAbstractListModel>
 #include <QSharedPointer>
-#include <QTimer>
 
 #include <QVector>
 #include <QQueue>
@@ -29,6 +28,14 @@ class TilesModel : public QAbstractListModel
         ScaleRole
     };
 
+    ///////////////////////////////////////////////////////
+    enum GameResult {
+        Win = Qt::UserRole + 1,
+        Lose,
+        NotFinished
+    };
+
+
 public:
     static TilesModel *Instance();
     void generate();
@@ -45,6 +52,10 @@ signals:
 
 
 public slots:
+    /*********************/
+    /********SLOTS********/
+    /*********************/
+
     void moveTile(int index);
     void provideScaleAnimation();
 
@@ -60,12 +71,15 @@ public slots:
     void setHeight(const int height);
 
     int execPackCnt() const;
-    void setExecPackCnt(int exec_pack_cnt);
+    void setExecPackCnt(int execPackCnt);
 
     QString status();
 
 public:
-    // interface for Command
+    /***************************/
+    /***interface for Command***/
+    /***************************/
+
     void swapCells(const int from, const int to);
     void swapCells(const Cell &from, const Cell &to);
 
@@ -79,7 +93,10 @@ public:
     QString getRandType();
 
 
-    // interface for Tile
+    /***************************/
+    /*****interface for Tile****/
+    /***************************/
+
     int indexOfItem(const Tile *item) const;
 
 
@@ -90,14 +107,14 @@ public:
 
 
     // setters / getters
-    int getElement_score() const;
-    void setElement_score(int element_score);
+    int elementScore() const;
+    void setElementScore(int element_score);
 
-    int getMin_score() const;
-    void setMin_score(int min_score);
+    int minScore() const;
+    void setMinScore(int minScore);
 
-    int getMax_moves() const;
-    void setMax_moves(int max_moves);
+    int maxMoves() const;
+    void setMaxMoves(int maxMoves);
 
     QVector<int> getTypes() const;
     void setTypes(const QVector<int> &types);
@@ -109,13 +126,17 @@ public:
     void setRoot(QObject *root);
 
 private:
-    // for game logic
+    /***************************/
+    /*******for game logic******/
+    /***************************/
     bool able_to_move(Cell);
     QVector<Cell> cellsToMove(Cell cell);
 
     QVector<QVector<QSharedPointer<Tile> > > findMatches() const;
     bool checkForRepeating(QSharedPointer<Tile> tile, QVector<QVector<QSharedPointer<Tile> > > conteiner) const;
     bool matchesExisting();
+
+    GameResult gameResult();
 
 
     // for singleton
@@ -139,8 +160,8 @@ private:
     int m_movesCount;
     int m_score;
 
-    int m_ExecPackCounter;
-    Cell m_DragedCell;
+    int m_execPackCnt;
+    Cell m_dragedCell;
 
     static bool m_initialised;
 };

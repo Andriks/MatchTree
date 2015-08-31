@@ -54,9 +54,9 @@ void JsonParser::fillParamsIntoModel()
 {
     TilesModel::Instance()->setWidth(m_width);
     TilesModel::Instance()->setHeight(m_height);
-    TilesModel::Instance()->setElement_score(m_elementScore);
-    TilesModel::Instance()->setMin_score(m_minScore);
-    TilesModel::Instance()->setMax_moves(m_maxMoves);
+    TilesModel::Instance()->setElementScore(m_elementScore);
+    TilesModel::Instance()->setMinScore(m_minScore);
+    TilesModel::Instance()->setMaxMoves(m_maxMoves);
     TilesModel::Instance()->setTypes(m_types);
 
     TilesModel::Instance()->setInitialised(true);
