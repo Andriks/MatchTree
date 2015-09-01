@@ -10,8 +10,7 @@
 #include "tilesmodel.h"
 #include "jsonparser.h"
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     QGuiApplication app(argc, argv);
 
     JsonParser parser("../MatchTree/input.json");

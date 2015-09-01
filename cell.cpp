@@ -25,43 +25,36 @@ Cell::Cell(int row, int column) :
 
 }
 
-Cell::Cell(int index)
-{
+Cell::Cell(int index) {
     m_row = std::ceil(index / TilesModel::Instance()->width()) + 1;
     m_col = (index + 1) - ((m_row - 1) * TilesModel::Instance()->width());
 }
 
 
-int Cell::row() const
-{
+int Cell::row() const {
     return m_row;
 }
 
-void Cell::setRow(int row)
-{
+void Cell::setRow(int row) {
     m_row = row;
 }
 
-int Cell::col() const
-{
+int Cell::col() const {
     return m_col;
 }
 
-void Cell::setCol(int col)
-{
+void Cell::setCol(int col) {
     m_col = col;
 }
 
-bool Cell::operator ==(const Cell cell)
-{
+bool Cell::operator ==(const Cell cell) {
     if ((m_row == cell.m_row) && (m_col == cell.m_col))
         return true;
 
     return false;
 }
 
-bool Cell::valid() const
-{
+bool Cell::valid() const {
     if ((m_row <= 0) || (m_row > (TilesModel::Instance()->height() + 1)))
         return false;
 
@@ -71,28 +64,23 @@ bool Cell::valid() const
     return true;
 }
 
-int Cell::index() const
-{
+int Cell::index() const {
     return ((m_row - 1) * TilesModel::Instance()->width()) + m_col - 1;
 }
 
-Cell Cell::upper()
-{
+Cell Cell::upper() {
     return Cell(m_row + 1, m_col);
 }
 
-Cell Cell::lower()
-{
+Cell Cell::lower() {
     return Cell(m_row - 1, m_col);
 }
 
-Cell Cell::right()
-{
+Cell Cell::right() {
     return Cell(m_row, m_col + 1);
 }
 
-Cell Cell::left()
-{
+Cell Cell::left() {
     return Cell(m_row, m_col - 1);
 }
 

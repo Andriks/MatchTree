@@ -26,34 +26,28 @@ SwapCommand::SwapCommand(const Cell &from, const Cell &to) :
 }
 
 //////////////////////////////////////////////////////////////
-void SwapCommand::exec()
-{
+void SwapCommand::exec() {
     TilesModel::Instance()->swapCells(m_from->index(), m_to->index());
 }
 
 
-int SwapCommand::delay()
-{
+int SwapCommand::delay() {
     return 200;
 }
 
-QSharedPointer<Tile> SwapCommand::from() const
-{
+QSharedPointer<Tile> SwapCommand::from() const {
     return m_from;
 }
 
-void SwapCommand::setFrom(QSharedPointer<Tile> from)
-{
+void SwapCommand::setFrom(QSharedPointer<Tile> from) {
     m_from = from;
 }
 
-QSharedPointer<Tile> SwapCommand::to() const
-{
+QSharedPointer<Tile> SwapCommand::to() const {
     return m_to;
 }
 
-void SwapCommand::setTo(QSharedPointer<Tile> to)
-{
+void SwapCommand::setTo(QSharedPointer<Tile> to) {
     m_to = to;
 }
 
@@ -65,8 +59,7 @@ MoveUpCommand::MoveUpCommand(QSharedPointer<Tile> target) :
 
 }
 
-void MoveUpCommand::exec()
-{
+void MoveUpCommand::exec() {
     Cell cell = Cell(m_target->index());
 
     while (cell.upper().valid()) {
@@ -76,18 +69,15 @@ void MoveUpCommand::exec()
     }
 }
 
-int MoveUpCommand::delay()
-{
+int MoveUpCommand::delay() {
     return 200;
 }
 
-QSharedPointer<Tile> MoveUpCommand::target() const
-{
+QSharedPointer<Tile> MoveUpCommand::target() const {
     return m_target;
 }
 
-void MoveUpCommand::setTarget(QSharedPointer<Tile> target)
-{
+void MoveUpCommand::setTarget(QSharedPointer<Tile> target) {
     m_target = target;
 }
 
@@ -100,34 +90,28 @@ OpacityCommand::OpacityCommand(QSharedPointer<Tile> target, float opacity) :
 
 }
 
-void OpacityCommand::exec()
-{
+void OpacityCommand::exec() {
     m_target->setValid(false);
     TilesModel::Instance()->changeOpacity(m_target, m_opacity);
 }
 
-int OpacityCommand::delay()
-{
+int OpacityCommand::delay() {
     return 700;
 }
 
-QSharedPointer<Tile> OpacityCommand::target() const
-{
+QSharedPointer<Tile> OpacityCommand::target() const {
     return m_target;
 }
 
-void OpacityCommand::setTarget(QSharedPointer<Tile> target)
-{
+void OpacityCommand::setTarget(QSharedPointer<Tile> target) {
     m_target = target;
 }
 
-float OpacityCommand::opacity() const
-{
+float OpacityCommand::opacity() const {
     return m_opacity;
 }
 
-void OpacityCommand::setOpacity(float opacity)
-{
+void OpacityCommand::setOpacity(float opacity) {
     m_opacity = opacity;
 }
 
@@ -140,33 +124,27 @@ ScaleCommand::ScaleCommand(QSharedPointer<Tile> target, float scale) :
 
 }
 
-void ScaleCommand::exec()
-{
+void ScaleCommand::exec() {
     m_target->setValid(false);
     TilesModel::Instance()->changeScale(m_target, m_scale);
 }
 
-int ScaleCommand::delay()
-{
+int ScaleCommand::delay() {
     return 300;
 }
 
-QSharedPointer<Tile> ScaleCommand::target() const
-{
+QSharedPointer<Tile> ScaleCommand::target() const {
     return m_target;
 }
 
-void ScaleCommand::setTarget(QSharedPointer<Tile> target)
-{
+void ScaleCommand::setTarget(QSharedPointer<Tile> target) {
     m_target = target;
 }
-float ScaleCommand::scale() const
-{
+float ScaleCommand::scale() const {
     return m_scale;
 }
 
-void ScaleCommand::setScale(float scale)
-{
+void ScaleCommand::setScale(float scale) {
     m_scale = scale;
 }
 
@@ -178,23 +156,19 @@ CreateCommand::CreateCommand(QSharedPointer<Tile> target) :
 
 }
 
-void CreateCommand::exec()
-{
+void CreateCommand::exec() {
     TilesModel::Instance()->createItem(m_target->index());
 }
 
-int CreateCommand::delay()
-{
+int CreateCommand::delay() {
     return 500;
 }
 
-QSharedPointer<Tile> CreateCommand::target() const
-{
+QSharedPointer<Tile> CreateCommand::target() const {
     return m_target;
 }
 
-void CreateCommand::setTarget(QSharedPointer<Tile> target)
-{
+void CreateCommand::setTarget(QSharedPointer<Tile> target) {
     m_target = target;
 }
 
@@ -205,22 +179,18 @@ RefreshCommand::RefreshCommand(QSharedPointer<Tile> target) :
 
 }
 
-void RefreshCommand::exec()
-{
+void RefreshCommand::exec() {
     TilesModel::Instance()->refreshItem(m_target->index());
 }
 
-int RefreshCommand::delay()
-{
+int RefreshCommand::delay() {
     return 0;
 }
 
-QSharedPointer<Tile> RefreshCommand::target() const
-{
+QSharedPointer<Tile> RefreshCommand::target() const {
     return m_target;
 }
 
-void RefreshCommand::setTarget(QSharedPointer<Tile> target)
-{
+void RefreshCommand::setTarget(QSharedPointer<Tile> target) {
     m_target = target;
 }

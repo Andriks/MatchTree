@@ -1,13 +1,11 @@
 #include "tile.h"
 #include "tilesmodel.h"
 
-Tile::Tile(QString type)
-{
+Tile::Tile(QString type) {
     setDefault(type);
 }
 
-void Tile::setDefault(QString type)
-{
+void Tile::setDefault(QString type) {
     m_type = type;
 
     if (m_type == "") {
@@ -21,46 +19,38 @@ void Tile::setDefault(QString type)
     }
 }
 
-QString Tile::type() const
-{
+QString Tile::type() const {
     return m_type;
 }
 
-void Tile::setType(const QString &type)
-{
+void Tile::setType(const QString &type) {
     m_type = type;
 }
 
-float Tile::opacity() const
-{
+float Tile::opacity() const {
     return m_opacity;
 }
 
-void Tile::setOpacity(const float &opacity)
-{
+void Tile::setOpacity(const float &opacity) {
     m_opacity = opacity;
 }
-int Tile::index() const
-{
+
+int Tile::index() const {
     return TilesModel::Instance()->indexOfItem(this);
 }
 
-bool Tile::valid() const
-{
+bool Tile::valid() const {
     return m_valid;
 }
 
-void Tile::setValid(bool valid)
-{
+void Tile::setValid(bool valid) {
     m_valid = valid;
 }
-float Tile::scale() const
-{
+float Tile::scale() const {
     return m_scale;
 }
 
-void Tile::setScale(float scale)
-{
+void Tile::setScale(float scale) {
     m_scale = scale;
 }
 

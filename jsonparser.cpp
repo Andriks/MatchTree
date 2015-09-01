@@ -9,8 +9,7 @@
 #include <QJsonArray>
 
 
-JsonParser::JsonParser(QString file_pas)
-{
+JsonParser::JsonParser(QString file_pas) {
     QFile jsonFile(file_pas);
     if (!jsonFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qDebug() << "not opened";
@@ -50,8 +49,7 @@ JsonParser::JsonParser(QString file_pas)
     }
 }
 
-void JsonParser::fillParamsIntoModel()
-{
+void JsonParser::fillParamsIntoModel() {
     TilesModel::Instance()->setWidth(m_width);
     TilesModel::Instance()->setHeight(m_height);
     TilesModel::Instance()->setElementScore(m_elementScore);
