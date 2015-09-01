@@ -2,7 +2,7 @@
 	"width": 7,
 	"height": 8,
 	"types": [0, 1, 2, 3],
-	"elementScore": 60,
+	"elementScore": 100,
 	"minScore": 10000,
 	"maxMoves": 5
 }

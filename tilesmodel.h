@@ -42,8 +42,6 @@ class TilesModel : public QAbstractListModel
 
 public:
     static TilesModel *Instance();
-    // start generating items (without matches)
-    void generate();
 
 
 private:
@@ -52,13 +50,17 @@ private:
 
 
 public slots:
-    /*********************/
-    /********SLOTS********/
-    /*********************/
+    /**************************/
+    /*********SLOTS************/
+    /**************************/
+
+    // start generating items (without matches)
+    void newGame();
 
     void moveTile(int index);
     void provideScaleAnimation();
 
+    // for packeges executing
     void execNextPackage();
     void createPackages();       //tmp move to slots for testing
 
@@ -112,6 +114,10 @@ private:
 
 
 public slots:
+    /***************************/
+    /*****setters / getters*****/
+    /***************************/
+
     // setters / getters for qml engine
     int width();
     void setWidth(const int width);
@@ -147,11 +153,16 @@ public:
 
 
 signals:
+    /**************************/
+    /*********SIGNALS**********/
+    /**************************/
+
     void widthChanged();
     void heightChanged();
     void packDelayChanged();
     void statusChanged();
     void scaleChanged();
+    void startTimer();
 
 
 private:

@@ -24,16 +24,31 @@ TilesModel *TilesModel::Instance()
     return &theSingleInstance;
 }
 
-void TilesModel::generate()
+void TilesModel::newGame()
 {
     if (!m_initialised)
         return;
 
+    if (!m_packList.empty())
+        return;
+
+    if (!m_dataList.empty())
+        m_dataList.clear();
+
+
+    m_movesCount = 0;
+    m_score = 0;
+    m_dragedCell = Cell();
+
+    emit statusChanged();
+
     int dim_size = m_width * m_height;
+
+    beginInsertRows(QModelIndex(), 0, dim_size - 1);
 
     int i;
     for (i = 0; i < dim_size; i++) {
-        m_dataList.push_back(QSharedPointer<Tile>(new Tile(getRandType())));
+        m_dataList.insert(m_dataList.begin() + i, QSharedPointer<Tile>(new Tile(getRandType())));
 
         // to avoid matches on start of game
         while (leadsToMatch(m_dataList[i])) {
@@ -47,6 +62,8 @@ void TilesModel::generate()
 
         m_dataList.push_back(QSharedPointer<Tile>(new Tile(getRandType())));
     }
+
+    endInsertRows();
 }
 
 bool TilesModel::leadsToMatch(QSharedPointer<Tile> new_tile)
@@ -474,6 +491,16 @@ QSharedPointer<Tile> TilesModel::item(int index)
 
 void TilesModel::moveTile(int index)
 {
+    if (!m_packList.empty())
+        return;
+
+    if (gameResult() != NotFinished)
+        return;
+
+
+    emit startTimer();
+
+
     Cell curr_cell(index);
 
     // for providing animated scale effect for draged tile

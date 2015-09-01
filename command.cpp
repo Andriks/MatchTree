@@ -185,7 +185,7 @@ void CreateCommand::exec()
 
 int CreateCommand::delay()
 {
-    return 0;
+    return 500;
 }
 
 QSharedPointer<Tile> CreateCommand::target() const

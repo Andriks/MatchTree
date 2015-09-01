@@ -14,6 +14,23 @@ ApplicationWindow {
     property int delay: 0
 
     //////////////////////////////////////////////////////////////////
+    menuBar: MenuBar {
+        Menu {
+            title: qsTr("&File")
+
+            MenuItem {
+                text: qsTr("&New game")
+                onTriggered: dataModel.newGame()
+            }
+
+            MenuItem {
+                text: qsTr("E&xit")
+                onTriggered: Qt.quit();
+            }
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////
     Component {
         id: highlight
         Rectangle {
@@ -34,7 +51,6 @@ ApplicationWindow {
         }
     }
 
-    //////////////////////////////////////////////////////////////////
     Transition {
         id: moveDisplaced_animation
         NumberAnimation {
@@ -44,12 +60,11 @@ ApplicationWindow {
         }
     }
 
-    //////////////////////////////////////////////////////////////////
     Transition {
         id: add_animation
         NumberAnimation {
             properties: "y"
-            duration: 200 + delay
+            duration: 500 + delay
             easing.type: Easing.OutCirc
         }
     }
@@ -60,11 +75,7 @@ ApplicationWindow {
         id: pack_timer
         objectName: "pack_timer"
         interval: dataModel.packDelay
-        onTriggered:
-        {
-
-            dataModel.execNextPackage()
-        }
+        onTriggered: dataModel.execNextPackage()
     }
 
     Timer {
@@ -100,6 +111,7 @@ ApplicationWindow {
 
             move: move_animation
             moveDisplaced: moveDisplaced_animation
+            add: add_animation
 
 
             delegate: Item {

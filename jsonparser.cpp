@@ -61,6 +61,6 @@ void JsonParser::fillParamsIntoModel()
 
     TilesModel::Instance()->setInitialised(true);
 
-    TilesModel::Instance()->generate();
+    TilesModel::Instance()->newGame();
 }
 
