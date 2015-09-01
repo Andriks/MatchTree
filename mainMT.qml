@@ -6,9 +6,9 @@ import QtQuick.Layouts 1.0
 
 
 ApplicationWindow {
-    title: qsTr("Hello World")
-    width: 700
-    height: 900
+    title: qsTr("match3")
+    width: dataModel.width * 120
+    height: dataModel.height * 130
     visible: true
 
     property int delay: 0
@@ -183,7 +183,8 @@ ApplicationWindow {
 
     MessageDialog {
         id: messageDialog
-        title: qsTr("May I have your attention, please?")
+        objectName: "messageDialog"
+        title: qsTr("Game complited")
 
         function show(caption) {
             messageDialog.text = caption;

@@ -148,6 +148,9 @@ bool TilesModel::matchesExisting()
 
 TilesModel::GameResult TilesModel::gameResult()
 {
+    if (matchesExisting())
+        return NotFinished;
+
     if (m_movesCount >= m_maxMovesCount) {
         if (m_score >= m_minScore) {
             return Win;
@@ -334,10 +337,10 @@ void TilesModel::execNextPackage()
         QObject *messageDialog = m_root->findChild<QObject *>("messageDialog");
         switch (gameResult()) {
         case Win:
-            QMetaObject::invokeMethod(messageDialog, "show", Q_ARG(QString, "Win"));
+            QMetaObject::invokeMethod(messageDialog, "show", Q_ARG(QVariant, QVariant("Congratulation, you win!!")));
             break;
         case Lose:
-            QMetaObject::invokeMethod(messageDialog, "show", Q_ARG(QString, "Lose"));
+            QMetaObject::invokeMethod(messageDialog, "show", Q_ARG(QVariant, QVariant("Sorry, but you lose, try again!!")));
             break;
         default:
             break;

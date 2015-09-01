@@ -18,11 +18,11 @@ int main(int argc, char *argv[])
     parser.fillParamsIntoModel();
 
     QQmlApplicationEngine engine;
+    TilesModel *model = TilesModel::Instance();
+    engine.rootContext()->setContextProperty("dataModel", model);
     engine.load(QUrl(QStringLiteral("qrc:/mainMT.qml")));
 
-    TilesModel *model = TilesModel::Instance();
     model->setRoot(engine.rootObjects()[0]);
-    engine.rootContext()->setContextProperty("dataModel", model);
 
     return app.exec();
 }
