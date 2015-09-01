@@ -14,6 +14,23 @@ ApplicationWindow {
     property int delay: 0
 
     //////////////////////////////////////////////////////////////////
+    menuBar: MenuBar {
+        Menu {
+            title: qsTr("&File")
+
+            MenuItem {
+                text: qsTr("&New game")
+                onTriggered: dataModel.newGame()
+            }
+
+            MenuItem {
+                text: qsTr("E&xit")
+                onTriggered: Qt.quit();
+            }
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////
     Component {
         id: highlight
         Rectangle {
@@ -49,7 +66,7 @@ ApplicationWindow {
         id: add_animation
         NumberAnimation {
             properties: "y"
-            duration: 200 + delay
+            duration: 500 + delay
             easing.type: Easing.OutCirc
         }
     }
@@ -100,6 +117,7 @@ ApplicationWindow {
 
             move: move_animation
             moveDisplaced: moveDisplaced_animation
+            add: add_animation
 
 
             delegate: Item {

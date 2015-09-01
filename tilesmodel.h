@@ -42,8 +42,6 @@ class TilesModel : public QAbstractListModel
 
 public:
     static TilesModel *Instance();
-    // start generating items (without matches)
-    void generate();
 
 
 private:
@@ -56,9 +54,13 @@ public slots:
     /********SLOTS********/
     /*********************/
 
+    // start generating items (without matches)
+    void newGame();
+
     void moveTile(int index);
     void provideScaleAnimation();
 
+    // for packeges executing
     void execNextPackage();
     void createPackages();       //tmp move to slots for testing
 
