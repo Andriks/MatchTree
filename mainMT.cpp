@@ -23,7 +23,6 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("dataModel", model);
     engine.load(QUrl(QStringLiteral("qrc:/mainMT.qml")));
 
-    model->setRoot(engine.rootObjects()[0]);
 
     return app.exec();
 }

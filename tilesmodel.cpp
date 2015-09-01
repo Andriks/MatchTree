@@ -9,7 +9,6 @@
 bool TilesModel::m_initialised(false);
 
 TilesModel::TilesModel() :
-    m_root(NULL),
     m_width(4),
     m_height(6),
     m_movesCount(0),
@@ -337,18 +336,15 @@ void TilesModel::execNextPackage()
     setPackDelay(pack.delay());
 
     emit statusChanged();
-
-    QObject *pack_timer = m_root->findChild<QObject *>("pack_timer");
-    QMetaObject::invokeMethod(pack_timer, "start");
+    emit startPackTimer();
 
     if (m_packList.empty()) {
-        QObject *messageDialog = m_root->findChild<QObject *>("messageDialog");
         switch (gameResult()) {
         case Win:
-            QMetaObject::invokeMethod(messageDialog, "show", Q_ARG(QVariant, QVariant("Congratulation, you win!!")));
+            emit showMessage("Congratulation, you win!!");
             break;
         case Lose:
-            QMetaObject::invokeMethod(messageDialog, "show", Q_ARG(QVariant, QVariant("Sorry, but you lose, try again!!")));
+            emit showMessage("Sorry, but you lose, try again!!");
             break;
         default:
             break;
@@ -497,24 +493,18 @@ void TilesModel::moveTile(int index)
     if (gameResult() != NotFinished)
         return;
 
-
-    emit startTimer();
-
-
     Cell curr_cell(index);
-
-    // for providing animated scale effect for draged tile
-    QObject *scale_timer = m_root->findChild<QObject *>("scale_timer");
 
     if (!m_dragedCell.valid()) {
         m_dragedCell = Cell(index);
 
-        QMetaObject::invokeMethod(scale_timer, "start");
+       emit startScaleTimer();
 
-    } else {
+    }
+    else {
         if (able_to_move(curr_cell)) {
             changeScale(m_dataList[m_dragedCell.index()], 1);
-            QMetaObject::invokeMethod(scale_timer, "stop");
+            emit stopScaleTimer();
 
             qSwap(m_dataList[curr_cell.index()], m_dataList[m_dragedCell.index()]);
             bool matches = matchesExisting();
@@ -529,7 +519,8 @@ void TilesModel::moveTile(int index)
                 emit statusChanged();
 
                 createPackages();
-            } else {
+            }
+            else {
                 Package pack;
 
                 pack.push(QSharedPointer<Command>(new SwapCommand(curr_cell, m_dragedCell)));
@@ -545,11 +536,11 @@ void TilesModel::moveTile(int index)
 
             m_dragedCell = Cell();
 
-        } else {
+        }
+        else {
             changeScale(m_dataList[m_dragedCell.index()], 1);
             m_dragedCell = Cell(index);
         }
-
     }
 }
 
@@ -562,7 +553,8 @@ void TilesModel::provideScaleAnimation()
     float scale = tile->scale();
     if (scale > 1) {
         scale = scale / 1.2;
-    } else {
+    }
+    else {
         scale = scale * 1.2;
     }
 
@@ -660,12 +652,3 @@ void TilesModel::setPackDelay(int packDelay)
     emit packDelayChanged();
 }
 
-QObject *TilesModel::getRoot() const
-{
-    return m_root;
-}
-
-void TilesModel::setRoot(QObject *root)
-{
-    m_root = root;
-}

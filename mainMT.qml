@@ -88,6 +88,19 @@ ApplicationWindow {
 
     //////////////////////////////////////////////////////////////////
 
+    Connections {
+        target: dataModel
+
+        onStartPackTimer: pack_timer.start()
+
+        onStartScaleTimer: scale_timer.start()
+        onStopScaleTimer: scale_timer.stop()
+
+        onShowMessage: messageDialog.show(text)
+    }
+
+    //////////////////////////////////////////////////////////////////
+
     Rectangle {
         width: parent.height; height: parent.width
         anchors.fill: parent

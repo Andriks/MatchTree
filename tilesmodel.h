@@ -148,9 +148,6 @@ public:
     static bool getInitialised();
     static void setInitialised(bool initialised);
 
-    QObject *getRoot() const;
-    void setRoot(QObject *root);
-
 
 signals:
     /**************************/
@@ -162,12 +159,13 @@ signals:
     void packDelayChanged();
     void statusChanged();
     void scaleChanged();
-    void startTimer();
+    void startPackTimer();
+    void startScaleTimer();
+    void stopScaleTimer();
+    void showMessage(QString text);
 
 
 private:
-    QObject *m_root;
-
     QVector<QSharedPointer<Tile> > m_dataList;
     QQueue<Package> m_packList;
     QVector<int> m_types;
