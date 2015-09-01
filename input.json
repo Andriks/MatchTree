@@ -1,8 +1,8 @@
 {
-	"width": 6,
+	"width": 7,
 	"height": 8,
 	"types": [0, 1, 2, 3],
 	"elementScore": 60,
 	"minScore": 10000,
-	"maxMoves": 20
+	"maxMoves": 5
 }

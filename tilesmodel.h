@@ -3,7 +3,6 @@
 
 #include <QAbstractListModel>
 #include <QSharedPointer>
-#include <QTimer>
 
 #include <QVector>
 #include <QQueue>
@@ -29,6 +28,13 @@ class TilesModel : public QAbstractListModel
         ScaleRole
     };
 
+    ///////////////////////////////////////////////////////
+    enum GameResult {
+        Win = Qt::UserRole + 1,
+        Lose,
+        NotFinished
+    };
+
     // for singleton
     TilesModel();
     TilesModel(const TilesModel&);
@@ -46,6 +52,10 @@ private:
 
 
 public slots:
+    /*********************/
+    /********SLOTS********/
+    /*********************/
+
     void moveTile(int index);
     void provideScaleAnimation();
 
@@ -54,7 +64,10 @@ public slots:
 
 
 public:
-    // interface for Command
+    /***************************/
+    /***interface for Command***/
+    /***************************/
+
     void swapCells(const int from, const int to);
     void swapCells(const Cell &from, const Cell &to);
 
@@ -68,7 +81,10 @@ public:
     QString getRandType();
 
 
-    // interface for Tile
+    /***************************/
+    /*****interface for Tile****/
+    /***************************/
+
     int indexOfItem(const Tile *item) const;
 
 
@@ -79,7 +95,10 @@ public:
 
 
 private:
-    // for game logic
+    /***************************/
+    /*******for game logic******/
+    /***************************/
+
     bool able_to_move(Cell);
     QVector<Cell> cellsToMove(Cell cell);
 
@@ -88,6 +107,8 @@ private:
     // checks for repeating tiles in matches
     bool checkForRepeating(QSharedPointer<Tile> tile, QVector<QVector<QSharedPointer<Tile> > > conteiner) const;
     bool matchesExisting();
+
+    GameResult gameResult();
 
 
 public slots:
@@ -106,14 +127,14 @@ public slots:
 
 public:
     // setters / getters
-    int getElement_score() const;
-    void setElement_score(int element_score);
+    int elementScore() const;
+    void setElementScore(int element_score);
 
-    int getMin_score() const;
-    void setMin_score(int min_score);
+    int minScore() const;
+    void setMinScore(int minScore);
 
-    int getMax_moves() const;
-    void setMax_moves(int max_moves);
+    int maxMoves() const;
+    void setMaxMoves(int maxMoves);
 
     QVector<int> getTypes() const;
     void setTypes(const QVector<int> &types);
@@ -149,7 +170,7 @@ private:
     int m_movesCount;
     int m_score;
 
-    Cell m_DragedCell;
+    Cell m_dragedCell;
 
     int m_packDelay;
 
