@@ -1,5 +1,6 @@
 #include "tile.h"
 #include "tilesmodel.h"
+//#include <QAbstractItemModel>
 
 Tile::Tile(QString type) {
     setDefault(type);

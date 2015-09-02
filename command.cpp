@@ -180,7 +180,7 @@ RefreshCommand::RefreshCommand(QSharedPointer<Tile> target) :
 }
 
 void RefreshCommand::exec() {
-    TilesModel::Instance()->refreshItem(m_target->index());
+    TilesModel::Instance()->refreshItem(m_target);
 }
 
 int RefreshCommand::delay() {
