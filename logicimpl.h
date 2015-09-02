@@ -11,8 +11,14 @@
 #include "package.h"
 
 
-class LogicImpl
+class LogicImpl: public QObject
 {
+    Q_OBJECT
+    Q_PROPERTY(int width READ width WRITE setWidth NOTIFY widthChanged)
+    Q_PROPERTY(int height READ height WRITE setHeight NOTIFY heightChanged)
+    Q_PROPERTY(int packDelay READ packDelay WRITE setPackDelay NOTIFY packDelayChanged)
+    Q_PROPERTY(QString status READ status NOTIFY statusChanged)
+
     enum GameResult {
         Win = Qt::UserRole + 1,
         Lose,
@@ -20,12 +26,15 @@ class LogicImpl
     };
 
 public:
-    LogicImpl();
+    LogicImpl(QObject *parent = 0);
 
     void newGame();
+
     void moveTile(int index);
     void execNextPackage();
     void provideScaleAnimation();
+
+    int modelSize() const;
 
     QString getRandType();
 
@@ -35,6 +44,39 @@ public:
     void insertItem(int index);
     void swapItems(const int index1, const int index2);
 
+
+    void setElementScore(int elementScore);
+
+    void setMinScore(int minScore);
+
+    void setMaxMovesCount(int maxMovesCount);
+
+    void setTypes(const QVector<int> &types);
+
+signals:
+    void widthChanged();
+    void heightChanged();
+    void packDelayChanged();
+    void statusChanged();
+    void scaleChanged();
+    void startPackTimer();
+    void startScaleTimer();
+    void stopScaleTimer();
+    void showMessage(QString text);
+
+
+
+public slots:
+    int width() const;
+    void setWidth(int width);
+
+    int height() const;
+    void setHeight(int height);
+
+    int packDelay() const;
+    void setPackDelay(int packDelay);
+
+    QString status();
 
 private:
     void parse_params(QString file_pas);
@@ -56,44 +98,6 @@ private:
     GameResult gameResult();
 
 
-public:
-    /***************************/
-    /*****setters / getters*****/
-    /***************************/
-
-    int modelSize() const;
-
-    int width() const;
-    void setWidth(int width);
-
-    int height() const;
-    void setHeight(int height);
-
-    int elementScore() const;
-    void setElementScore(int elementScore);
-
-    int minScore() const;
-    void setMinScore(int minScore);
-
-    int maxMovesCount() const;
-    void setMaxMovesCount(int maxMovesCount);
-
-    int movesCount() const;
-    void setMovesCount(int movesCount);
-
-    int score() const;
-    void setScore(int score);
-
-    Cell dragedCell() const;
-    void setDragedCell(const Cell &dragedCell);
-
-    int packDelay() const;
-    void setPackDelay(int packDelay);
-
-    QVector<int> types() const;
-    void setTypes(const QVector<int> &types);
-
-
 private:
     QVector<QSharedPointer<Tile> > m_dataList;
     QQueue<Package> m_packList;
@@ -110,7 +114,6 @@ private:
     int m_movesCount;
     int m_score;
     Cell m_dragedCell;
-
 
     int m_packDelay;
 

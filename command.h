@@ -12,7 +12,7 @@ public:
     Command();
 
     virtual void exec() = 0;
-    virtual int delay() = 0;
+    virtual int duration() = 0;
 
 };
 
@@ -24,7 +24,7 @@ public:
     SwapCommand(const Cell &from, const Cell &to);
 
     virtual void exec();
-    virtual int delay();
+    virtual int duration();
 
     QSharedPointer<Tile> from() const;
     void setFrom(QSharedPointer<Tile> from);
@@ -44,7 +44,7 @@ public:
     MoveUpCommand(QSharedPointer<Tile> target);
 
     virtual void exec();
-    virtual int delay();
+    virtual int duration();
 
     QSharedPointer<Tile> target() const;
     void setTarget(QSharedPointer<Tile> target);
@@ -61,7 +61,7 @@ public:
     OpacityCommand(QSharedPointer<Tile> target, float opacity);
 
     virtual void exec();
-    virtual int delay();
+    virtual int duration();
 
     QSharedPointer<Tile> target() const;
     void setTarget(QSharedPointer<Tile> target);
@@ -82,7 +82,7 @@ public:
     ScaleCommand(QSharedPointer<Tile> target, float scale);
 
     virtual void exec();
-    virtual int delay();
+    virtual int duration();
 
     QSharedPointer<Tile> target() const;
     void setTarget(QSharedPointer<Tile> target);
@@ -104,7 +104,7 @@ public:
     CreateCommand(QSharedPointer<Tile> target);
 
     virtual void exec();
-    virtual int delay();
+    virtual int duration();
 
     QSharedPointer<Tile> target() const;
     void setTarget(QSharedPointer<Tile> target);
@@ -120,7 +120,7 @@ public:
     RefreshCommand(QSharedPointer<Tile> target);
 
     virtual void exec();
-    virtual int delay();
+    virtual int duration();
 
     QSharedPointer<Tile> target() const;
     void setTarget(QSharedPointer<Tile> target);

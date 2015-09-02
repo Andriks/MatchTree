@@ -1,62 +1,25 @@
 #include "logicimpl.h"
 #include "tilesmodel.h"
+#include "jsonparser.h"
 
 #include <cmath>
 
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QFile>
 #include <QString>
 
 
-void LogicImpl::parse_params(QString file_pas) {
-    QFile jsonFile(file_pas);
-    if (!jsonFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-//        qDebug() << "not opened";
-        return;
-    }
-
-    QJsonParseError parseError;
-    QJsonDocument json_doc = QJsonDocument::fromJson(jsonFile.readAll(), &parseError);
-
-    if (parseError.error != QJsonParseError::NoError) {
-//        qDebug() << parseError.error;
-        jsonFile.close();
-        return;
-    }
-
-    if (json_doc.isEmpty()) {
-//        qDebug() << "empty";
-        jsonFile.close();
-        return;
-    }
-
-    jsonFile.close();
-
-    QJsonObject jsonObject = json_doc.object();
-
-    m_width = jsonObject["width"].toInt();
-    m_height = jsonObject["height"].toInt();
-    m_elementScore = jsonObject["elementScore"].toInt();
-    m_minScore = jsonObject["minScore"].toInt();
-    m_maxMovesCount = jsonObject["maxMoves"].toInt();
-
-    m_types.clear();
-
-    QJsonArray jsonArray = jsonObject["types"].toArray();
-    foreach (const QJsonValue & value, jsonArray) {
-        int arr_item = value.toInt();
-        m_types.push_back(arr_item);
-    }
-}
-
-LogicImpl::LogicImpl() :
+LogicImpl::LogicImpl(QObject *parent) :
+    QObject(parent),
+    m_width(6),
+    m_height(6),
+    m_elementScore(100),
+    m_minScore(1000),
+    m_maxMovesCount(5),
     m_movesCount(0),
     m_score(0),
     m_dragedCell(),
     m_packDelay(0)
-{
+{    JsonParser parser;
+    parser.parse_config("../match3/config.json", this);
 }
 
 void LogicImpl::newGame()
@@ -66,14 +29,14 @@ void LogicImpl::newGame()
 
     m_dataList.clear();
 
-    parse_params("../match3/input.json");
-
     m_movesCount = 0;
     m_score = 0;
     m_dragedCell = Cell();
     m_packDelay = 0;
 
-    int dim_size = m_width * m_height;
+    emit statusChanged();
+
+    int dim_size = m_width * (m_height + 1); // 1 additional row for invisible part
 
     int i;
     for (i = 0; i < dim_size; i++) {
@@ -85,15 +48,8 @@ void LogicImpl::newGame()
             m_dataList[i]->setDefault(getRandType());
         }
     }
-
-    // one more row for invisible part
-    dim_size += m_width;
-    for (i; i < dim_size; i++) {
-
-        m_dataList.push_back(QSharedPointer<Tile>(new Tile(getRandType())));
-    }
-
 }
+
 
 
 bool LogicImpl::leadsToMatch(QSharedPointer<Tile> new_tile) {
@@ -109,7 +65,7 @@ bool LogicImpl::leadsToMatch(QSharedPointer<Tile> new_tile) {
 
         lower_cell = lower_cell.lower();
 
-        // if we still don't occures break, we have match here
+        // if we still don't occuresR break, we have match here
         if (i == 1)
             return true;
     }
@@ -324,8 +280,7 @@ QVector<QVector<QSharedPointer<Tile> > > LogicImpl::findMatches() const {
     return res;
 }
 
-bool LogicImpl::checkForRepeating(QSharedPointer<Tile> tile, QVector<QVector<QSharedPointer<Tile> > > conteiner) const
-{
+bool LogicImpl::checkForRepeating(QSharedPointer<Tile> tile, QVector<QVector<QSharedPointer<Tile> > > conteiner) const {
     for (QVector<QVector<QSharedPointer<Tile> > >::iterator it1 = conteiner.begin(); it1 < conteiner.end(); it1++) {
         for (QVector<QSharedPointer<Tile> >::iterator it2 = it1->begin(); it2 != it1->end(); it2++) {
             if (*it2 == tile) {
@@ -333,10 +288,11 @@ bool LogicImpl::checkForRepeating(QSharedPointer<Tile> tile, QVector<QVector<QSh
             }
         }
     }
+
+    return false;
 }
 
-bool LogicImpl::matchesExisting()
-{
+bool LogicImpl::matchesExisting() {
     QVector< QVector<QSharedPointer<Tile> > > matches_list = findMatches();
     if (matches_list.empty())
         return false;
@@ -344,8 +300,7 @@ bool LogicImpl::matchesExisting()
     return true;
 }
 
-LogicImpl::GameResult LogicImpl::gameResult()
-{
+LogicImpl::GameResult LogicImpl::gameResult() {
     if (matchesExisting())
         return NotFinished;
 
@@ -360,26 +315,26 @@ LogicImpl::GameResult LogicImpl::gameResult()
 
     return NotFinished;
 }
-
-QVector<int> LogicImpl::types() const
-{
-    return m_types;
-}
-
 void LogicImpl::setTypes(const QVector<int> &types)
 {
     m_types = types;
 }
 
-int LogicImpl::packDelay() const
+void LogicImpl::setMaxMovesCount(int maxMovesCount)
 {
-    return m_packDelay;
+    m_maxMovesCount = maxMovesCount;
 }
 
-void LogicImpl::setPackDelay(int packDelay)
+void LogicImpl::setMinScore(int minScore)
 {
-    m_packDelay = packDelay;
+    m_minScore = minScore;
 }
+
+void LogicImpl::setElementScore(int elementScore)
+{
+    m_elementScore = elementScore;
+}
+
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -389,9 +344,6 @@ QSharedPointer<Tile> LogicImpl::item(int index) const {
 }
 
 int LogicImpl::indexOfItem(const Tile *item) const {
-
-//    return m_dataList.indexOf(item);
-
     for (int i = 0; i < m_dataList.size(); i++) {
         if (m_dataList[i] == item) {
             return i;
@@ -421,13 +373,13 @@ void LogicImpl::moveTile(int index) {
     if (!m_dragedCell.valid()) {
         m_dragedCell = Cell(index);
 
-       emit TilesModel::Instance()->startScaleTimer();
+       emit startScaleTimer();
 
     }
     else {
         if (able_to_move(curr_cell)) {
             TilesModel::Instance()->changeScale(m_dataList[m_dragedCell.index()], 1);
-            emit TilesModel::Instance()->stopScaleTimer();
+            emit stopScaleTimer();
 
             qSwap(m_dataList[curr_cell.index()], m_dataList[m_dragedCell.index()]);
             bool matches = matchesExisting();
@@ -439,7 +391,7 @@ void LogicImpl::moveTile(int index) {
                 m_packList.enqueue(pack);
 
                 m_movesCount++;
-                emit TilesModel::Instance()->statusChanged();
+                emit statusChanged();
 
                 createPackages();
             }
@@ -476,18 +428,18 @@ void LogicImpl::execNextPackage() {
 
     Package pack = m_packList.dequeue();
     pack.exec();
-    TilesModel::Instance()->setPackDelay(pack.delay());
+    setPackDelay(pack.duration());
 
-    emit TilesModel::Instance()->statusChanged();
-    emit TilesModel::Instance()->startPackTimer();
+    emit statusChanged();
+    emit startPackTimer();
 
     if (m_packList.empty()) {
         switch (gameResult()) {
         case Win:
-            emit TilesModel::Instance()->showMessage("Congratulation, you win!!");
+            emit showMessage("Congratulation, you win!!");
             break;
         case Lose:
-            emit TilesModel::Instance()->showMessage("Sorry, but you lose, try again!!");
+            emit showMessage("Sorry, but you lose, try again!!");
             break;
         default:
             break;
@@ -516,81 +468,38 @@ void LogicImpl::swapItems(const int index1, const int index2) {
     qSwap(m_dataList[index1], m_dataList[index2]);
 }
 
-int LogicImpl::modelSize() const
-{
-    return m_width * m_height;
+int LogicImpl::modelSize() const {
+//    return m_width * m_height;
+    return m_dataList.size();
 }
 
-int LogicImpl::width() const
-{
+int LogicImpl::width() const {
     return m_width;
 }
 
-void LogicImpl::setWidth(int width)
-{
+void LogicImpl::setWidth(int width) {
     m_width = width;
+    emit widthChanged();
 }
-int LogicImpl::height() const
-{
+int LogicImpl::height() const {
     return m_height;
 }
 
-void LogicImpl::setHeight(int height)
-{
+void LogicImpl::setHeight(int height) {
     m_height = height;
-}
-int LogicImpl::elementScore() const
-{
-    return m_elementScore;
+    emit heightChanged();
 }
 
-void LogicImpl::setElementScore(int elementScore)
-{
-    m_elementScore = elementScore;
-}
-int LogicImpl::minScore() const
-{
-    return m_minScore;
+int LogicImpl::packDelay() const {
+    return m_packDelay;
 }
 
-void LogicImpl::setMinScore(int minScore)
-{
-    m_minScore = minScore;
-}
-int LogicImpl::maxMovesCount() const
-{
-    return m_maxMovesCount;
+void LogicImpl::setPackDelay(int packDelay) {
+    m_packDelay = packDelay;
+    emit packDelayChanged();
 }
 
-void LogicImpl::setMaxMovesCount(int maxMovesCount)
+QString LogicImpl::status()
 {
-    m_maxMovesCount = maxMovesCount;
+    return QString(" score: %1; moves: %2 / %3").arg(m_score).arg(m_movesCount).arg(m_maxMovesCount);
 }
-int LogicImpl::movesCount() const
-{
-    return m_movesCount;
-}
-
-void LogicImpl::setMovesCount(int movesCount)
-{
-    m_movesCount = movesCount;
-}
-int LogicImpl::score() const
-{
-    return m_score;
-}
-
-void LogicImpl::setScore(int score)
-{
-    m_score = score;
-}
-Cell LogicImpl::dragedCell() const
-{
-    return m_dragedCell;
-}
-
-void LogicImpl::setDragedCell(const Cell &dragedCell)
-{
-    m_dragedCell = dragedCell;
-}
-

@@ -5,7 +5,7 @@
 
 
 Package::Package() :
-    m_delay(0)
+    m_duration(0)
 {
 
 }
@@ -17,7 +17,7 @@ void Package::push(QSharedPointer<Command> comm) {
 void Package::exec() {
     while (m_commList.size()) {
         QSharedPointer<Command> comm = m_commList.dequeue();
-        m_delay = std::max(m_delay, comm->delay());
+        m_duration = std::max(m_duration, comm->duration());
 
         comm->exec();
     }
@@ -32,12 +32,12 @@ void Package::clear() {
 size_t Package::size() {
     return m_commList.size();
 }
-int Package::delay() const {
-    return m_delay;
+int Package::duration() const {
+    return m_duration;
 }
 
 void Package::setDelay(int delay) {
-    m_delay = delay;
+    m_duration = delay;
 }
 
 

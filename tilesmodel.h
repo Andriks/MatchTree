@@ -8,16 +8,15 @@
 #include "cell.h"
 #include "package.h"
 #include "logicimpl.h"
+#include "durationsconf.h"
 
 
 
 class TilesModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(int width READ width WRITE setWidth NOTIFY widthChanged)
-    Q_PROPERTY(int height READ height WRITE setHeight NOTIFY heightChanged)
-    Q_PROPERTY(int packDelay READ packDelay WRITE setPackDelay NOTIFY packDelayChanged)
-    Q_PROPERTY(QString status READ status NOTIFY statusChanged)
+    Q_PROPERTY(LogicImpl *config READ config NOTIFY configChanged)
+    Q_PROPERTY(DurationsConf *durations READ durations NOTIFY durationsChanged)
 
     ///////////////////////////////////////////////////////
     enum TileElemRoles {
@@ -34,7 +33,14 @@ class TilesModel : public QAbstractListModel
 public:
     static TilesModel *Instance();
 
+signals:
+    void configChanged();
+    void durationsChanged();
+
 public slots:
+    LogicImpl *config() const;
+    DurationsConf *durations() const;
+
     // start generating items (without matches)
     void newGame();
 
@@ -75,34 +81,14 @@ public:
     QHash<int, QByteArray> roleNames() const;
 
 
-signals:
-    void widthChanged();
-    void heightChanged();
-    void packDelayChanged();
-    void statusChanged();
-    void scaleChanged();
-    void startPackTimer();
-    void startScaleTimer();
-    void stopScaleTimer();
-    void showMessage(QString text);
 
-
-public slots:
-    // setters / getters for qml engine
+public:
     int width();
-    void setWidth(const int width);
-
     int height();
-    void setHeight(const int height);
-
-    int packDelay() const;
-    void setPackDelay(int packDelay);
-
-    QString status();
-
 
 private:
-    LogicImpl m_logicImpl;
+    LogicImpl *m_logicImpl;
+    DurationsConf *m_durations;
 
 };
 

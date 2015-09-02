@@ -2,8 +2,11 @@
 #include "command.h"
 
 
-TilesModel::TilesModel()
+TilesModel::TilesModel() :
+    m_logicImpl(NULL),
+    m_durations(NULL)
 {
+    m_durations = new DurationsConf();
 }
 
 TilesModel *TilesModel::Instance() {
@@ -11,27 +14,42 @@ TilesModel *TilesModel::Instance() {
     return &theSingleInstance;
 }
 
+LogicImpl *TilesModel::config() const
+{
+    return m_logicImpl;
+}
+
+DurationsConf *TilesModel::durations() const
+{
+    return m_durations;
+}
+
 void TilesModel::newGame() {
-    beginInsertRows(QModelIndex(), 0, m_logicImpl.modelSize() - 1);
-    m_logicImpl.newGame();
+    delete m_logicImpl;
+    m_logicImpl = new LogicImpl();
+
+    emit configChanged();
+
+    beginInsertRows(QModelIndex(), 0, m_logicImpl->modelSize() - 1);
+    m_logicImpl->newGame();
     endInsertRows();
 
-    emit statusChanged();
+
 }
 
 int TilesModel::indexOfItem(const Tile *item) const {
-    return m_logicImpl.indexOfItem(item);
+    return m_logicImpl->indexOfItem(item);
 }
 
 int TilesModel::rowCount(const QModelIndex & parent) const {
-    return m_logicImpl.modelSize();
+    return m_logicImpl->modelSize();
 }
 
 QVariant TilesModel::data(const QModelIndex & index, int role) const {
-    if (index.row() < 0 || index.row() > m_logicImpl.modelSize())
+    if (index.row() < 0 || index.row() > m_logicImpl->modelSize())
         return QVariant();
 
-    const QSharedPointer<Tile> tile = m_logicImpl.item(index.row());
+    const QSharedPointer<Tile> tile = m_logicImpl->item(index.row());
 
     switch (role) {
     case TypeRole:
@@ -59,7 +77,7 @@ QHash<int, QByteArray> TilesModel::roleNames() const {
 }
 
 void TilesModel::execNextPackage() {
-    m_logicImpl.execNextPackage();
+    m_logicImpl->execNextPackage();
 }
 
 void TilesModel::swapCells(const int from, const int to) {
@@ -87,7 +105,7 @@ void TilesModel::swapCells(const int from, const int to) {
 
     }
 
-    m_logicImpl.swapItems(from, to);
+    m_logicImpl->swapItems(from, to);
 }
 
 void TilesModel::swapCells(const Cell &from, const Cell &to) {
@@ -108,64 +126,38 @@ void TilesModel::changeScale(QSharedPointer<Tile> target, const float scale) {
 
 void TilesModel::createItem(int index) {
     beginRemoveRows(QModelIndex(), index, index);
-    m_logicImpl.eraseItem(index);
+    m_logicImpl->eraseItem(index);
     endRemoveRows();
 
     beginInsertRows(QModelIndex(), index, index);
-    m_logicImpl.insertItem(index);
+    m_logicImpl->insertItem(index);
     endInsertRows();
 }
 
 void TilesModel::refreshItem(QSharedPointer<Tile> target) {
-//    beginResetModel();
-    target->setDefault(m_logicImpl.getRandType());
-//    endResetModel();
-
-    emit dataChanged(createIndex(target->index(), 0), createIndex(target->index(), 0));
+    beginResetModel();
+    target->setDefault(m_logicImpl->getRandType());
+    endResetModel();
 }
 
 QSharedPointer<Tile> TilesModel::item(int index) {
-    return m_logicImpl.item(index);
+    return m_logicImpl->item(index);
 }
 
 void TilesModel::moveTile(int index) {
-    m_logicImpl.moveTile(index);
+    m_logicImpl->moveTile(index);
 }
 
 void TilesModel::provideScaleAnimation() {
-    m_logicImpl.provideScaleAnimation();
+    m_logicImpl->provideScaleAnimation();
 
 }
 
-////////////////////////////////////////////////////////////////////////////////////
 int TilesModel::width() {
-    return m_logicImpl.width();
-}
-
-void TilesModel::setWidth(const int width) {
-    m_logicImpl.setWidth(width);
-    emit widthChanged();
+    return m_logicImpl->width();
 }
 
 int TilesModel::height() {
-    return m_logicImpl.height();
-}
-
-void TilesModel::setHeight(const int height) {
-    m_logicImpl.setHeight(height);
-    emit heightChanged();
-}
-
-int TilesModel::packDelay() const {
-    return m_logicImpl.packDelay();
-}
-
-void TilesModel::setPackDelay(int packDelay) {
-    m_logicImpl.setPackDelay(packDelay);
-    emit packDelayChanged();
-}
-
-QString TilesModel::status() {
-    return QString(" score: %1; moves: %2").arg(m_logicImpl.score()).arg(m_logicImpl.movesCount());
+    return m_logicImpl->height();
 }
 

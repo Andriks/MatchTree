@@ -9,7 +9,9 @@ SOURCES += \
     command.cpp \
     package.cpp \
     mainMT.cpp \
-    logicimpl.cpp
+    logicimpl.cpp \
+    jsonparser.cpp \
+    durationsconf.cpp
 
 RESOURCES += qml.qrc
 
@@ -25,4 +27,6 @@ HEADERS += \
     cell.h \
     command.h \
     package.h \
-    logicimpl.h
+    logicimpl.h \
+    jsonparser.h \
+    durationsconf.h
