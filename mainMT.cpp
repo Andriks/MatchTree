@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
-    JsonParser parser("../MatchTree/input.json");
+    JsonParser parser("../match3/input.json");
     parser.fillParamsIntoModel();
 
     QQmlApplicationEngine engine;
