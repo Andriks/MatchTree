@@ -7,11 +7,9 @@ import QtQuick.Layouts 1.0
 
 ApplicationWindow {
     title: qsTr("match3")
-    width: dataModel.width * 120
-    height: dataModel.height * 120
+    width: dataModel.config.width * 120
+    height: dataModel.config.height * 120
     visible: true
-
-    property int delay: 0
 
     //////////////////////////////////////////////////////////////////
     menuBar: MenuBar {
@@ -31,22 +29,12 @@ ApplicationWindow {
     }
 
     //////////////////////////////////////////////////////////////////
-    Component {
-        id: highlight
-        Rectangle {
-            height: view.cellHeight
-            width: view.cellWidth
-            radius: 10
-            color: "lightgrey"
-        }
-    }
 
-    //////////////////////////////////////////////////////////////////
     Transition {
         id: move_animation
         NumberAnimation {
             properties: "x,y"
-            duration: 200 + delay
+            duration: dataModel.durations.move
             easing.type: "OutBack"
         }
     }
@@ -55,7 +43,7 @@ ApplicationWindow {
         id: moveDisplaced_animation
         NumberAnimation {
             properties: "x,y"
-            duration: 200 + delay
+            duration: dataModel.durations.move
             easing.type: "OutBack"
         }
     }
@@ -64,7 +52,7 @@ ApplicationWindow {
         id: add_animation
         NumberAnimation {
             properties: "y"
-            duration: 500 + delay
+            duration: dataModel.durations.create
             easing.type: Easing.OutCirc
         }
     }
@@ -74,14 +62,14 @@ ApplicationWindow {
     Timer {
         id: pack_timer
         objectName: "pack_timer"
-        interval: dataModel.packDelay
+        interval: dataModel.config.packDelay
         onTriggered: dataModel.execNextPackage()
     }
 
     Timer {
         id: scale_timer
         objectName: "scale_timer"
-        interval: 250
+        interval: dataModel.durations.scale
         repeat: true
         onTriggered: dataModel.provideScaleAnimation()
     }
@@ -89,7 +77,7 @@ ApplicationWindow {
     //////////////////////////////////////////////////////////////////
 
     Connections {
-        target: dataModel
+        target: dataModel.config
 
         onStartPackTimer: pack_timer.start()
 
@@ -115,8 +103,8 @@ ApplicationWindow {
 
             anchors.fill: parent
             anchors.centerIn: parent
-            cellHeight: parent.height / dataModel.height;
-            cellWidth: parent.width / dataModel.width;
+            cellHeight: parent.height / dataModel.config.height;
+            cellWidth: parent.width / dataModel.config.width;
 
             interactive: false
             verticalLayoutDirection: GridView.BottomToTop
@@ -144,20 +132,26 @@ ApplicationWindow {
                         source: model.type
                     }
 
+//                    Text {
+//                        x: 10
+//                        y: 10
+//                        text: "%1".arg(model.index);
+//                    }
+
                     opacity: model.opacity
                     scale: model.scale
 
                     Behavior on opacity {
                         NumberAnimation {
                             id: opacity_animation
-                            duration: 700 + delay
+                            duration: dataModel.durations.opacity
                         }
                     }
 
                     Behavior on scale {
                         NumberAnimation {
                             id: scale_animation
-                            duration: 300
+                            duration: dataModel.durations.scale
                         }
                     }
 
@@ -172,11 +166,12 @@ ApplicationWindow {
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
+
     statusBar: StatusBar {
         id: status_bar
         RowLayout {
             anchors.fill: parent
-            Label { text: dataModel.status }
+            Label { text: dataModel.config.status }
         }
     }
 

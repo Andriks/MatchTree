@@ -1,18 +1,19 @@
 #include "jsonparser.h"
-#include "tilesmodel.h"
-
-#include <QDebug>
-#include <QFile>
 
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QFile>
 
 
-JsonParser::JsonParser(QString file_pas) {
+JsonParser::JsonParser()
+{
+}
+
+void JsonParser::parse_config(QString file_pas, LogicImpl *target)
+{
     QFile jsonFile(file_pas);
     if (!jsonFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qDebug() << "not opened";
         return;
     }
 
@@ -20,13 +21,11 @@ JsonParser::JsonParser(QString file_pas) {
     QJsonDocument json_doc = QJsonDocument::fromJson(jsonFile.readAll(), &parseError);
 
     if (parseError.error != QJsonParseError::NoError) {
-        qDebug() << parseError.error;
         jsonFile.close();
         return;
     }
 
     if (json_doc.isEmpty()) {
-        qDebug() << "empty";
         jsonFile.close();
         return;
     }
@@ -35,30 +34,53 @@ JsonParser::JsonParser(QString file_pas) {
 
     QJsonObject jsonObject = json_doc.object();
 
-    m_width = jsonObject["width"].toInt();
-    m_height = jsonObject["height"].toInt();
-    m_elementScore = jsonObject["elementScore"].toInt();
-    m_minScore = jsonObject["minScore"].toInt();
-    m_maxMoves = jsonObject["maxMoves"].toInt();
+    target->setWidth(jsonObject["width"].toInt());
+    target->setHeight(jsonObject["height"].toInt());
+    target->setElementScore(jsonObject["elementScore"].toInt());
+    target->setMinScore(jsonObject["minScore"].toInt());
+    target->setMaxMovesCount(jsonObject["maxMoves"].toInt());
 
+
+    QVector<int> types;
 
     QJsonArray jsonArray = jsonObject["types"].toArray();
     foreach (const QJsonValue & value, jsonArray) {
         int arr_item = value.toInt();
-        m_types.push_back(arr_item);
+        types.push_back(arr_item);
     }
+
+    target->setTypes(types);
 }
 
-void JsonParser::fillParamsIntoModel() {
-    TilesModel::Instance()->setWidth(m_width);
-    TilesModel::Instance()->setHeight(m_height);
-    TilesModel::Instance()->setElementScore(m_elementScore);
-    TilesModel::Instance()->setMinScore(m_minScore);
-    TilesModel::Instance()->setMaxMoves(m_maxMoves);
-    TilesModel::Instance()->setTypes(m_types);
+void JsonParser::parse_durations(QString file_pas, DurationsConf *target)
+{
+    QFile jsonFile(file_pas);
+    if (!jsonFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return;
+    }
 
-    TilesModel::Instance()->setInitialised(true);
+    QJsonParseError parseError;
+    QJsonDocument json_doc = QJsonDocument::fromJson(jsonFile.readAll(), &parseError);
 
-    TilesModel::Instance()->newGame();
+    if (parseError.error != QJsonParseError::NoError) {
+        jsonFile.close();
+        return;
+    }
+
+    if (json_doc.isEmpty()) {
+        jsonFile.close();
+        return;
+    }
+
+    jsonFile.close();
+
+    QJsonObject jsonObject = json_doc.object();
+
+    target->setSwap(jsonObject["swap"].toInt());
+    target->setMoveUp(jsonObject["moveUp"].toInt());
+    target->setOpacity(jsonObject["opacity"].toInt());
+    target->setScale(jsonObject["scale"].toInt());
+    target->setCreate(jsonObject["create"].toInt());
+    target->setRefresh(jsonObject["refresh"].toInt());
 }
 

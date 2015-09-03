@@ -4,35 +4,25 @@
 #include <QAbstractListModel>
 #include <QSharedPointer>
 
-#include <QVector>
-#include <QQueue>
-
 #include "tile.h"
 #include "cell.h"
 #include "package.h"
+#include "logicimpl.h"
+#include "durationsconf.h"
 
 
 
 class TilesModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(int width READ width WRITE setWidth NOTIFY widthChanged)
-    Q_PROPERTY(int height READ height WRITE setHeight NOTIFY heightChanged)
-    Q_PROPERTY(int packDelay READ packDelay WRITE setPackDelay NOTIFY packDelayChanged)
-    Q_PROPERTY(QString status READ status NOTIFY statusChanged)
+    Q_PROPERTY(LogicImpl *config READ config NOTIFY configChanged)
+    Q_PROPERTY(DurationsConf *durations READ durations NOTIFY durationsChanged)
 
     ///////////////////////////////////////////////////////
     enum TileElemRoles {
         TypeRole = Qt::UserRole + 1,
         OpacityRole,
         ScaleRole
-    };
-
-    ///////////////////////////////////////////////////////
-    enum GameResult {
-        Win = Qt::UserRole + 1,
-        Lose,
-        NotFinished
     };
 
     // for singleton
@@ -43,16 +33,13 @@ class TilesModel : public QAbstractListModel
 public:
     static TilesModel *Instance();
 
-
-private:
-    // check for generate()
-    bool leadsToMatch(QSharedPointer<Tile> new_tile);
-
+signals:
+    void configChanged();
+    void durationsChanged();
 
 public slots:
-    /**************************/
-    /*********SLOTS************/
-    /**************************/
+    LogicImpl *config() const;
+    DurationsConf *durations() const;
 
     // start generating items (without matches)
     void newGame();
@@ -62,14 +49,11 @@ public slots:
 
     // for packeges executing
     void execNextPackage();
-    void createPackages();       //tmp move to slots for testing
 
 
 public:
-    /***************************/
-    /***interface for Command***/
-    /***************************/
 
+    // interface for Command
     void swapCells(const int from, const int to);
     void swapCells(const Cell &from, const Cell &to);
 
@@ -77,113 +61,28 @@ public:
     void changeScale(QSharedPointer<Tile> target, const float scale);
 
     void createItem(int index);
-    void refreshItem(int index);
+    void refreshItem(QSharedPointer<Tile> target);
 
     QSharedPointer<Tile> item(int index);
-    QString getRandType();
 
 
-    /***************************/
-    /*****interface for Tile****/
-    /***************************/
-
+    // interface for Tile
     int indexOfItem(const Tile *item) const;
 
 
-    // for QML Engine
+    // interface for QML Engine
     int rowCount(const QModelIndex & parent = QModelIndex()) const;
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
     QHash<int, QByteArray> roleNames() const;
 
-
-private:
-    /***************************/
-    /*******for game logic******/
-    /***************************/
-
-    bool able_to_move(Cell);
-    QVector<Cell> cellsToMove(Cell cell);
-
-    // returns vector of hor / vert matches
-    QVector<QVector<QSharedPointer<Tile> > > findMatches() const;
-    // checks for repeating tiles in matches
-    bool checkForRepeating(QSharedPointer<Tile> tile, QVector<QVector<QSharedPointer<Tile> > > conteiner) const;
-    bool matchesExisting();
-
-    GameResult gameResult();
-
-
-public slots:
-    /***************************/
-    /*****setters / getters*****/
-    /***************************/
-
-    // setters / getters for qml engine
-    int width();
-    void setWidth(const int width);
-
-    int height();
-    void setHeight(const int height);
-
-    int packDelay() const;
-    void setPackDelay(int packDelay);
-
-    QString status();
-
-
 public:
-    // setters / getters
-    int elementScore() const;
-    void setElementScore(int element_score);
-
-    int minScore() const;
-    void setMinScore(int minScore);
-
-    int maxMoves() const;
-    void setMaxMoves(int maxMoves);
-
-    QVector<int> getTypes() const;
-    void setTypes(const QVector<int> &types);
-
-    static bool getInitialised();
-    static void setInitialised(bool initialised);
-
-
-signals:
-    /**************************/
-    /*********SIGNALS**********/
-    /**************************/
-
-    void widthChanged();
-    void heightChanged();
-    void packDelayChanged();
-    void statusChanged();
-    void scaleChanged();
-    void startPackTimer();
-    void startScaleTimer();
-    void stopScaleTimer();
-    void showMessage(QString text);
-
+    int width();
+    int height();
 
 private:
-    QVector<QSharedPointer<Tile> > m_dataList;
-    QQueue<Package> m_packList;
-    QVector<int> m_types;
+    LogicImpl *m_logicImpl;
+    DurationsConf *m_durations;
 
-    int m_width;
-    int m_height;
-    int m_elementScore;
-    int m_minScore;
-    int m_maxMovesCount;
-
-    int m_movesCount;
-    int m_score;
-
-    Cell m_dragedCell;
-
-    int m_packDelay;
-
-    static bool m_initialised;
 };
 
 #endif // TILESMODEL_H

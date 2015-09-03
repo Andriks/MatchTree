@@ -27,12 +27,18 @@ SwapCommand::SwapCommand(const Cell &from, const Cell &to) :
 
 //////////////////////////////////////////////////////////////
 void SwapCommand::exec() {
+//    int duration = TilesModel::Instance()->durations()->swap();
+//    TilesModel::Instance()->durations()->setMove(duration);
+
     TilesModel::Instance()->swapCells(m_from->index(), m_to->index());
 }
 
 
-int SwapCommand::delay() {
-    return 200;
+int SwapCommand::duration() {
+    int duration = TilesModel::Instance()->durations()->swap();
+
+    TilesModel::Instance()->durations()->setMove(duration);
+    return duration;
 }
 
 QSharedPointer<Tile> SwapCommand::from() const {
@@ -60,6 +66,9 @@ MoveUpCommand::MoveUpCommand(QSharedPointer<Tile> target) :
 }
 
 void MoveUpCommand::exec() {
+//    int duration = TilesModel::Instance()->durations()->moveUp();
+//    TilesModel::Instance()->durations()->setMove(duration);
+
     Cell cell = Cell(m_target->index());
 
     while (cell.upper().valid()) {
@@ -69,8 +78,11 @@ void MoveUpCommand::exec() {
     }
 }
 
-int MoveUpCommand::delay() {
-    return 200;
+int MoveUpCommand::duration() {
+    int duration = TilesModel::Instance()->durations()->moveUp();
+
+    TilesModel::Instance()->durations()->setMove(duration);
+    return duration;
 }
 
 QSharedPointer<Tile> MoveUpCommand::target() const {
@@ -95,8 +107,8 @@ void OpacityCommand::exec() {
     TilesModel::Instance()->changeOpacity(m_target, m_opacity);
 }
 
-int OpacityCommand::delay() {
-    return 700;
+int OpacityCommand::duration() {
+    return TilesModel::Instance()->durations()->opacity();
 }
 
 QSharedPointer<Tile> OpacityCommand::target() const {
@@ -129,8 +141,8 @@ void ScaleCommand::exec() {
     TilesModel::Instance()->changeScale(m_target, m_scale);
 }
 
-int ScaleCommand::delay() {
-    return 300;
+int ScaleCommand::duration() {
+    return TilesModel::Instance()->durations()->scale();
 }
 
 QSharedPointer<Tile> ScaleCommand::target() const {
@@ -160,8 +172,8 @@ void CreateCommand::exec() {
     TilesModel::Instance()->createItem(m_target->index());
 }
 
-int CreateCommand::delay() {
-    return 500;
+int CreateCommand::duration() {
+    return TilesModel::Instance()->durations()->create();
 }
 
 QSharedPointer<Tile> CreateCommand::target() const {
@@ -180,11 +192,11 @@ RefreshCommand::RefreshCommand(QSharedPointer<Tile> target) :
 }
 
 void RefreshCommand::exec() {
-    TilesModel::Instance()->refreshItem(m_target->index());
+    TilesModel::Instance()->refreshItem(m_target);
 }
 
-int RefreshCommand::delay() {
-    return 0;
+int RefreshCommand::duration() {
+    return TilesModel::Instance()->durations()->refresh();
 }
 
 QSharedPointer<Tile> RefreshCommand::target() const {

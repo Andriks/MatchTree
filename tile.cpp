@@ -1,5 +1,6 @@
 #include "tile.h"
 #include "tilesmodel.h"
+//#include <QAbstractItemModel>
 
 Tile::Tile(QString type) {
     setDefault(type);
@@ -21,10 +22,6 @@ void Tile::setDefault(QString type) {
 
 QString Tile::type() const {
     return m_type;
-}
-
-void Tile::setType(const QString &type) {
-    m_type = type;
 }
 
 float Tile::opacity() const {

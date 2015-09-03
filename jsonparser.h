@@ -1,24 +1,19 @@
 #ifndef JSONPARSER_H
 #define JSONPARSER_H
 
-#include <QVector>
+#include "logicimpl.h"
+#include "durationsconf.h"
+
 #include <QString>
+
 
 class JsonParser
 {
 public:
-    JsonParser(QString file_pas);
-    void fillParamsIntoModel();
+    JsonParser();
 
-private:
-    QVector<int> m_types;
-
-    int m_width;
-    int m_height;
-    int m_elementScore;
-    int m_minScore;
-    int m_maxMoves;
-
+    void parse_config(QString file_pas, LogicImpl *target);
+    void parse_durations(QString file_pas, DurationsConf *target);
 };
 
 #endif // JSONPARSER_H

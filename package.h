@@ -17,12 +17,12 @@ public:
     void clear();
     size_t size();
 
-    int delay() const;
-    void setDelay(int delay);
+    int duration() const;
+//    void setDuration(int duration);
 
 private:
     QQueue<QSharedPointer<Command> > m_commList;
-    int m_delay;
+    int m_duration;
 
 };
 
