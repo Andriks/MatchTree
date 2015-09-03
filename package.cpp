@@ -36,11 +36,5 @@ size_t Package::size() {
 }
 int Package::duration() const {
     return m_duration;
-    qDebug() << m_duration;
 }
-
-//void Package::setDuration(int delay) {
-//    m_duration = delay;
-//}
-
 

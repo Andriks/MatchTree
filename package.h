@@ -18,7 +18,6 @@ public:
     size_t size();
 
     int duration() const;
-//    void setDuration(int duration);
 
 private:
     QQueue<QSharedPointer<Command> > m_commList;

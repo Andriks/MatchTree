@@ -38,12 +38,12 @@ void DurationsConf::setMoveUp(int moveUp)
 int DurationsConf::move()
 {
     return m_move;
-    emit moveChanged();
 }
 
 void DurationsConf::setMove(int move)
 {
     m_move = move;
+    emit moveChanged();
 }
 
 int DurationsConf::opacity() const

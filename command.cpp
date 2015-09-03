@@ -27,9 +27,6 @@ SwapCommand::SwapCommand(const Cell &from, const Cell &to) :
 
 //////////////////////////////////////////////////////////////
 void SwapCommand::exec() {
-//    int duration = TilesModel::Instance()->durations()->swap();
-//    TilesModel::Instance()->durations()->setMove(duration);
-
     TilesModel::Instance()->swapCells(m_from->index(), m_to->index());
 }
 
@@ -66,9 +63,6 @@ MoveUpCommand::MoveUpCommand(QSharedPointer<Tile> target) :
 }
 
 void MoveUpCommand::exec() {
-//    int duration = TilesModel::Instance()->durations()->moveUp();
-//    TilesModel::Instance()->durations()->setMove(duration);
-
     Cell cell = Cell(m_target->index());
 
     while (cell.upper().valid()) {
