@@ -35,6 +35,8 @@ public:
     void provideScaleAnimation();
 
     int modelSize() const;
+    int packListSize() const;
+
 
     QString getRandType();
 
@@ -45,12 +47,10 @@ public:
     void swapItems(const int index1, const int index2);
 
 
+    // for parsing from json
     void setElementScore(int elementScore);
-
     void setMinScore(int minScore);
-
     void setMaxMovesCount(int maxMovesCount);
-
     void setTypes(const QVector<int> &types);
 
 signals:
@@ -79,8 +79,6 @@ public slots:
     QString status();
 
 private:
-    void parse_params(QString file_pas);
-
     bool leadsToMatch(QSharedPointer<Tile> new_tile);
 
     void createPackages();

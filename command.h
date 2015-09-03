@@ -14,6 +14,8 @@ public:
     virtual void exec() = 0;
     virtual int duration() = 0;
 
+//    virtual ~Command();
+
 };
 
 //////////////////////////////////////////////////////////////

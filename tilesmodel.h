@@ -52,10 +52,8 @@ public slots:
 
 
 public:
-    /***************************/
-    /***interface for Command***/
-    /***************************/
 
+    // interface for Command
     void swapCells(const int from, const int to);
     void swapCells(const Cell &from, const Cell &to);
 
@@ -68,19 +66,14 @@ public:
     QSharedPointer<Tile> item(int index);
 
 
-    /***************************/
-    /*****interface for Tile****/
-    /***************************/
-
+    // interface for Tile
     int indexOfItem(const Tile *item) const;
 
 
-    // for QML Engine
+    // interface for QML Engine
     int rowCount(const QModelIndex & parent = QModelIndex()) const;
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
     QHash<int, QByteArray> roleNames() const;
-
-
 
 public:
     int width();

@@ -4,6 +4,7 @@
 
 #include <cmath>
 
+#include <QDebug>
 #include <QString>
 
 
@@ -18,14 +19,16 @@ LogicImpl::LogicImpl(QObject *parent) :
     m_score(0),
     m_dragedCell(),
     m_packDelay(0)
-{    JsonParser parser;
-    parser.parse_config("../match3/config.json", this);
+{
 }
 
 void LogicImpl::newGame()
 {
     if (!m_packList.empty())
         return;
+
+    JsonParser parser;
+    parser.parse_config("../match3/config.json", this);
 
     m_dataList.clear();
 
@@ -140,7 +143,7 @@ void LogicImpl::createPackages() {
 
 
     if (m_packList.size())
-      execNextPackage();
+        execNextPackage();
 
 
 }
@@ -373,7 +376,7 @@ void LogicImpl::moveTile(int index) {
     if (!m_dragedCell.valid()) {
         m_dragedCell = Cell(index);
 
-       emit startScaleTimer();
+        emit startScaleTimer();
 
     }
     else {
@@ -469,8 +472,13 @@ void LogicImpl::swapItems(const int index1, const int index2) {
 }
 
 int LogicImpl::modelSize() const {
-//    return m_width * m_height;
+    //    return m_width * m_height;
     return m_dataList.size();
+}
+
+int LogicImpl::packListSize() const
+{
+    return m_packList.size();
 }
 
 int LogicImpl::width() const {

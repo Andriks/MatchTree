@@ -7,7 +7,8 @@ class DurationsConf : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(int swap READ swap NOTIFY swapChanged)
-    Q_PROPERTY(int move READ moveUp NOTIFY moveUpChanged)
+    Q_PROPERTY(int moveUp READ moveUp NOTIFY moveUpChanged)
+    Q_PROPERTY(int move READ move NOTIFY moveChanged)       // depends on what is proccess (swap or moveUp)
     Q_PROPERTY(int opacity READ opacity NOTIFY opacityChanged)
     Q_PROPERTY(int scale READ scale NOTIFY scaleChanged)
     Q_PROPERTY(int create READ create NOTIFY createChanged)
@@ -19,6 +20,7 @@ public:
 signals:
     void swapChanged();
     void moveUpChanged();
+    void moveChanged();
     void opacityChanged();
     void scaleChanged();
     void createChanged();
@@ -31,6 +33,9 @@ public slots:
 
     int moveUp() const;
     void setMoveUp(int moveUp);
+
+    int move();
+    void setMove(int move);
 
     int opacity() const;
     void setOpacity(int opacity);
@@ -47,6 +52,7 @@ public slots:
 private:
     int m_swap;
     int m_moveUp;
+    int m_move;     // depends on what is proccess (swap or moveUp)
     int m_opacity;
     int m_scale;
     int m_create;

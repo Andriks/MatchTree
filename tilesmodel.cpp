@@ -6,6 +6,7 @@ TilesModel::TilesModel() :
     m_logicImpl(NULL),
     m_durations(NULL)
 {
+    m_logicImpl = new LogicImpl();
     m_durations = new DurationsConf();
 }
 
@@ -25,16 +26,14 @@ DurationsConf *TilesModel::durations() const
 }
 
 void TilesModel::newGame() {
-    delete m_logicImpl;
-    m_logicImpl = new LogicImpl();
-
-    emit configChanged();
+    if (m_logicImpl->packListSize())
+        return;
 
     beginInsertRows(QModelIndex(), 0, m_logicImpl->modelSize() - 1);
     m_logicImpl->newGame();
     endInsertRows();
 
-
+    emit configChanged();
 }
 
 int TilesModel::indexOfItem(const Tile *item) const {
@@ -42,6 +41,7 @@ int TilesModel::indexOfItem(const Tile *item) const {
 }
 
 int TilesModel::rowCount(const QModelIndex & parent) const {
+    Q_UNUSED(parent)
     return m_logicImpl->modelSize();
 }
 

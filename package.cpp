@@ -3,6 +3,8 @@
 
 #include <cmath>
 
+#include <QDebug>
+
 
 Package::Package() :
     m_duration(0)
@@ -34,10 +36,11 @@ size_t Package::size() {
 }
 int Package::duration() const {
     return m_duration;
+    qDebug() << m_duration;
 }
 
-void Package::setDelay(int delay) {
-    m_duration = delay;
-}
+//void Package::setDuration(int delay) {
+//    m_duration = delay;
+//}
 
 

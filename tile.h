@@ -12,13 +12,11 @@ public:
     void setDefault(QString type = "");
 
     QString type() const;
-    void setType(const QString &type);
 
     float opacity() const;
     void setOpacity(const float &opacity);
 
     int index() const;
-    void setIndex(int index);
 
     bool valid() const;
     void setValid(bool valid);
@@ -29,9 +27,7 @@ public:
 private:
     QString m_type;
     bool m_valid;
-
     float m_opacity;
-
     float m_scale;
 
 };

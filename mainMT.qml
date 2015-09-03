@@ -132,11 +132,11 @@ ApplicationWindow {
                         source: model.type
                     }
 
-                    Text {
-                        x: 10
-                        y: 10
-                        text: "%1".arg(model.index);
-                    }
+//                    Text {
+//                        x: 10
+//                        y: 10
+//                        text: "%1".arg(model.index);
+//                    }
 
                     opacity: model.opacity
                     scale: model.scale

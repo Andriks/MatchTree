@@ -5,6 +5,7 @@ DurationsConf::DurationsConf(QObject *parent) :
     QObject(parent),
     m_swap(100),
     m_moveUp(100),
+    m_move(100),
     m_opacity(100),
     m_scale(100),
     m_create(100),
@@ -33,6 +34,18 @@ void DurationsConf::setMoveUp(int moveUp)
     m_moveUp = moveUp;
     emit moveUpChanged();
 }
+
+int DurationsConf::move()
+{
+    return m_move;
+    emit moveChanged();
+}
+
+void DurationsConf::setMove(int move)
+{
+    m_move = move;
+}
+
 int DurationsConf::opacity() const
 {
     return m_opacity;
@@ -73,10 +86,4 @@ void DurationsConf::setRefresh(int refresh)
     m_refresh = refresh;
     emit refreshChanged();
 }
-
-
-
-
-
-
 
