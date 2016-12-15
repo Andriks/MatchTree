@@ -1,0 +1,15 @@
+Game Match3
+
+Motivation:
+Project was developed with purpose to learn more closely Qt+QML
+
+Technologies:
+- C++
+- Qt5
+- QML
+- qmake
+
+Requeriments:
+- gcc
+- Qt5 framework
+- qtcreator (for building using qmake)
